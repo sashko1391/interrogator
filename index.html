@@ -48,8 +48,9 @@
         .case-subtitle{font-size:0.7rem;color:var(--text-secondary);line-height:1.5}
         .case-arrow{font-size:1.1rem;color:var(--text-muted);transition:transform 150ms}
         .case-card:hover .case-arrow{transform:translateX(4px);color:var(--text-secondary)}
-        .game-screen{display:none;min-height:100vh}
+        .game-screen{display:none;min-height:100vh;position:relative}
         .game-screen.active{display:block}
+        .game-screen .bg-fallback,.game-screen .bg-image{position:fixed}
         .start-screen.hidden{display:none}
         .game-container{max-width:900px;margin:0 auto;padding:1.5rem;min-height:100vh;display:flex;flex-direction:column}
         .back-btn{position:fixed;top:1rem;left:1rem;background:rgba(18,18,26,0.9);border:1px solid var(--border-color);border-radius:4px;padding:0.4rem 0.7rem;color:var(--text-muted);font-family:var(--font-mono);font-size:0.6rem;cursor:pointer;transition:all 150ms;z-index:50}
@@ -64,6 +65,7 @@
         .status-value{display:flex;align-items:center;gap:0.5rem}
         .energy-display{font-family:var(--font-display);font-size:1.25rem;font-weight:700;color:var(--accent-gold)}
         .energy-max{font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted)}
+        .hint-counter{font-family:var(--font-mono);font-size:0.55rem;color:var(--accent-green-bright);margin-left:0.5rem}
         .suspicion-container{flex:1}
         .suspicion-bar-bg{height:8px;background:var(--bg-tertiary);border-radius:4px;overflow:hidden}
         .suspicion-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-green),var(--accent-gold),var(--accent-red-bright));transition:width 300ms;border-radius:4px}
@@ -118,6 +120,11 @@
         .action-btn--accuse:hover{background:var(--accent-red);color:var(--text-primary)}
         .action-btn--restart{border-color:var(--accent-gold-dim);color:var(--accent-gold)}
         .action-btn--restart:hover{background:var(--accent-gold-dim);color:var(--bg-primary)}
+        .action-btn--hint{border-color:var(--accent-green);color:var(--accent-green-bright)}
+        .action-btn--hint:hover{background:var(--accent-green);color:var(--text-primary)}
+        .action-btn--hint:disabled{opacity:0.4;cursor:not-allowed;border-color:var(--border-color);color:var(--text-muted)}
+        .action-btn--reveal{border-color:var(--text-muted);color:var(--text-muted);font-size:0.5rem}
+        .action-btn--reveal:hover{border-color:var(--accent-red);color:var(--accent-red-bright)}
         .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:100;align-items:center;justify-content:center}
         .modal-overlay.visible{display:flex}
         .modal-content{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;padding:2rem;max-width:500px;width:90%;text-align:center;animation:modalIn 400ms ease}
@@ -174,6 +181,9 @@
         </div>
     </div>
     <div class="game-screen" id="game-screen">
+        <div class="bg-fallback"></div>
+        <div class="bg-image bg-landscape"></div>
+        <div class="bg-image bg-portrait"></div>
         <button class="back-btn" id="back-btn" data-i18n="backBtn">← Back</button>
         <div class="game-container">
             <header class="game-header">
@@ -200,8 +210,12 @@
                 </div>
             </div>
             <div class="action-bar">
+                <button class="action-btn action-btn--hint" id="hint-btn" data-i18n="hintBtn">💡 Hint <span class="hint-counter" id="hint-counter">(3)</span></button>
                 <button class="action-btn action-btn--accuse" id="accuse-btn" data-i18n="accuseBtn">⚖️ Accuse</button>
                 <button class="action-btn action-btn--restart" id="restart-btn" data-i18n="restartBtn">↺ Restart</button>
+            </div>
+            <div class="action-bar" style="margin-top:0.5rem">
+                <button class="action-btn action-btn--reveal" id="reveal-btn" data-i18n="revealBtn">🔓 Reveal Answer (ends game)</button>
             </div>
             <footer class="game-footer"><p class="game-footer-text">The Interrogator • v2.0</p></footer>
         </div>
@@ -218,7 +232,7 @@
     <script>
 (function(){
 'use strict';
-const i18n={en:{startTitle:"The Interrogator",startTagline:"AI-Powered Detective Game",startDescription:"You are a detective. Your suspect sits across the table. They will lie, deflect, and manipulate. Use your questions wisely — you only have 10. Find the truth. Solve the case.",selectCase:"Select Your Case",diffEasy:"Easy",diffMedium:"Medium",diffHard:"Hard",case1Title:"The Vanished Witness",case1Subtitle:"A key witness disappears before trial. Her roommate claims ignorance.",case2Title:"The Vanishing Investor",case2Subtitle:"A tech mogul found dead. His business partner was the only one there.",case3Title:"The Poisoned Heir",case3Subtitle:"A wealthy patriarch poisoned at his birthday. One had opportunity.",backBtn:"← Back",energyLabel:"Energy",suspicionLabel:"Pressure",briefingToggle:"📁 Case Briefing",crimeTitle:"The Crime",factsTitle:"Known Facts",suspectTitle:"The Suspect",inputPlaceholder:"Ask your question...",sendBtn:"Send",accuseBtn:"⚖️ Accuse",restartBtn:"↺ Restart",truthTitle:"The Truth",newCaseBtn:"Back",calm:"Calm",nervous:"Nervous",defensive:"Defensive",breaking:"Breaking",detective:"Detective",system:"System",winTitle:"Case Solved",winText:"Your interrogation broke through. Justice will be served.",loseTitle:"Wrong Accusation",loseTextDefault:"Your accusation doesn't hold up.",loseTextWeak:"Right track, but not enough pressure to prove it.",unsolvedTitle:"Case Unsolved",unsolvedText:"Questions exhausted. Case goes cold."},ua:{startTitle:"Слідчий",startTagline:"Детективна гра на базі ШІ",startDescription:"Ви — детектив. Підозрюваний сидить навпроти. Він буде брехати та маніпулювати. Використовуйте питання мудро — у вас лише 10. Знайдіть правду.",selectCase:"Оберіть справу",diffEasy:"Легко",diffMedium:"Середньо",diffHard:"Складно",case1Title:"Зниклий свідок",case1Subtitle:"Свідчиця зникає перед судом. Сусідка нібито нічого не знає.",case2Title:"Зниклий інвестор",case2Subtitle:"Магната знайдено мертвим. Партнерка була єдиною поруч.",case3Title:"Отруєний спадкоємець",case3Subtitle:"Патріарха отруєно на дні народження. Можливість була в одного.",backBtn:"← Назад",energyLabel:"Енергія",suspicionLabel:"Тиск",briefingToggle:"📁 Матеріали справи",crimeTitle:"Злочин",factsTitle:"Відомі факти",suspectTitle:"Підозрюваний",inputPlaceholder:"Задайте питання...",sendBtn:"Надіслати",accuseBtn:"⚖️ Звинуватити",restartBtn:"↺ Спочатку",truthTitle:"Правда",newCaseBtn:"Назад",calm:"Спокійний",nervous:"Нервує",defensive:"Захищається",breaking:"Ламається",detective:"Детектив",system:"Система",winTitle:"Справу розкрито",winText:"Ваш допит зламав захист. Справедливість восторжествує.",loseTitle:"Помилкове звинувачення",loseTextDefault:"Звинувачення не підтверджується.",loseTextWeak:"Правильний шлях, але тиску недостатньо.",unsolvedTitle:"Не розкрито",unsolvedText:"Питання вичерпано. Справа у глухому куті."}};
+const i18n={en:{startTitle:"The Interrogator",startTagline:"AI-Powered Detective Game",startDescription:"You are a detective. Your suspect sits across the table. They will lie, deflect, and manipulate. Use your questions wisely — you only have 10. Find the truth. Solve the case.",selectCase:"Select Your Case",diffEasy:"Easy",diffMedium:"Medium",diffHard:"Hard",case1Title:"The Vanished Witness",case1Subtitle:"A key witness disappears before trial. Her roommate claims ignorance.",case2Title:"The Vanishing Investor",case2Subtitle:"A tech mogul found dead. His business partner was the only one there.",case3Title:"The Poisoned Heir",case3Subtitle:"A wealthy patriarch poisoned at his birthday. One had opportunity.",backBtn:"← Back",energyLabel:"Energy",suspicionLabel:"Pressure",briefingToggle:"📁 Case Briefing",crimeTitle:"The Crime",factsTitle:"Known Facts",suspectTitle:"The Suspect",inputPlaceholder:"Ask your question...",sendBtn:"Send",accuseBtn:"⚖️ Accuse",restartBtn:"↺ Restart",truthTitle:"The Truth",newCaseBtn:"Back",calm:"Calm",nervous:"Nervous",defensive:"Defensive",breaking:"Breaking",detective:"Detective",system:"System",winTitle:"Case Solved",winText:"Your interrogation broke through. Justice will be served.",loseTitle:"Wrong Accusation",loseTextDefault:"Your accusation doesn't hold up.",loseTextWeak:"Right track, but not enough pressure to prove it.",unsolvedTitle:"Case Unsolved",unsolvedText:"Questions exhausted. Case goes cold.",hintBtn:"💡 Hint",revealBtn:"🔓 Reveal Answer (ends game)",revealConfirm:"⚠️ WARNING!\n\nRevealing the answer will:\n• Show you the truth\n• End this game session\n• You can still replay from start\n\nAre you sure? Type YES to confirm:",revealConfirmWord:"YES",hint1:"Focus on timeline inconsistencies.",hint2:"Ask about relationships and motives.",hint3:"Confront them with contradictions you found."},ua:{startTitle:"Слідчий",startTagline:"Детективна гра на базі ШІ",startDescription:"Ви — детектив. Підозрюваний сидить навпроти. Він буде брехати та маніпулювати. Використовуйте питання мудро — у вас лише 10. Знайдіть правду.",selectCase:"Оберіть справу",diffEasy:"Легко",diffMedium:"Середньо",diffHard:"Складно",case1Title:"Зниклий свідок",case1Subtitle:"Свідчиця зникає перед судом. Сусідка нібито нічого не знає.",case2Title:"Зниклий інвестор",case2Subtitle:"Магната знайдено мертвим. Партнерка була єдиною поруч.",case3Title:"Отруєний спадкоємець",case3Subtitle:"Патріарха отруєно на дні народження. Можливість була в одного.",backBtn:"← Назад",energyLabel:"Енергія",suspicionLabel:"Тиск",briefingToggle:"📁 Матеріали справи",crimeTitle:"Злочин",factsTitle:"Відомі факти",suspectTitle:"Підозрюваний",inputPlaceholder:"Задайте питання...",sendBtn:"Надіслати",accuseBtn:"⚖️ Звинуватити",restartBtn:"↺ Спочатку",truthTitle:"Правда",newCaseBtn:"Назад",calm:"Спокійний",nervous:"Нервує",defensive:"Захищається",breaking:"Ламається",detective:"Детектив",system:"Система",winTitle:"Справу розкрито",winText:"Ваш допит зламав захист. Справедливість восторжествує.",loseTitle:"Помилкове звинувачення",loseTextDefault:"Звинувачення не підтверджується.",loseTextWeak:"Правильний шлях, але тиску недостатньо.",unsolvedTitle:"Не розкрито",unsolvedText:"Питання вичерпано. Справа у глухому куті.",hintBtn:"💡 Підказка",revealBtn:"🔓 Розкрити відповідь (кінець гри)",revealConfirm:"⚠️ УВАГА!\n\nРозкриття відповіді:\n• Покаже вам правду\n• Закінчить цю сесію гри\n• Ви зможете перезапустити гру\n\nВи впевнені? Введіть ТАК для підтвердження:",revealConfirmWord:"ТАК",hint1:"Зверніть увагу на невідповідності в часі.",hint2:"Питайте про стосунки та мотиви.",hint3:"Вкажіть на суперечності, які знайшли."}};
 
 const CASES={
 easy:{id:"easy",caseNumber:"#001",winThreshold:40,
@@ -330,13 +344,13 @@ ua:`Ти др. Елеонора Блеквуд, 38, токсикологиня, 
 
 let currentLang=localStorage.getItem('interrogator-lang')||'en';
 let currentCase=null;
-const GameState={energy:10,maxEnergy:10,suspicion:0,emotionalState:'calm',conversationHistory:[],gameOver:false,
-reset(){this.energy=10;this.suspicion=0;this.emotionalState='calm';this.conversationHistory=[];this.gameOver=false}};
+const GameState={energy:10,maxEnergy:10,suspicion:0,hintsRemaining:3,emotionalState:'calm',conversationHistory:[],gameOver:false,
+reset(){this.energy=10;this.suspicion=0;this.hintsRemaining=3;this.emotionalState='calm';this.conversationHistory=[];this.gameOver=false}};
 
 function t(k){return i18n[currentLang][k]||i18n.en[k]||k}
 function tCase(k){return currentCase?CASES[currentCase][currentLang][k]||CASES[currentCase].en[k]:''}
 
-const DOM={startScreen:document.getElementById('start-screen'),gameScreen:document.getElementById('game-screen'),chatLog:document.getElementById('chat-log'),chatInput:document.getElementById('chat-input'),sendBtn:document.getElementById('send-btn'),energyCurrent:document.getElementById('energy-current'),suspicionBar:document.getElementById('suspicion-bar'),suspicionText:document.getElementById('suspicion-text'),briefingToggle:document.getElementById('briefing-toggle'),briefingContent:document.getElementById('briefing-content'),caseDescription:document.getElementById('case-description'),caseEvidence:document.getElementById('case-evidence'),suspectInfo:document.getElementById('suspect-info'),accuseBtn:document.getElementById('accuse-btn'),restartBtn:document.getElementById('restart-btn'),backBtn:document.getElementById('back-btn'),modalOverlay:document.getElementById('modal-overlay'),modalIcon:document.getElementById('modal-icon'),modalTitle:document.getElementById('modal-title'),modalText:document.getElementById('modal-text'),modalRevealText:document.getElementById('modal-reveal-text'),modalBtn:document.getElementById('modal-btn'),langBtns:document.querySelectorAll('.lang-btn'),caseCards:document.querySelectorAll('.case-card'),gameTitle:document.getElementById('game-title'),gameCaseName:document.getElementById('game-case-name')};
+const DOM={startScreen:document.getElementById('start-screen'),gameScreen:document.getElementById('game-screen'),chatLog:document.getElementById('chat-log'),chatInput:document.getElementById('chat-input'),sendBtn:document.getElementById('send-btn'),energyCurrent:document.getElementById('energy-current'),suspicionBar:document.getElementById('suspicion-bar'),suspicionText:document.getElementById('suspicion-text'),briefingToggle:document.getElementById('briefing-toggle'),briefingContent:document.getElementById('briefing-content'),caseDescription:document.getElementById('case-description'),caseEvidence:document.getElementById('case-evidence'),suspectInfo:document.getElementById('suspect-info'),accuseBtn:document.getElementById('accuse-btn'),restartBtn:document.getElementById('restart-btn'),backBtn:document.getElementById('back-btn'),modalOverlay:document.getElementById('modal-overlay'),modalIcon:document.getElementById('modal-icon'),modalTitle:document.getElementById('modal-title'),modalText:document.getElementById('modal-text'),modalRevealText:document.getElementById('modal-reveal-text'),modalBtn:document.getElementById('modal-btn'),langBtns:document.querySelectorAll('.lang-btn'),caseCards:document.querySelectorAll('.case-card'),gameTitle:document.getElementById('game-title'),gameCaseName:document.getElementById('game-case-name'),hintBtn:document.getElementById('hint-btn'),hintCounter:document.getElementById('hint-counter'),revealBtn:document.getElementById('reveal-btn')};
 
 const API_ENDPOINT='https://interrogator-api.sashko1391.workers.dev';
 const MODEL='claude-sonnet-4-20250514';
@@ -364,6 +378,12 @@ function showModal(type,custom=null){const c={win:{icon:'✓',title:t('winTitle'
 function hideModal(){DOM.modalOverlay.classList.remove('visible')}
 function handleAccuse(){if(GameState.gameOver)return;const ch=prompt(tCase('accusationPrompt'));if(!ch)return;const n=parseInt(ch),th=CASES[currentCase].winThreshold;if(n===1){GameState.suspicion>=th?showModal('win'):showModal('lose',t('loseTextWeak'))}else if(n>=2&&n<=4){showModal('lose',tCase('wrongAccusations')[n])}}
 
+function useHint(){if(GameState.gameOver||GameState.hintsRemaining<=0)return;GameState.hintsRemaining--;updateHintCounter();const hintNum=3-GameState.hintsRemaining;const hintText=t('hint'+hintNum);addMsg('💡 '+hintText,'system')}
+
+function updateHintCounter(){DOM.hintCounter.textContent='('+GameState.hintsRemaining+')';DOM.hintBtn.disabled=GameState.hintsRemaining<=0||GameState.gameOver}
+
+function revealAnswer(){if(GameState.gameOver)return;const confirm=prompt(t('revealConfirm'));if(confirm&&confirm.toUpperCase()===t('revealConfirmWord')){GameState.gameOver=true;disableInput(true);DOM.hintBtn.disabled=true;DOM.revealBtn.disabled=true;const truth=tCase('truthReveal');addMsg('🔓 '+t('truthTitle')+': '+truth,'system')}}
+
 async function sendMessage(){if(GameState.gameOver||GameState.energy<=0)return;const raw=DOM.chatInput.value;if(!raw.trim())return;const msg=sanitize(raw);DOM.chatInput.value='';GameState.energy--;updateEnergy();addMsg(msg,'player');GameState.conversationHistory.push({role:'user',content:msg});const inc=calcSuspicion(msg);GameState.suspicion=Math.min(100,GameState.suspicion+inc);updateEmotion();updateSuspicion();disableInput(true);showTyping();
 try{const em={en:{calm:'CALM',nervous:'NERVOUS',defensive:'DEFENSIVE',breaking:'BREAKING'},ua:{calm:'СПОКІЙНА',nervous:'НЕРВОВА',defensive:'ЗАХИСНА',breaking:'ЛАМАЄТЬСЯ'}};const sys=NPC_PROMPTS[currentCase][currentLang].replace('{{EMOTIONAL_STATE}}',em[currentLang][GameState.emotionalState]).replace('{{SUSPICION_LEVEL}}',GameState.suspicion);const msgs=[{role:'system',content:sys},...GameState.conversationHistory];const resp=await queryLLM(msgs);GameState.conversationHistory.push({role:'assistant',content:resp});hideTyping();addMsg(resp,'npc')}catch(e){hideTyping();addMsg(currentLang==='ua'?'*мовчить*':'*silent*','npc')}
 disableInput(false);DOM.chatInput.focus();if(GameState.energy<=0)setTimeout(()=>showModal('unsolved'),1000)}
@@ -371,7 +391,7 @@ disableInput(false);DOM.chatInput.focus();if(GameState.energy<=0)setTimeout(()=>
 function updateUI(){document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.getAttribute('data-i18n')));document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.getAttribute('data-i18n-placeholder')));document.documentElement.lang=currentLang==='ua'?'uk':'en';document.title=t('startTitle')}
 function setLang(l){currentLang=l;localStorage.setItem('interrogator-lang',l);DOM.langBtns.forEach(b=>b.classList.toggle('active',b.dataset.lang===l));updateUI()}
 function showStart(){DOM.startScreen.classList.remove('hidden');DOM.gameScreen.classList.remove('active');currentCase=null;hideModal()}
-function startGame(caseId){currentCase=caseId;GameState.reset();DOM.startScreen.classList.add('hidden');DOM.gameScreen.classList.add('active');DOM.gameTitle.textContent=t('startTitle');DOM.gameCaseName.textContent=tCase('title')+' '+CASES[caseId].caseNumber;DOM.caseDescription.textContent=tCase('crimeDescription');DOM.caseEvidence.innerHTML=tCase('knownFacts').map(f=>'<li>'+f+'</li>').join('');DOM.suspectInfo.textContent=tCase('suspectProfile');updateEnergy();updateSuspicion();updateUI();DOM.chatLog.innerHTML='';addMsg(tCase('sessionStart'),'system');setTimeout(()=>{const g=tCase('npcGreeting');addMsg(g,'npc');GameState.conversationHistory.push({role:'assistant',content:g})},500);disableInput(false);DOM.briefingToggle.classList.add('active');DOM.briefingContent.classList.add('visible')}
+function startGame(caseId){currentCase=caseId;GameState.reset();DOM.startScreen.classList.add('hidden');DOM.gameScreen.classList.add('active');DOM.gameTitle.textContent=t('startTitle');DOM.gameCaseName.textContent=tCase('title')+' '+CASES[caseId].caseNumber;DOM.caseDescription.textContent=tCase('crimeDescription');DOM.caseEvidence.innerHTML=tCase('knownFacts').map(f=>'<li>'+f+'</li>').join('');DOM.suspectInfo.textContent=tCase('suspectProfile');updateEnergy();updateSuspicion();updateHintCounter();updateUI();DOM.chatLog.innerHTML='';DOM.revealBtn.disabled=false;addMsg(tCase('sessionStart'),'system');setTimeout(()=>{const g=tCase('npcGreeting');addMsg(g,'npc');GameState.conversationHistory.push({role:'assistant',content:g})},500);disableInput(false);DOM.briefingToggle.classList.add('active');DOM.briefingContent.classList.add('visible')}
 
 DOM.langBtns.forEach(b=>b.addEventListener('click',()=>{if(b.dataset.lang!==currentLang){setLang(b.dataset.lang);if(currentCase)startGame(currentCase)}}));
 DOM.caseCards.forEach(c=>c.addEventListener('click',()=>startGame(c.dataset.case)));
@@ -382,6 +402,8 @@ DOM.accuseBtn.addEventListener('click',handleAccuse);
 DOM.restartBtn.addEventListener('click',()=>startGame(currentCase));
 DOM.backBtn.addEventListener('click',showStart);
 DOM.modalBtn.addEventListener('click',showStart);
+DOM.hintBtn.addEventListener('click',useHint);
+DOM.revealBtn.addEventListener('click',revealAnswer);
 setLang(currentLang);
 })();
 </script>
