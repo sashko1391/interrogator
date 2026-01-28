@@ -14,7 +14,8 @@
         /* --- БАЗОВИЙ ШРИФТ 22px (ПК/Планшет) --- */
         html{font-size:22px;scroll-behavior:smooth}
         
-        body{font-family:var(--font-body);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;line-height:1.6; display: flex; flex-direction: column;}
+        /* Повернув звичайний потік документу (прибрав display:flex для body) */
+        body{font-family:var(--font-body);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;line-height:1.6;}
         body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.03;pointer-events:none;z-index:1000}
         
         /* UI Elements Positioning */
@@ -66,11 +67,13 @@
         .game-screen.active{display:block}
         .game-screen .bg-fallback,.game-screen .bg-image{position:fixed}
         .start-screen.hidden{display:none}
+        
+        /* ВИПРАВЛЕНО: min-height замість height, щоб сторінка могла рости */
         .game-container{
             max-width:900px;
             margin:0 auto;
             padding:1.5rem;
-            height:100vh; /* Займає всю висоту */
+            min-height:100vh; 
             display:flex;
             flex-direction:column;
         }
@@ -96,8 +99,18 @@
         .briefing-toggle{width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;padding:0.8rem 1.2rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 150ms}
         .briefing-toggle:hover{background:var(--bg-tertiary);border-color:var(--border-accent)}
         .briefing-toggle.active .briefing-toggle-icon{transform:rotate(180deg)}
-        .briefing-content{display:none;background:var(--bg-card);border:1px solid var(--border-color);border-top:none;border-radius:0 0 4px 4px;padding:1.5rem; position: absolute; z-index: 20; width: calc(100% - 3rem); max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
+        
+        /* ВИПРАВЛЕНО: Бріфінг тепер у звичайному потоці документу, не absolute */
+        .briefing-content{
+            display:none;
+            background:var(--bg-card);
+            border:1px solid var(--border-color);
+            border-top:none;
+            border-radius:0 0 4px 4px;
+            padding:1.5rem; 
+        }
         .briefing-content.visible{display:block;animation:slideDown 300ms ease}
+        
         @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
         .briefing-section{margin-bottom:1.5rem}
         .briefing-section:last-child{margin-bottom:0}
@@ -107,16 +120,16 @@
         .evidence-list li{position:relative;padding-left:1rem;margin-bottom:0.5rem;color:var(--text-secondary);font-size:0.7rem}
         .evidence-list li::before{content:'▪';position:absolute;left:0;color:var(--accent-gold-dim)}
         
-        /* --- АДАПТИВНИЙ КОНТЕЙНЕР ЧАТУ (Fix обрізання) --- */
+        /* --- КОНТЕЙНЕР ЧАТУ --- */
         .chat-container {
-            flex-grow: 1; /* Займає весь вільний простір */
+            flex: 1; /* Гнучка висота */
             display: flex;
             flex-direction: column;
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 4px;
             overflow: hidden;
-            min-height: 0; /* Важливо для flex-контейнера */
+            min-height: 40vh; /* Щоб чат не зникав зовсім, якщо бріфінг довгий */
         }
         
         /* --- ЛОГ ПОВІДОМЛЕНЬ --- */
@@ -124,11 +137,11 @@
             flex-grow: 1;
             overflow-y: auto;
             padding: 1.5rem;
-            padding-bottom: 3rem; /* Додатковий відступ знизу */
+            padding-bottom: 3rem; 
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            scroll-behavior: auto; /* Вимикаємо плавний скрол для JS-контролю */
+            scroll-behavior: auto; 
         }
         
         .chat-log::-webkit-scrollbar{width:6px}
@@ -304,7 +317,7 @@
                 <button class="action-btn action-btn--restart" id="restart-btn" data-i18n="restartBtn">↺ Restart</button>
                 <button class="action-btn action-btn--reveal" id="reveal-btn" data-i18n="revealBtn">🔓 Reveal Answer (ends game)</button>
             </div>
-            <footer class="game-footer"><p class="game-footer-text">The Interrogator • v2.2</p></footer>
+            <footer class="game-footer"><p class="game-footer-text">The Interrogator • v2.3</p></footer>
         </div>
     </div>
     <div class="modal-overlay" id="modal-overlay">
@@ -676,7 +689,6 @@ function exportChat() {
     exportText += `Suspect: ${tCase('suspectName')}\n`;
     exportText += "--------------------------------\n\n";
 
-    // Adding initial system/NPC greeting which might not be in conversationHistory fully
     const greeting = document.querySelector('.message-npc .message-text')?.textContent || "";
     if(greeting) {
          exportText += `[SUSPECT]: ${greeting}\n\n`;
@@ -741,15 +753,13 @@ function updateSuspicion(){DOM.suspicionBar.style.width=GameState.suspicion+'%';
 // AGGRESSIVE SCROLL TO BOTTOM
 function scrollToBottom() {
     const log = DOM.chatLog;
-    // Call immediately
     log.scrollTop = log.scrollHeight;
-    // Call in next frame to handle reflows
     requestAnimationFrame(() => {
         log.scrollTop = log.scrollHeight;
     });
 }
 
-function typeWriterEffect(element, text, speed = 20) { // Faster speed
+function typeWriterEffect(element, text, speed = 20) { 
     let i = 0;
     playSound('type');
     
@@ -847,7 +857,6 @@ function updateUI(){
     document.documentElement.lang=currentLang==='ua'?'uk':'en';
     document.title=t('startTitle');
     DOM.langBtns.forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang));
-    // Re-render hints/buttons text if dynamic
     updateHintCounter();
 }
 
