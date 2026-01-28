@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Interrogator</title>
+    <title>The Interrogator: War Crimes</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Code+Pro:wght@400;500&family=Crimson+Pro:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
         /* --- БАЗОВИЙ ШРИФТ 22px (ПК/Планшет) --- */
         html{font-size:22px;scroll-behavior:smooth}
         
-        body{font-family:var(--font-body);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;line-height:1.6}
+        body{font-family:var(--font-body);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;line-height:1.6; display: flex; flex-direction: column;}
         body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.03;pointer-events:none;z-index:1000}
         
         /* UI Elements Positioning */
@@ -66,14 +66,21 @@
         .game-screen.active{display:block}
         .game-screen .bg-fallback,.game-screen .bg-image{position:fixed}
         .start-screen.hidden{display:none}
-        .game-container{max-width:900px;margin:0 auto;padding:1.5rem;min-height:100vh;display:flex;flex-direction:column}
+        .game-container{
+            max-width:900px;
+            margin:0 auto;
+            padding:1.5rem;
+            height:100vh; /* Займає всю висоту */
+            display:flex;
+            flex-direction:column;
+        }
         
-        .game-header{text-align:center;padding:2rem 0;border-bottom:1px solid var(--border-color);margin-bottom:1.5rem;position:relative;margin-top:1rem;}
+        .game-header{text-align:center;padding:1rem 0;border-bottom:1px solid var(--border-color);margin-bottom:1rem;position:relative;margin-top:0.5rem;}
         .game-header::after{content:'◆';position:absolute;bottom:-0.5rem;left:50%;transform:translateX(-50%);background:var(--bg-primary);padding:0 1rem;color:var(--accent-gold-dim);font-size:0.55rem}
-        .game-title{font-family:var(--font-display);font-size:1.6rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);margin-bottom:0.25rem;text-shadow:0 0 40px rgba(212,175,55,0.2)}
+        .game-title{font-family:var(--font-display);font-size:1.4rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);margin-bottom:0.1rem;text-shadow:0 0 40px rgba(212,175,55,0.2)}
         .game-subtitle{font-family:var(--font-mono);font-size:0.55rem;color:var(--text-muted);letter-spacing:0.3em;text-transform:uppercase}
         
-        .status-bar{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;padding:1rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;margin-bottom:1.5rem}
+        .status-bar{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;padding:0.8rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;margin-bottom:1rem}
         .status-item{display:flex;flex-direction:column;gap:0.25rem}
         .status-label{font-family:var(--font-mono);font-size:0.5rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-muted)}
         .status-value{display:flex;align-items:center;gap:0.5rem}
@@ -85,11 +92,11 @@
         .suspicion-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-green),var(--accent-gold),var(--accent-red-bright));transition:width 300ms;border-radius:4px}
         .suspicion-value{font-family:var(--font-mono);font-size:0.65rem;color:var(--text-secondary);margin-top:0.25rem}
         
-        .briefing-container{margin-bottom:1.5rem}
-        .briefing-toggle{width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;padding:1rem 1.5rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 150ms}
+        .briefing-container{margin-bottom:1rem; flex-shrink: 0;}
+        .briefing-toggle{width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;padding:0.8rem 1.2rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 150ms}
         .briefing-toggle:hover{background:var(--bg-tertiary);border-color:var(--border-accent)}
         .briefing-toggle.active .briefing-toggle-icon{transform:rotate(180deg)}
-        .briefing-content{display:none;background:var(--bg-card);border:1px solid var(--border-color);border-top:none;border-radius:0 0 4px 4px;padding:1.5rem}
+        .briefing-content{display:none;background:var(--bg-card);border:1px solid var(--border-color);border-top:none;border-radius:0 0 4px 4px;padding:1.5rem; position: absolute; z-index: 20; width: calc(100% - 3rem); max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
         .briefing-content.visible{display:block;animation:slideDown 300ms ease}
         @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
         .briefing-section{margin-bottom:1.5rem}
@@ -100,11 +107,29 @@
         .evidence-list li{position:relative;padding-left:1rem;margin-bottom:0.5rem;color:var(--text-secondary);font-size:0.7rem}
         .evidence-list li::before{content:'▪';position:absolute;left:0;color:var(--accent-gold-dim)}
         
-        /* --- АДАПТИВНИЙ КОНТЕЙНЕР ЧАТУ --- */
-        .chat-container{flex:1;display:flex;flex-direction:column;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;overflow:hidden;min-height:40vh;max-height:60vh}
+        /* --- АДАПТИВНИЙ КОНТЕЙНЕР ЧАТУ (Fix обрізання) --- */
+        .chat-container {
+            flex-grow: 1; /* Займає весь вільний простір */
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            min-height: 0; /* Важливо для flex-контейнера */
+        }
         
-        /* --- ЛОГ ПОВІДОМЛЕНЬ (з відступом) --- */
-        .chat-log{flex:1;overflow-y:auto;padding:1.5rem;padding-bottom:4rem;display:flex;flex-direction:column;gap:1rem;scroll-behavior:smooth}
+        /* --- ЛОГ ПОВІДОМЛЕНЬ --- */
+        .chat-log {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            padding-bottom: 3rem; /* Додатковий відступ знизу */
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            scroll-behavior: auto; /* Вимикаємо плавний скрол для JS-контролю */
+        }
         
         .chat-log::-webkit-scrollbar{width:6px}
         .chat-log::-webkit-scrollbar-track{background:var(--bg-tertiary)}
@@ -116,7 +141,7 @@
         .message-npc{align-self:flex-start;background:var(--bg-card);border:1px solid var(--border-color);border-left:3px solid var(--accent-red)}
         .message-system{align-self:center;background:transparent;border:1px dashed var(--border-color);color:var(--text-muted);font-family:var(--font-mono);font-size:0.6rem;text-align:center;max-width:90%}
         .message-sender{font-family:var(--font-mono);font-size:0.5rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.25rem}
-        .message-text{font-size:0.75rem;line-height:1.6}
+        .message-text{font-size:0.75rem;line-height:1.6; word-wrap: break-word;}
         .message-player .message-text{color:var(--text-primary)}
         .message-npc .message-text{color:var(--text-secondary);font-style:italic}
         .typing-indicator{display:flex;gap:4px;padding:1rem;align-self:flex-start}
@@ -126,7 +151,7 @@
         .typing-dot:nth-child(3){animation-delay:400ms}
         @keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-6px);opacity:1}}
         
-        .input-container{display:flex;gap:0.5rem;padding:1rem;background:var(--bg-tertiary);border-top:1px solid var(--border-color)}
+        .input-container{display:flex;gap:0.5rem;padding:1rem;background:var(--bg-tertiary);border-top:1px solid var(--border-color); flex-shrink: 0;}
         .chat-input{flex:1;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:4px;padding:1rem 1.5rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.75rem;outline:none;transition:border-color 150ms}
         .chat-input:focus{border-color:var(--accent-gold-dim)}
         .chat-input::placeholder{color:var(--text-muted);font-style:italic}
@@ -135,7 +160,7 @@
         .send-btn:hover:not(:disabled){background:var(--accent-gold)}
         .send-btn:disabled{opacity:0.5;cursor:not-allowed}
         
-        .action-bar{display:flex;gap:1rem;margin-top:1.5rem;flex-wrap: wrap;}
+        .action-bar{display:flex;gap:1rem;margin-top:1rem;flex-wrap: wrap; flex-shrink: 0; margin-bottom: 0.5rem;}
         .action-btn{flex:1;background:transparent;border:1px solid var(--border-color);border-radius:4px;padding:1rem 1.5rem;color:var(--text-secondary);font-family:var(--font-mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;transition:all 150ms;min-width: 100px;}
         .action-btn:hover{border-color:var(--border-accent);color:var(--text-primary)}
         
@@ -166,7 +191,7 @@
         .modal-reveal-text{color:var(--text-secondary);font-size:0.7rem;line-height:1.6}
         .modal-btn{background:var(--accent-gold-dim);border:none;border-radius:4px;padding:1rem 2rem;color:var(--bg-primary);font-family:var(--font-mono);font-size:0.65rem;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;transition:all 150ms}
         .modal-btn:hover{background:var(--accent-gold)}
-        .game-footer{text-align:center;padding:1.5rem 0;margin-top:1.5rem;border-top:1px solid var(--border-color)}
+        .game-footer{text-align:center;padding:0.5rem 0;border-top:1px solid var(--border-color); flex-shrink: 0;}
         .game-footer-text{font-family:var(--font-mono);font-size:0.5rem;color:var(--text-muted);letter-spacing:0.1em}
         
         /* --- АДАПТИВ ДЛЯ МОБІЛЬНИХ (Фікс шрифту 20px та кнопки "Надіслати") --- */
@@ -209,6 +234,7 @@
 
     <div class="top-controls-left">
         <button class="icon-btn" id="mute-btn" title="Toggle Sound">🔊</button>
+        <button class="icon-btn" id="export-btn" title="Export Chat">💾</button>
         <button class="icon-btn" id="back-btn" data-i18n="backBtn">← Back</button>
     </div>
 
@@ -219,23 +245,23 @@
         <div class="start-content">
             <h1 class="start-title" data-i18n="startTitle">The Interrogator</h1>
             <p class="start-tagline" data-i18n="startTagline">AI-Powered Detective Game</p>
-            <p class="start-description" data-i18n="startDescription">You are a detective. Your suspect sits across the table. They will lie, deflect, and manipulate. Find the truth. Solve the case.</p>
+            <p class="start-description" data-i18n="startDescription">You are a Ukrainian investigator. The war is ongoing. Saboteurs and spies are trying to infiltrate. Find the enemy. Protect your home.</p>
             <div class="case-selection">
                 <h2 class="case-selection-title" data-i18n="selectCase">Select Your Case</h2>
                 <div class="case-cards">
                     <div class="case-card case-card--easy" data-case="easy">
                         <div class="case-difficulty case-difficulty--easy"><span class="case-difficulty-icon">★</span><span data-i18n="diffEasy">Easy</span></div>
-                        <div class="case-info"><h3 class="case-title" data-i18n="case1Title">The Vanished Witness</h3><p class="case-subtitle" data-i18n="case1Subtitle">A key witness disappears before trial. Her roommate claims ignorance.</p></div>
+                        <div class="case-info"><h3 class="case-title" data-i18n="case1Title">The Night Photographer</h3><p class="case-subtitle" data-i18n="case1Subtitle">Detained near a power plant during a raid. Claims to be a student.</p></div>
                         <span class="case-arrow">→</span>
                     </div>
                     <div class="case-card case-card--medium" data-case="medium">
                         <div class="case-difficulty case-difficulty--medium"><span class="case-difficulty-icon">★★</span><span data-i18n="diffMedium">Medium</span></div>
-                        <div class="case-info"><h3 class="case-title" data-i18n="case2Title">The Vanishing Investor</h3><p class="case-subtitle" data-i18n="case2Subtitle">A tech mogul found dead. His business partner was the only one there.</p></div>
+                        <div class="case-info"><h3 class="case-title" data-i18n="case2Title">The Lost Tractor Driver</h3><p class="case-subtitle" data-i18n="case2Subtitle">Found hiding in a basement. Suspicious marks on face, soft hands.</p></div>
                         <span class="case-arrow">→</span>
                     </div>
                     <div class="case-card case-card--hard" data-case="hard">
                         <div class="case-difficulty case-difficulty--hard"><span class="case-difficulty-icon">★★★</span><span data-i18n="diffHard">Hard</span></div>
-                        <div class="case-info"><h3 class="case-title" data-i18n="case3Title">The Poisoned Heir</h3><p class="case-subtitle" data-i18n="case3Subtitle">A wealthy patriarch poisoned at his birthday. One had opportunity.</p></div>
+                        <div class="case-info"><h3 class="case-title" data-i18n="case3Title">The Humanitarian Volunteer</h3><p class="case-subtitle" data-i18n="case3Subtitle">Stopped at a checkpoint. Dogs smell explosives, but he delivers food.</p></div>
                         <span class="case-arrow">→</span>
                     </div>
                 </div>
@@ -259,7 +285,7 @@
             <div class="briefing-container">
                 <button class="briefing-toggle" id="briefing-toggle"><span data-i18n="briefingToggle">📁 Case Briefing</span><span class="briefing-toggle-icon">▼</span></button>
                 <div class="briefing-content" id="briefing-content">
-                    <div class="briefing-section"><h3 class="briefing-section-title" data-i18n="crimeTitle">The Crime</h3><p class="briefing-text" id="case-description"></p></div>
+                    <div class="briefing-section"><h3 class="briefing-section-title" data-i18n="crimeTitle">The Context</h3><p class="briefing-text" id="case-description"></p></div>
                     <div class="briefing-section"><h3 class="briefing-section-title" data-i18n="factsTitle">Known Facts</h3><ul class="evidence-list" id="case-evidence"></ul></div>
                     <div class="briefing-section"><h3 class="briefing-section-title" data-i18n="suspectTitle">The Suspect</h3><p class="briefing-text" id="suspect-info"></p></div>
                 </div>
@@ -274,11 +300,11 @@
             <div class="action-bar">
                 <button class="action-btn action-btn--hint" id="hint-btn" data-i18n="hintBtn">💡 Hint <span class="hint-counter" id="hint-counter">(3)</span></button>
                 <button class="action-btn action-btn--coffee" id="coffee-btn" data-i18n="coffeeBtn">☕ Coffee (+5)</button>
-                <button class="action-btn action-btn--accuse" id="accuse-btn" data-i18n="accuseBtn">⚖️ Accuse</button>
+                <button class="action-btn action-btn--accuse" id="accuse-btn" data-i18n="accuseBtn">⚖️ Verdict</button>
                 <button class="action-btn action-btn--restart" id="restart-btn" data-i18n="restartBtn">↺ Restart</button>
                 <button class="action-btn action-btn--reveal" id="reveal-btn" data-i18n="revealBtn">🔓 Reveal Answer (ends game)</button>
             </div>
-            <footer class="game-footer"><p class="game-footer-text">The Interrogator • v2.1</p></footer>
+            <footer class="game-footer"><p class="game-footer-text">The Interrogator • v2.2</p></footer>
         </div>
     </div>
     <div class="modal-overlay" id="modal-overlay">
@@ -297,7 +323,6 @@
     <script>
 (function(){
 'use strict';
-    
 const i18n = {
     en: {
         startTitle: "The Interrogator",
@@ -307,25 +332,22 @@ const i18n = {
         diffEasy: "Easy",
         diffMedium: "Medium",
         diffHard: "Hard",
-        
-        // --- ОНОВЛЕНІ ОПИСИ КЕЙСІВ (АНГЛ) ---
         case1Title: "The Night Photographer",
         case1Subtitle: "Detained near a power plant during a raid. Claims to be a student.",
         case2Title: "The Lost Tractor Driver",
         case2Subtitle: "Found hiding in a basement. Suspicious marks on face, soft hands.",
         case3Title: "The Humanitarian Volunteer",
         case3Subtitle: "Stopped at a checkpoint. Dogs smell explosives, but he delivers food.",
-        
         backBtn: "← Back",
         energyLabel: "Energy",
         suspicionLabel: "Pressure",
         briefingToggle: "📁 Case Briefing",
-        crimeTitle: "The Context", // Замінив "Crime" на "Context" для військової теми
+        crimeTitle: "The Context",
         factsTitle: "Known Facts",
         suspectTitle: "The Suspect",
         inputPlaceholder: "Ask your question...",
         sendBtn: "Send",
-        accuseBtn: "⚖️ Verdict", // Замінив "Accuse" на "Verdict"
+        accuseBtn: "⚖️ Verdict",
         restartBtn: "↺ Restart",
         truthTitle: "The Truth",
         newCaseBtn: "Back",
@@ -345,11 +367,12 @@ const i18n = {
         hintBtn: "💡 Hint",
         coffeeBtn: "☕ Coffee (+5)",
         revealBtn: "🔓 Reveal Answer (ends game)",
-        revealConfirm: "⚠️ WARNING!\n\nRevealing the answer will:\n• Show you the truth\n• End this game session\n• You can still replay from start\n\nAre you sure? Type YES to confirm:",
+        revealConfirm: "⚠️ WARNING!\n\nRevealing the truth exposes state secrets and ends the session.\n\nAre you sure? Type YES to confirm:",
         revealConfirmWord: "YES",
-        hint1: "Focus on timeline inconsistencies.",
-        hint2: "Ask about specific local details.",
-        hint3: "Confront them with the physical evidence."
+        // UPDATED HINTS FOR WAR CONTEXT
+        hint1: "Check biography details (streets, prices, local knowledge).",
+        hint2: "Press on inconsistencies in their cover story.",
+        hint3: "Confront them with physical evidence (phone, marks, receipts)."
     },
     ua: {
         startTitle: "Слідчий",
@@ -359,15 +382,12 @@ const i18n = {
         diffEasy: "Легко",
         diffMedium: "Середньо",
         diffHard: "Складно",
-        
-        // --- ОНОВЛЕНІ ОПИСИ КЕЙСІВ (УКР) ---
         case1Title: "Нічний фотограф",
         case1Subtitle: "Затриманий біля ТЕЦ під час нальоту. Каже, що студент-художник.",
         case2Title: "Загублений тракторист",
         case2Subtitle: "Знайдений у підвалі. Підозрілі сліди на обличчі, м'які руки.",
         case3Title: "Волонтер з гуманітаркою",
         case3Subtitle: "Зупинений на блокпосту. Собаки чують вибухівку, але він везе їжу.",
-        
         backBtn: "← Назад",
         energyLabel: "Енергія",
         suspicionLabel: "Тиск",
@@ -397,14 +417,15 @@ const i18n = {
         hintBtn: "💡 Підказка",
         coffeeBtn: "☕ Кава (+5)",
         revealBtn: "🔓 Розкрити відповідь (кінець гри)",
-        revealConfirm: "⚠️ УВАГА!\n\nРозкриття відповіді:\n• Покаже вам правду\n• Закінчить цю сесію гри\n• Ви зможете перезапустити гру\n\nВи впевнені? Введіть ТАК для підтвердження:",
+        revealConfirm: "⚠️ УВАГА!\n\nРозкриття відповіді означає розголошення державної таємниці. Сесію буде завершено.\n\nВи впевнені? Введіть ТАК для підтвердження:",
         revealConfirmWord: "ТАК",
-        hint1: "Зверніть увагу на невідповідності в часі.",
-        hint2: "Питайте про конкретні місцеві деталі (магазини, вулиці).",
-        hint3: "Тисніть на речові докази (телефон, сліди на тілі)."
+        // UPDATED HINTS FOR WAR CONTEXT
+        hint1: "Перевірте знання місцевості (вулиці, ціни, заклади).",
+        hint2: "Тисніть на невідповідності в легенді.",
+        hint3: "Використайте речові докази (телефон, сліди на тілі, документи)."
     }
 };
-    
+
 const CASES = {
     easy: {
         id: "easy",
@@ -604,7 +625,7 @@ reset(){this.energy=15;this.suspicion=0;this.hintsRemaining=3;this.emotionalStat
 function t(k){return i18n[currentLang][k]||i18n.en[k]||k}
 function tCase(k){return currentCase?CASES[currentCase][currentLang][k]||CASES[currentCase].en[k]:''}
 
-const DOM={startScreen:document.getElementById('start-screen'),gameScreen:document.getElementById('game-screen'),chatLog:document.getElementById('chat-log'),chatInput:document.getElementById('chat-input'),sendBtn:document.getElementById('send-btn'),energyCurrent:document.getElementById('energy-current'),energyMax:document.querySelector('.energy-max'),suspicionBar:document.getElementById('suspicion-bar'),suspicionText:document.getElementById('suspicion-text'),briefingToggle:document.getElementById('briefing-toggle'),briefingContent:document.getElementById('briefing-content'),caseDescription:document.getElementById('case-description'),caseEvidence:document.getElementById('case-evidence'),suspectInfo:document.getElementById('suspect-info'),accuseBtn:document.getElementById('accuse-btn'),restartBtn:document.getElementById('restart-btn'),backBtn:document.getElementById('back-btn'),modalOverlay:document.getElementById('modal-overlay'),modalIcon:document.getElementById('modal-icon'),modalTitle:document.getElementById('modal-title'),modalText:document.getElementById('modal-text'),modalRevealText:document.getElementById('modal-reveal-text'),modalBtn:document.getElementById('modal-btn'),langBtns:document.querySelectorAll('.lang-btn'),caseCards:document.querySelectorAll('.case-card'),gameTitle:document.getElementById('game-title'),gameCaseName:document.getElementById('game-case-name'),hintBtn:document.getElementById('hint-btn'),hintCounter:document.getElementById('hint-counter'),revealBtn:document.getElementById('reveal-btn'),coffeeBtn:document.getElementById('coffee-btn'),muteBtn:document.getElementById('mute-btn'),audioTypewriter:document.getElementById('audio-typewriter'),audioBackground:document.getElementById('audio-background')};
+const DOM={startScreen:document.getElementById('start-screen'),gameScreen:document.getElementById('game-screen'),chatLog:document.getElementById('chat-log'),chatInput:document.getElementById('chat-input'),sendBtn:document.getElementById('send-btn'),energyCurrent:document.getElementById('energy-current'),energyMax:document.querySelector('.energy-max'),suspicionBar:document.getElementById('suspicion-bar'),suspicionText:document.getElementById('suspicion-text'),briefingToggle:document.getElementById('briefing-toggle'),briefingContent:document.getElementById('briefing-content'),caseDescription:document.getElementById('case-description'),caseEvidence:document.getElementById('case-evidence'),suspectInfo:document.getElementById('suspect-info'),accuseBtn:document.getElementById('accuse-btn'),restartBtn:document.getElementById('restart-btn'),backBtn:document.getElementById('back-btn'),modalOverlay:document.getElementById('modal-overlay'),modalIcon:document.getElementById('modal-icon'),modalTitle:document.getElementById('modal-title'),modalText:document.getElementById('modal-text'),modalRevealText:document.getElementById('modal-reveal-text'),modalBtn:document.getElementById('modal-btn'),langBtns:document.querySelectorAll('.lang-btn'),caseCards:document.querySelectorAll('.case-card'),gameTitle:document.getElementById('game-title'),gameCaseName:document.getElementById('game-case-name'),hintBtn:document.getElementById('hint-btn'),hintCounter:document.getElementById('hint-counter'),revealBtn:document.getElementById('reveal-btn'),coffeeBtn:document.getElementById('coffee-btn'),muteBtn:document.getElementById('mute-btn'),exportBtn:document.getElementById('export-btn'),audioTypewriter:document.getElementById('audio-typewriter'),audioBackground:document.getElementById('audio-background')};
 
 const API_ENDPOINT='https://interrogator-api.sashko1391.workers.dev';
 const MODEL='claude-sonnet-4-20250514';
@@ -642,6 +663,49 @@ function stopSound(type){
     }
 }
 
+// EXPORT CHAT FUNCTION
+function exportChat() {
+    if (GameState.conversationHistory.length === 0) {
+        alert(currentLang === 'ua' ? "Чат порожній!" : "Chat is empty!");
+        return;
+    }
+
+    let exportText = "=== THE INTERROGATOR LOG ===\n";
+    exportText += `Date: ${new Date().toLocaleString()}\n`;
+    exportText += `Case: ${tCase('title')} (${CASES[currentCase].caseNumber})\n`;
+    exportText += `Suspect: ${tCase('suspectName')}\n`;
+    exportText += "--------------------------------\n\n";
+
+    // Adding initial system/NPC greeting which might not be in conversationHistory fully
+    const greeting = document.querySelector('.message-npc .message-text')?.textContent || "";
+    if(greeting) {
+         exportText += `[SUSPECT]: ${greeting}\n\n`;
+    }
+
+    GameState.conversationHistory.forEach(msg => {
+        if (msg.role === 'user') {
+            exportText += `[INVESTIGATOR]: ${msg.content}\n\n`;
+        } else if (msg.role === 'assistant') {
+            exportText += `[SUSPECT]: ${msg.content}\n\n`;
+        }
+    });
+
+    if (GameState.gameOver) {
+        exportText += "\n=== CASE CLOSED ===\n";
+        exportText += `Final Pressure: ${GameState.suspicion}%\n`;
+    }
+
+    const blob = new Blob([exportText], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `interrogation_${new Date().toISOString().slice(0,10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+
 async function queryLLM(messages){
     const sys=messages.find(m=>m.role==='system');
     const conv=messages.filter(m=>m.role!=='system');
@@ -674,15 +738,18 @@ function drinkCoffee(){
 
 function updateSuspicion(){DOM.suspicionBar.style.width=GameState.suspicion+'%';DOM.suspicionText.textContent=GameState.suspicion+'% — '+t(GameState.emotionalState)}
 
-// ВИПРАВЛЕНИЙ СКРОЛ
+// AGGRESSIVE SCROLL TO BOTTOM
 function scrollToBottom() {
     const log = DOM.chatLog;
+    // Call immediately
+    log.scrollTop = log.scrollHeight;
+    // Call in next frame to handle reflows
     requestAnimationFrame(() => {
         log.scrollTop = log.scrollHeight;
     });
 }
 
-function typeWriterEffect(element, text, speed = 25) {
+function typeWriterEffect(element, text, speed = 20) { // Faster speed
     let i = 0;
     playSound('type');
     
@@ -838,6 +905,7 @@ DOM.hintBtn.addEventListener('click',useHint);
 DOM.revealBtn.addEventListener('click',revealAnswer);
 DOM.coffeeBtn.addEventListener('click', drinkCoffee);
 DOM.muteBtn.addEventListener('click', toggleMute);
+DOM.exportBtn.addEventListener('click', exportChat);
 
 setLang(currentLang);
 })();
