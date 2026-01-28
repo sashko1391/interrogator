@@ -297,8 +297,114 @@
     <script>
 (function(){
 'use strict';
-const i18n={en:{startTitle:"The Interrogator",startTagline:"AI-Powered Detective Game",startDescription:"You are a detective. Your suspect sits across the table. They will lie, deflect, and manipulate. Use your questions wisely. Find the truth. Solve the case.",selectCase:"Select Your Case",diffEasy:"Easy",diffMedium:"Medium",diffHard:"Hard",case1Title:"The Vanished Witness",case1Subtitle:"A key witness disappears before trial. Her roommate claims ignorance.",case2Title:"The Vanishing Investor",case2Subtitle:"A tech mogul found dead. His business partner was the only one there.",case3Title:"The Poisoned Heir",case3Subtitle:"A wealthy patriarch poisoned at his birthday. One had opportunity.",backBtn:"← Back",energyLabel:"Energy",suspicionLabel:"Pressure",briefingToggle:"📁 Case Briefing",crimeTitle:"The Crime",factsTitle:"Known Facts",suspectTitle:"The Suspect",inputPlaceholder:"Ask your question...",sendBtn:"Send",accuseBtn:"⚖️ Accuse",restartBtn:"↺ Restart",truthTitle:"The Truth",newCaseBtn:"Back",calm:"Calm",nervous:"Nervous",defensive:"Defensive",breaking:"Breaking",detective:"Detective",system:"System",winTitle:"Case Solved",winText:"Your interrogation broke through. Justice will be served.",loseTitle:"Wrong Accusation",loseTextDefault:"Your accusation doesn't hold up.",loseTextWeak:"Right track, but not enough pressure to prove it.",unsolvedTitle:"Case Unsolved",unsolvedText:"Questions exhausted. Case goes cold.",hintBtn:"💡 Hint",coffeeBtn:"☕ Coffee (+5)",revealBtn:"🔓 Reveal Answer (ends game)",revealConfirm:"⚠️ WARNING!\n\nRevealing the answer will:\n• Show you the truth\n• End this game session\n• You can still replay from start\n\nAre you sure? Type YES to confirm:",revealConfirmWord:"YES",hint1:"Focus on timeline inconsistencies.",hint2:"Ask about relationships and motives.",hint3:"Confront them with contradictions you found."},ua:{startTitle:"Слідчий",startTagline:"Детективна гра на базі ШІ",startDescription:"Ви — детектив. Підозрюваний сидить навпроти. Він буде брехати та маніпулювати. Використовуйте питання мудро. Знайдіть правду.",selectCase:"Оберіть справу",diffEasy:"Легко",diffMedium:"Середньо",diffHard:"Складно",case1Title:"Зниклий свідок",case1Subtitle:"Свідчиця зникає перед судом. Сусідка нібито нічого не знає.",case2Title:"Зниклий інвестор",case2Subtitle:"Магната знайдено мертвим. Партнерка була єдиною поруч.",case3Title:"Отруєний спадкоємець",case3Subtitle:"Патріарха отруєно на дні народження. Можливість була в одного.",backBtn:"← Назад",energyLabel:"Енергія",suspicionLabel:"Тиск",briefingToggle:"📁 Матеріали справи",crimeTitle:"Злочин",factsTitle:"Відомі факти",suspectTitle:"Підозрюваний",inputPlaceholder:"Задайте питання...",sendBtn:"Надіслати",accuseBtn:"⚖️ Звинуватити",restartBtn:"↺ Спочатку",truthTitle:"Правда",newCaseBtn:"Назад",calm:"Спокійний",nervous:"Нервує",defensive:"Захищається",breaking:"Ламається",detective:"Детектив",system:"Система",winTitle:"Справу розкрито",winText:"Ваш допит зламав захист. Справедливість восторжествує.",loseTitle:"Помилкове звинувачення",loseTextDefault:"Звинувачення не підтверджується.",loseTextWeak:"Правильний шлях, але тиску недостатньо.",unsolvedTitle:"Не розкрито",unsolvedText:"Питання вичерпано. Справа у глухому куті.",hintBtn:"💡 Підказка",coffeeBtn:"☕ Кава (+5)",revealBtn:"🔓 Розкрити відповідь (кінець гри)",revealConfirm:"⚠️ УВАГА!\n\nРозкриття відповіді:\n• Покаже вам правду\n• Закінчить цю сесію гри\n• Ви зможете перезапустити гру\n\nВи впевнені? Введіть ТАК для підтвердження:",revealConfirmWord:"ТАК",hint1:"Зверніть увагу на невідповідності в часі.",hint2:"Питайте про стосунки та мотиви.",hint3:"Вкажіть на суперечності, які знайшли."}};
-
+    
+const i18n = {
+    en: {
+        startTitle: "The Interrogator",
+        startTagline: "AI-Powered Detective Game",
+        startDescription: "You are a Ukrainian investigator. The war is ongoing. Saboteurs and spies are trying to infiltrate. Find the enemy. Protect your home.",
+        selectCase: "Select Your Case",
+        diffEasy: "Easy",
+        diffMedium: "Medium",
+        diffHard: "Hard",
+        
+        // --- ОНОВЛЕНІ ОПИСИ КЕЙСІВ (АНГЛ) ---
+        case1Title: "The Night Photographer",
+        case1Subtitle: "Detained near a power plant during a raid. Claims to be a student.",
+        case2Title: "The Lost Tractor Driver",
+        case2Subtitle: "Found hiding in a basement. Suspicious marks on face, soft hands.",
+        case3Title: "The Humanitarian Volunteer",
+        case3Subtitle: "Stopped at a checkpoint. Dogs smell explosives, but he delivers food.",
+        
+        backBtn: "← Back",
+        energyLabel: "Energy",
+        suspicionLabel: "Pressure",
+        briefingToggle: "📁 Case Briefing",
+        crimeTitle: "The Context", // Замінив "Crime" на "Context" для військової теми
+        factsTitle: "Known Facts",
+        suspectTitle: "The Suspect",
+        inputPlaceholder: "Ask your question...",
+        sendBtn: "Send",
+        accuseBtn: "⚖️ Verdict", // Замінив "Accuse" на "Verdict"
+        restartBtn: "↺ Restart",
+        truthTitle: "The Truth",
+        newCaseBtn: "Back",
+        calm: "Calm",
+        nervous: "Nervous",
+        defensive: "Defensive",
+        breaking: "Breaking",
+        detective: "Investigator",
+        system: "System",
+        winTitle: "Threat Neutralized",
+        winText: "You identified the enemy correctly. Good work.",
+        loseTitle: "Wrong Verdict",
+        loseTextDefault: "Your accusation doesn't hold up.",
+        loseTextWeak: "Right track, but not enough pressure to prove it.",
+        unsolvedTitle: "Suspect Released",
+        unsolvedText: "Questions exhausted. We had to let them go.",
+        hintBtn: "💡 Hint",
+        coffeeBtn: "☕ Coffee (+5)",
+        revealBtn: "🔓 Reveal Answer (ends game)",
+        revealConfirm: "⚠️ WARNING!\n\nRevealing the answer will:\n• Show you the truth\n• End this game session\n• You can still replay from start\n\nAre you sure? Type YES to confirm:",
+        revealConfirmWord: "YES",
+        hint1: "Focus on timeline inconsistencies.",
+        hint2: "Ask about specific local details.",
+        hint3: "Confront them with the physical evidence."
+    },
+    ua: {
+        startTitle: "Слідчий",
+        startTagline: "Детективна гра на базі ШІ",
+        startDescription: "Ви — український слідчий. Йде війна. Диверсанти та шпигуни намагаються проникнути в тил. Знайдіть ворога. Захистіть свій дім.",
+        selectCase: "Оберіть справу",
+        diffEasy: "Легко",
+        diffMedium: "Середньо",
+        diffHard: "Складно",
+        
+        // --- ОНОВЛЕНІ ОПИСИ КЕЙСІВ (УКР) ---
+        case1Title: "Нічний фотограф",
+        case1Subtitle: "Затриманий біля ТЕЦ під час нальоту. Каже, що студент-художник.",
+        case2Title: "Загублений тракторист",
+        case2Subtitle: "Знайдений у підвалі. Підозрілі сліди на обличчі, м'які руки.",
+        case3Title: "Волонтер з гуманітаркою",
+        case3Subtitle: "Зупинений на блокпосту. Собаки чують вибухівку, але він везе їжу.",
+        
+        backBtn: "← Назад",
+        energyLabel: "Енергія",
+        suspicionLabel: "Тиск",
+        briefingToggle: "📁 Матеріали справи",
+        crimeTitle: "Обставини",
+        factsTitle: "Відомі факти",
+        suspectTitle: "Підозрюваний",
+        inputPlaceholder: "Задайте питання...",
+        sendBtn: "Надіслати",
+        accuseBtn: "⚖️ Вердикт",
+        restartBtn: "↺ Спочатку",
+        truthTitle: "Правда",
+        newCaseBtn: "Назад",
+        calm: "Спокійний",
+        nervous: "Нервує",
+        defensive: "Захищається",
+        breaking: "Ламається",
+        detective: "Слідчий",
+        system: "Система",
+        winTitle: "Загрозу ліквідовано",
+        winText: "Ви правильно ідентифікували ворога. Гарна робота.",
+        loseTitle: "Помилковий вердикт",
+        loseTextDefault: "Звинувачення не підтвердилося фактами.",
+        loseTextWeak: "Правильний шлях, але тиску недостатньо для зізнання.",
+        unsolvedTitle: "Підозрюваного відпущено",
+        unsolvedText: "Питання вичерпано. Доказів для арешту забракло.",
+        hintBtn: "💡 Підказка",
+        coffeeBtn: "☕ Кава (+5)",
+        revealBtn: "🔓 Розкрити відповідь (кінець гри)",
+        revealConfirm: "⚠️ УВАГА!\n\nРозкриття відповіді:\n• Покаже вам правду\n• Закінчить цю сесію гри\n• Ви зможете перезапустити гру\n\nВи впевнені? Введіть ТАК для підтвердження:",
+        revealConfirmWord: "ТАК",
+        hint1: "Зверніть увагу на невідповідності в часі.",
+        hint2: "Питайте про конкретні місцеві деталі (магазини, вулиці).",
+        hint3: "Тисніть на речові докази (телефон, сліди на тілі)."
+    }
+};
+    
 const CASES = {
     easy: {
         id: "easy",
