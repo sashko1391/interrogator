@@ -10,7 +10,10 @@
     <style>
         :root{--bg-primary:#0a0a0c;--bg-secondary:#12121a;--bg-tertiary:#1a1a24;--bg-card:#15151f;--text-primary:#e8e6e3;--text-secondary:#9a9a9a;--text-muted:#5a5a6a;--accent-gold:#d4af37;--accent-gold-dim:#8b7323;--accent-red:#8b2942;--accent-red-bright:#c73e5c;--accent-green:#2d5a3d;--accent-green-bright:#4a9b6a;--border-color:#2a2a3a;--border-accent:#3a3a4a;--font-display:'Playfair Display',Georgia,serif;--font-body:'Crimson Pro',Georgia,serif;--font-mono:'Source Code Pro',monospace}
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-        html{font-size:22px;scroll-behavior:smooth}
+        
+        /* --- ЗМІНА РОЗМІРУ ШРИФТУ ТУТ --- */
+        html{font-size:28px;scroll-behavior:smooth}
+        
         body{font-family:var(--font-body);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;line-height:1.6}
         body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.03;pointer-events:none;z-index:1000}
         
@@ -97,11 +100,16 @@
         .evidence-list li{position:relative;padding-left:1rem;margin-bottom:0.5rem;color:var(--text-secondary);font-size:0.7rem}
         .evidence-list li::before{content:'▪';position:absolute;left:0;color:var(--accent-gold-dim)}
         
-        .chat-container{flex:1;display:flex;flex-direction:column;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;overflow:hidden;min-height:320px;max-height:420px}
-        .chat-log{flex:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:1rem}
+        /* --- ВИПРАВЛЕНИЙ КОНТЕЙНЕР ЧАТУ --- */
+        .chat-container{flex:1;display:flex;flex-direction:column;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;overflow:hidden;min-height:40vh;max-height:60vh}
+        
+        /* --- ВИПРАВЛЕНИЙ ЛОГ ПОВІДОМЛЕНЬ (з відступом знизу) --- */
+        .chat-log{flex:1;overflow-y:auto;padding:1.5rem;padding-bottom:4rem;display:flex;flex-direction:column;gap:1rem;scroll-behavior:smooth}
+        
         .chat-log::-webkit-scrollbar{width:6px}
         .chat-log::-webkit-scrollbar-track{background:var(--bg-tertiary)}
         .chat-log::-webkit-scrollbar-thumb{background:var(--border-accent);border-radius:3px}
+        
         .message{max-width:80%;padding:1rem 1.5rem;border-radius:4px;animation:messageIn 300ms ease}
         @keyframes messageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
         .message-player{align-self:flex-end;background:var(--bg-tertiary);border:1px solid var(--border-accent);border-right:3px solid var(--accent-gold)}
@@ -160,7 +168,9 @@
         .modal-btn:hover{background:var(--accent-gold)}
         .game-footer{text-align:center;padding:1.5rem 0;margin-top:1.5rem;border-top:1px solid var(--border-color)}
         .game-footer-text{font-family:var(--font-mono);font-size:0.5rem;color:var(--text-muted);letter-spacing:0.1em}
-        @media(max-width:600px){html{font-size:18px}.start-title{font-size:1.8rem}.game-title{font-size:1.3rem}.status-bar{grid-template-columns:1fr}.message{max-width:90%}.action-bar{gap: 0.5rem;}.action-btn{flex-basis: 45%;}.case-card{grid-template-columns:auto 1fr}.case-arrow{display:none}}
+        
+        /* Адаптив для маленьких екранів: шрифт 22px замість 18px */
+        @media(max-width:600px){html{font-size:22px}.start-title{font-size:1.8rem}.game-title{font-size:1.3rem}.status-bar{grid-template-columns:1fr}.message{max-width:90%}.action-bar{gap: 0.5rem;}.action-btn{flex-basis: 45%;}.case-card{grid-template-columns:auto 1fr}.case-arrow{display:none}}
     </style>
 </head>
 <body>
@@ -461,20 +471,35 @@ function drinkCoffee(){
 
 function updateSuspicion(){DOM.suspicionBar.style.width=GameState.suspicion+'%';DOM.suspicionText.textContent=GameState.suspicion+'% — '+t(GameState.emotionalState)}
 
+// ВИПРАВЛЕНИЙ СКРОЛ
+function scrollToBottom() {
+    const log = DOM.chatLog;
+    requestAnimationFrame(() => {
+        log.scrollTop = log.scrollHeight;
+    });
+}
+
 function typeWriterEffect(element, text, speed = 25) {
     let i = 0;
     playSound('type');
+    
+    if (element.dataset.typingInterval) {
+        clearInterval(parseInt(element.dataset.typingInterval));
+    }
+
     const interval = setInterval(() => {
         if (i < text.length) {
             element.textContent += text.charAt(i);
             i++;
-            // Scroll to bottom on each char
-            DOM.chatLog.scrollTop = DOM.chatLog.scrollHeight;
+            scrollToBottom();
         } else {
             clearInterval(interval);
             stopSound('type');
+            scrollToBottom();
         }
     }, speed);
+    
+    element.dataset.typingInterval = interval;
 }
 
 function addMsg(content,type){
@@ -494,11 +519,10 @@ function addMsg(content,type){
     DOM.chatLog.appendChild(d);
     
     if(type === 'npc'){
-        // Apply typewriter effect for NPC
         typeWriterEffect(txt, content);
     } else {
         txt.textContent=content;
-        DOM.chatLog.scrollTop=DOM.chatLog.scrollHeight;
+        scrollToBottom();
     }
 }
 
