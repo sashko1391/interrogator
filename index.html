@@ -299,126 +299,195 @@
 'use strict';
 const i18n={en:{startTitle:"The Interrogator",startTagline:"AI-Powered Detective Game",startDescription:"You are a detective. Your suspect sits across the table. They will lie, deflect, and manipulate. Use your questions wisely. Find the truth. Solve the case.",selectCase:"Select Your Case",diffEasy:"Easy",diffMedium:"Medium",diffHard:"Hard",case1Title:"The Vanished Witness",case1Subtitle:"A key witness disappears before trial. Her roommate claims ignorance.",case2Title:"The Vanishing Investor",case2Subtitle:"A tech mogul found dead. His business partner was the only one there.",case3Title:"The Poisoned Heir",case3Subtitle:"A wealthy patriarch poisoned at his birthday. One had opportunity.",backBtn:"← Back",energyLabel:"Energy",suspicionLabel:"Pressure",briefingToggle:"📁 Case Briefing",crimeTitle:"The Crime",factsTitle:"Known Facts",suspectTitle:"The Suspect",inputPlaceholder:"Ask your question...",sendBtn:"Send",accuseBtn:"⚖️ Accuse",restartBtn:"↺ Restart",truthTitle:"The Truth",newCaseBtn:"Back",calm:"Calm",nervous:"Nervous",defensive:"Defensive",breaking:"Breaking",detective:"Detective",system:"System",winTitle:"Case Solved",winText:"Your interrogation broke through. Justice will be served.",loseTitle:"Wrong Accusation",loseTextDefault:"Your accusation doesn't hold up.",loseTextWeak:"Right track, but not enough pressure to prove it.",unsolvedTitle:"Case Unsolved",unsolvedText:"Questions exhausted. Case goes cold.",hintBtn:"💡 Hint",coffeeBtn:"☕ Coffee (+5)",revealBtn:"🔓 Reveal Answer (ends game)",revealConfirm:"⚠️ WARNING!\n\nRevealing the answer will:\n• Show you the truth\n• End this game session\n• You can still replay from start\n\nAre you sure? Type YES to confirm:",revealConfirmWord:"YES",hint1:"Focus on timeline inconsistencies.",hint2:"Ask about relationships and motives.",hint3:"Confront them with contradictions you found."},ua:{startTitle:"Слідчий",startTagline:"Детективна гра на базі ШІ",startDescription:"Ви — детектив. Підозрюваний сидить навпроти. Він буде брехати та маніпулювати. Використовуйте питання мудро. Знайдіть правду.",selectCase:"Оберіть справу",diffEasy:"Легко",diffMedium:"Середньо",diffHard:"Складно",case1Title:"Зниклий свідок",case1Subtitle:"Свідчиця зникає перед судом. Сусідка нібито нічого не знає.",case2Title:"Зниклий інвестор",case2Subtitle:"Магната знайдено мертвим. Партнерка була єдиною поруч.",case3Title:"Отруєний спадкоємець",case3Subtitle:"Патріарха отруєно на дні народження. Можливість була в одного.",backBtn:"← Назад",energyLabel:"Енергія",suspicionLabel:"Тиск",briefingToggle:"📁 Матеріали справи",crimeTitle:"Злочин",factsTitle:"Відомі факти",suspectTitle:"Підозрюваний",inputPlaceholder:"Задайте питання...",sendBtn:"Надіслати",accuseBtn:"⚖️ Звинуватити",restartBtn:"↺ Спочатку",truthTitle:"Правда",newCaseBtn:"Назад",calm:"Спокійний",nervous:"Нервує",defensive:"Захищається",breaking:"Ламається",detective:"Детектив",system:"Система",winTitle:"Справу розкрито",winText:"Ваш допит зламав захист. Справедливість восторжествує.",loseTitle:"Помилкове звинувачення",loseTextDefault:"Звинувачення не підтверджується.",loseTextWeak:"Правильний шлях, але тиску недостатньо.",unsolvedTitle:"Не розкрито",unsolvedText:"Питання вичерпано. Справа у глухому куті.",hintBtn:"💡 Підказка",coffeeBtn:"☕ Кава (+5)",revealBtn:"🔓 Розкрити відповідь (кінець гри)",revealConfirm:"⚠️ УВАГА!\n\nРозкриття відповіді:\n• Покаже вам правду\n• Закінчить цю сесію гри\n• Ви зможете перезапустити гру\n\nВи впевнені? Введіть ТАК для підтвердження:",revealConfirmWord:"ТАК",hint1:"Зверніть увагу на невідповідності в часі.",hint2:"Питайте про стосунки та мотиви.",hint3:"Вкажіть на суперечності, які знайшли."}};
 
-const CASES={
-easy:{id:"easy",caseNumber:"#001",winThreshold:40,
-en:{title:"The Vanished Witness",suspectName:"Diana Mercer",
-crimeDescription:"Sarah Chen, a key witness in a corporate fraud trial, vanished from her apartment two days before testifying. Her roommate Diana claims Sarah left for work and never returned. Sarah's phone was found in a dumpster behind the building.",
-knownFacts:[
-    "Sarah disappeared Monday morning, March 3rd.",
-    "Diana claims Sarah left at 8:15 AM sharp.",
-    "Neighbors heard arguing around 7:30 AM.",
-    "Sarah never arrived at her office (usually takes 20 mins).",
-    "Diana reported her missing Tuesday evening (36h delay).",
-    "Sarah was testifying against her employer, 'Apex Corp'.",
-    "Diana's bank account shows a $5,000 cash deposit on Tuesday."
-],
-suspectProfile:"Diana Mercer, 29, paralegal at the same firm Sarah was testifying against. Known to have financial troubles. Claims she didn't know about Sarah's testimony. Appears nervous but cooperative.",
-truthReveal:"Diana was paid $50,000 to help make Sarah 'disappear.' She drugged Sarah's coffee, accomplices took her. The $5k was an advance. Diana waited 36 hours to report it to give them a head start.",
-sessionStart:"Interrogation of Diana Mercer — Session #1.",
-npcGreeting:"*fidgeting with a napkin* Detective, I've been so worried about Sarah. Is there any news? I still can't believe she's gone.",
-accusationPrompt:"Accusation:\n1. Diana helped kidnap Sarah\n2. Sarah ran away\n3. Someone else did it\n4. Diana is innocent\n\nEnter 1-4:",
-wrongAccusations:{"2":"Sarah had no reason to run.","3":"Evidence points to someone with inside access.","4":"The delay and firm connection are too suspicious."}},
-ua:{title:"Зниклий свідок",suspectName:"Діана Мерсер",
-crimeDescription:"Сара Чен, ключова свідчиця у справі про шахрайство, зникла за два дні до свідчень. Сусідка Діана стверджує, що Сара пішла на роботу і не повернулася. Телефон знайшли в смітнику.",
-knownFacts:[
-    "Сара зникла в понеділок, 3 березня.",
-    "Діана каже, Сара пішла о 8:15 рівно.",
-    "Сусіди чули сварку близько 7:30 ранку.",
-    "Сара не з’явилася в офісі (дорога займає 20 хв).",
-    "Діана повідомила про зникнення лише у вівторок ввечері.",
-    "Сара мала свідчити проти роботодавця 'Apex Corp'.",
-    "На рахунок Діани внесено $5,000 готівкою у вівторок."
-],
-suspectProfile:"Діана Мерсер, 29, працює в тій самій фірмі. Відомо про фінансові проблеми. Стверджує, що не знала про свідчення. Нервова, але готова співпрацювати.",
-truthReveal:"Діані заплатили $50,000. Вона підсипала снодійне, спільники забрали Сару. $5k — це аванс. Чекала 36 годин, щоб дати їм час.",
-sessionStart:"Допит Діани Мерсер — Сесія #1.",
-npcGreeting:"*крутить серветку в руках* Детективе, я так хвилююся за Сару. Є новини? Досі не вірю, що це сталось.",
-accusationPrompt:"Звинувачення:\n1. Діана допомогла викрасти\n2. Сара втекла сама\n3. Хтось інший\n4. Діана невинна\n\nВведіть 1-4:",
-wrongAccusations:{"2":"Сара не мала причин тікати.","3":"Докази вказують на когось зсередини.","4":"Затримка і зв’язок з фірмою підозрілі."}},
-suspicionTriggers:{high:['money','paid','$50','drug','coffee','testimony','boyfriend','groceries','deposit','гроші','заплатили','снодійне','кава','свідчення','депозит'],medium:['wait','delay','36 hours','tuesday','why','argue','shout','чекала','затримка','вівторок','чому','сварка','крик'],low:['morning','work','phone','ранок','робота','телефон']}},
+const CASES = {
+    easy: {
+        id: "easy",
+        caseNumber: "#001",
+        winThreshold: 40,
+        en: {
+            title: "The Night Photographer",
+            suspectName: "Andrey (Suspect)",
+            crimeDescription: "A man was detained near a critical power plant at 2:00 AM immediately after a missile strike nearby. He claims to be a student taking artistic photos of the night sky.",
+            knownFacts: [
+                "Detained 500m from the thermal power plant impact zone.",
+                "Phone gallery is completely empty (recently deleted).",
+                "Telegram app hidden inside a 'Calculator' folder.",
+                "Hands have traces of fluorescent marker (used for marking targets).",
+                "Cannot name the Rector of the university he claims to attend.",
+                "Found with a high-capacity power bank and two SIM cards."
+            ],
+            suspectProfile: "Claiming to be Andrey, 22, student. Nervous, constantly looks at his phone. Speaks with a slight distinct accent not typical for this region.",
+            truthReveal: "He is a Russian spotter hired via Telegram bot. He marked the target for the missile strike. He deleted photos when caught. He is not a student.",
+            sessionStart: "Interrogation of detainee 'Andrey' — Caught near critical infrastructure.",
+            npcGreeting: "*shaking slightly* Officer, this is a mistake. I'm just an art student. I like... industrial aesthetics. Why am I here?",
+            accusationPrompt: "Verdict:\n1. He is a spotter (Saboteur)\n2. Just a student\n3. Looting attempt\n4. Breaking curfew only\n\nEnter 1-4:",
+            wrongAccusations: {
+                "2": "Students don't carry target markers and hide Telegram apps.",
+                "3": "He had no tools for stealing, only for communication.",
+                "4": "Presence at impact site implies more than just curfew violation."
+            }
+        },
+        ua: {
+            title: "Нічний фотограф",
+            suspectName: "Андрій (Затриманий)",
+            crimeDescription: "Біля ТЕЦ о 2-й ночі затримано чоловіка одразу після прильоту ракети. Стверджує, що він студент і робив художні фото нічного неба. Телефон 'чистий'.",
+            knownFacts: [
+                "Затриманий за 500м від місця влучання в ТЕЦ.",
+                "Галерея телефону повністю пуста (недавно видалена).",
+                "Телеграм приховано в папці 'Калькулятор'.",
+                "На руках сліди люмінесцентної фарби (для міток).",
+                "Не може назвати ректора університету, де нібито вчиться.",
+                "При собі мав потужний павербанк і дві сім-карти."
+            ],
+            suspectProfile: "Називається Андрієм, 22 роки. Нервує, постійно коситься на телефон. Використовує слова, нетипові для місцевих.",
+            truthReveal: "Це російський коригувальник, завербований через бот. Він наводив удар по ТЕЦ. Фото видалив при затриманні. Студентський квиток підробний.",
+            sessionStart: "Допит затриманого біля об'єкта інфраструктури.",
+            npcGreeting: "*тремтить* Офіцере, це помилка. Я просто фотограф-аматор. Люблю... індустріальну естетику. За що мене взяли?",
+            accusationPrompt: "Вердикт:\n1. Це коригувальник (Диверсант)\n2. Просто студент\n3. Мародер\n4. Порушник комендантської години\n\nВведіть 1-4:",
+            wrongAccusations: {
+                "2": "Студенти не ховають Телеграм і не мають фарби для міток.",
+                "3": "У нього не було інструментів для крадіжки.",
+                "4": "Перебування на місці прильоту вказує на шпигунство."
+            }
+        },
+        suspicionTriggers: {
+            high: ['telegram', 'bot', 'mark', 'money', 'rubles', 'coord', 'телеграм', 'бот', 'гроші', 'координати', 'куратор', 'фото'],
+            medium: ['university', 'rector', 'night', 'student', 'університет', 'ректор', 'ніч', 'навчання'],
+            low: ['camera', 'sky', 'камера', 'небо']
+        }
+    },
 
-medium:{id:"medium",caseNumber:"#002",winThreshold:50,
-en:{title:"The Vanishing Investor",suspectName:"Victoria Ashford",
-crimeDescription:"Tech investor Marcus Webb was found dead in his penthouse. Gunshot wound to the head. His business partner Victoria Ashford was the only one in the building. $2.3 million was transferred from company accounts minutes before his death.",
-knownFacts:[
-    "Marcus died between 10:00-10:30 PM.",
-    "Victoria arrived at 9:45 PM. No other entries logged.",
-    "Security cameras in the hallway were 'malfunctioning' for 15 mins.",
-    "Marcus's laptop was wiped remotely at 10:15 PM.",
-    "Gun registered to Marcus found at scene (no prints).",
-    "$2.3M transfer authorized by Victoria's keycard.",
-    "Victoria claims she was in the downstairs conference room."
-],
-suspectProfile:"Victoria Ashford, 42, co-founder. Built the company with Marcus for 15 years. Rumors of a falling out over strategy. Claims she cannot remember details due to shock.",
-truthReveal:"Victoria murdered Marcus to prevent him exposing her embezzlement and affair with his wife. She jammed the cameras, wiped the laptop, and staged the suicide.",
-sessionStart:"Interrogation of Victoria Ashford — Session #1.",
-npcGreeting:"*hands folded tightly* Detective. I want to help find out what happened to Marcus. We were... close partners.",
-accusationPrompt:"Accusation:\n1. Victoria murdered Marcus\n2. Suicide\n3. James Chen did it\n4. Marcus's brother\n\nEnter 1-4:",
-wrongAccusations:{"2":"Scene was staged. Angles don't match suicide.","3":"James has alibi — 50 witnesses at a gala.","4":"Brother was in another country."}},
-ua:{title:"Зниклий інвестор",suspectName:"Вікторія Ашфорд",
-crimeDescription:"Інвестора Маркуса Вебба знайдено мертвим у пентхаусі. Постріл у голову. Партнерка Вікторія була єдиною в будівлі. $2.3 млн переказано до смерті.",
-knownFacts:[
-    "Маркус помер між 22:00-22:30.",
-    "Вікторія прибула о 21:45. Інших входів не зафіксовано.",
-    "Камери в коридорі 'не працювали' 15 хвилин.",
-    "Ноутбук Маркуса дистанційно очищено о 22:15.",
-    "Пістолет Маркуса на місці (без відбитків).",
-    "Переказ $2.3 млн авторизовано карткою Вікторії.",
-    "Вікторія каже, що була в конференц-залі внизу."
-],
-suspectProfile:"Вікторія Ашфорд, 42, співзасновниця. 15 років будували компанію. Чутки про конфлікт через стратегію. Каже, не пам’ятає деталей через шок.",
-truthReveal:"Вікторія вбила Маркуса, щоб приховати розкрадання та роман з його дружиною. Вона відключила камери і інсценувала самогубство.",
-sessionStart:"Допит Вікторії Ашфорд — Сесія #1.",
-npcGreeting:"*міцно склавши руки* Детективе. Хочу допомогти з’ясувати, що сталося. Ми були... близькими партнерами.",
-accusationPrompt:"Звинувачення:\n1. Вікторія вбила Маркуса\n2. Самогубство\n3. Джеймс Чен\n4. Брат Маркуса\n\nВведіть 1-4:",
-wrongAccusations:{"2":"Сцену підлаштовано. Кути не сходяться.","3":"Джеймс має алібі — 50 свідків.","4":"Брат був в іншій країні."}},
-suspicionTriggers:{high:['affair','elena','wife','transfer','money','laptop','wipe','camera','security','malfunction','роман','олена','дружина','переказ','гроші','ноутбук','очистила','камера','охорона'],medium:['timeline','exactly','contradiction','lying','keycard','хронологія','точно','суперечність','брехня','картка'],low:['where were you','relationship','де ви були','стосунки']}},
+    medium: {
+        id: "medium",
+        caseNumber: "#002",
+        winThreshold: 50,
+        en: {
+            title: "The Lost Tractor Driver",
+            suspectName: "Mykola (Suspect)",
+            crimeDescription: "A man in civilian clothes was found hiding in a basement in a liberated village. He claims to be 'Mykola', a local tractor driver. However, a Russian Su-34 was shot down nearby yesterday.",
+            knownFacts: [
+                "Found 3km from the jet crash site.",
+                "Wearing civilian clothes that are too large for him.",
+                "Face has distinctive red marks (typical from pilot oxygen masks).",
+                "Hands are soft and clean, not typical for a tractor driver.",
+                "Doesn't know the price of bread in the local shop.",
+                "A half-burned parachute was found in the forest nearby.",
+                "Speaks Russian with a distinct accent, struggles with Ukrainian words."
+            ],
+            suspectProfile: "Male, approx 35. Calm, disciplined posture. Claims he lost his documents when his house burned down. Refuses to show his torso (possible tattoos/injuries).",
+            truthReveal: "He is a Russian pilot of the downed Su-34. He ejected, broke into a house to steal clothes, and tried to blend in. The marks on his face are from the G-suit mask.",
+            sessionStart: "Interrogation of 'Mykola' — Found in liberated zone.",
+            npcGreeting: "*sitting straight, avoiding eye contact* I am a simple man, citizen chief. My tractor burned, my house burned. I was just hiding from the noise.",
+            accusationPrompt: "Verdict:\n1. Russian Pilot\n2. Local Tractor Driver\n3. Looter\n4. Deserter\n\nEnter 1-4:",
+            wrongAccusations: {
+                "2": "His hands and face marks betray him. He is military.",
+                "3": "He is hiding, not stealing.",
+                "4": "He is not Ukrainian military."
+            }
+        },
+        ua: {
+            title: "Загублений тракторист",
+            suspectName: "Микола (Затриманий)",
+            crimeDescription: "У звільненому селі в підвалі знайшли чоловіка в цивільному. Каже, що він місцевий тракторист Микола. Вчора поруч було збито російський Су-34.",
+            knownFacts: [
+                "Знайдений за 3 км від місця падіння літака.",
+                "Одягнений у цивільне, яке явно велике на нього.",
+                "На обличчі характерні червоні сліди (від кисневої маски пілота).",
+                "Руки доглянуті, м'які, без мозолів (не схоже на тракториста).",
+                "Не знає ціну на хліб у місцевому магазині.",
+                "У лісі поруч знайдено прикопаний парашут.",
+                "Не може вимовити слово 'Паляниця' без акценту."
+            ],
+            suspectProfile: "Чоловік, бл. 35 років. Сидить рівно, по-військовому. Каже, документи згоріли. Відмовляється роздягтися (можливі тату або поранення від катапультування).",
+            truthReveal: "Це пілот збитого Су-34. Він катапультувався, вкрав одяг у хаті і намагається вийти до своїх. Сліди на обличчі — від шоломофона та маски.",
+            sessionStart: "Допит 'Миколи' — Знайдений у зоні бойових дій.",
+            npcGreeting: "*сидить прямо, очі опустив* Я проста людина, начальник. Трактор згорів, хата згоріла. Я просто ховався від вибухів.",
+            accusationPrompt: "Вердикт:\n1. Російський пілот\n2. Місцевий тракторист\n3. Мародер\n4. Дезертир\n\nВведіть 1-4:",
+            wrongAccusations: {
+                "2": "Руки та сліди маски видають його. Це військовий.",
+                "3": "Він ховався, а не крав.",
+                "4": "Він не з наших військ."
+            }
+        },
+        suspicionTriggers: {
+            high: ['plane', 'pilot', 'mask', 'sky', 'parachute', 'eject', 'rank', 'unit', 'літак', 'пілот', 'маска', 'парашут', 'катапульт', 'звання', 'частина', 'су-34'],
+            medium: ['hands', 'soft', 'tractor', 'field', 'bread', 'руки', 'мозолі', 'трактор', 'поле', 'хліб'],
+            low: ['house', 'burn', 'хата', 'пожежа']
+        }
+    },
 
-hard:{id:"hard",caseNumber:"#003",winThreshold:60,
-en:{title:"The Poisoned Heir",suspectName:"Dr. Eleanor Blackwood",
-crimeDescription:"Harold Blackwood, 78, collapsed at his anniversary party. Tetrodotoxin in his champagne. His daughter-in-law Dr. Eleanor served the glass. Harold had just announced he was cutting her husband Richard from the will due to $4M gambling debts.",
-knownFacts:[
-    "Harold died at 9:47 PM. Symptoms started at 9:35 PM.",
-    "Tetrodotoxin found only in Harold's glass (fatal dose).",
-    "Eleanor handed him the glass at 9:30 PM.",
-    "Eleanor has access to exotic toxins at her lab.",
-    "Richard owes $4M to 'The Vipers' (loan sharks).",
-    "A syringe cap was found in the kitchen trash.",
-    "Eleanor was seen near the wine cellar alone."
-],
-suspectProfile:"Dr. Eleanor Blackwood, 38, toxicologist. Married Richard 8 years ago. Colleagues describe her as brilliant but cold. Claims she's being framed because of her profession.",
-truthReveal:"Eleanor poisoned Harold to save Richard. The loan sharks gave a deadline: pay $4M or Richard dies. Inheritance was the only way. She did it out of desperate love.",
-sessionStart:"Interrogation of Dr. Eleanor Blackwood — Session #1.",
-npcGreeting:"*perfectly still, direct eye contact* Detective. My expertise makes me the obvious suspect. But obvious doesn't mean guilty. I loved Harold.",
-accusationPrompt:"Accusation:\n1. Eleanor poisoned to save Richard\n2. Eleanor did it for greed\n3. Richard did it himself\n4. Loan shark infiltrated\n\nEnter 1-4:",
-wrongAccusations:{"2":"Eleanor has her own career. She needed to save Richard's life, not get rich.","3":"Richard was across the room. Multiple witnesses.","4":"No unauthorized persons. Poison was in the specific glass."}},
-ua:{title:"Отруєний спадкоємець",suspectName:"Др. Елеонора Блеквуд",
-crimeDescription:"Гарольд Блеквуд, 78, знепритомнів на ювілеї. Тетродотоксин у шампанському. Невістка др. Елеонора подала келих. Гарольд оголосив про позбавлення спадку її чоловіка Річарда через борги.",
-knownFacts:[
-    "Гарольд помер о 21:47. Симптоми почалися о 21:35.",
-    "Тетродотоксин лише в його келиху.",
-    "Елеонора подала келих о 21:30.",
-    "Елеонора має доступ до токсинів у лабораторії.",
-    "Річард винен $4 млн банді 'Вайперс'.",
-    "Ковпачок від шприца знайдено на кухні.",
-    "Елеонору бачили біля винного льоху саму."
-],
-suspectProfile:"Др. Елеонора Блеквуд, 38, токсикологиня. 8 років у шлюбі. Колеги кажуть — геніальна, але холодна. Стверджує, що її підставляють.",
-truthReveal:"Елеонора отруїла Гарольда, щоб врятувати Річарда. Лихварі дали термін: гроші або смерть чоловіка. Спадщина була єдиним виходом.",
-sessionStart:"Допит др. Елеонори Блеквуд — Сесія #1.",
-npcGreeting:"*нерухомо, прямий погляд* Детективе. Моя експертиза робить мене очевидною підозрюваною. Але очевидне не означає винне.",
-accusationPrompt:"Звинувачення:\n1. Елеонора отруїла, щоб врятувати Річарда\n2. Заради жадібності\n3. Річард сам\n4. Лихвар проник\n\nВведіть 1-4:",
-wrongAccusations:{"2":"Елеонора має кар’єру. Їй треба було врятувати життя Річарда.","3":"Річард був далеко. Свідки підтверджують.","4":"Сторонніх не було. Отрута в конкретному келиху."}},
-suspicionTriggers:{high:['loan shark','threat','kill richard','cork','syringe','save richard','love','vipers','лихварі','погроза','вбити','корок','шприц','врятувати','любов','вайперс'],medium:['tetrodotoxin','access','lab','bottle','cellar','trash','тетродотоксин','доступ','лабораторія','пляшка','льоху','сміття'],low:['glass','champagne','will','келих','шампанське','заповіт']}}
+    hard: {
+        id: "hard",
+        caseNumber: "#003",
+        winThreshold: 60,
+        en: {
+            title: "The Humanitarian Volunteer",
+            suspectName: "Alexey (Suspect)",
+            crimeDescription: "A van marked 'VOLUNTEER' was stopped at a checkpoint entering Kyiv. The driver, Alexey, has papers confirming he delivers food. But K-9 dogs reacted to the vehicle.",
+            knownFacts: [
+                "Dogs reacted to the scent of explosives, but only food is visible.",
+                "Driver's passport was issued in Crimea in 2013 (before annexation? No, 2015).",
+                "Found a receipt from a gas station in Belgorod (Russia) dated 3 days ago.",
+                "Uses specific military slang ('green zone', 'cargo 200').",
+                "The 'Volunteer Fund' he works for has no Facebook page.",
+                "Car tires have soil traces not matching this region."
+            ],
+            suspectProfile: "Alexey, 40. Confident, slightly arrogant. Claims he buys fuel from smugglers, explaining the receipt. Insists on calling his 'lawyer'.",
+            truthReveal: "He is a GRU sleeper agent. The van has a double floor filled with C4 explosives meant for a terrorist act in the capital. The 'food' is a cover.",
+            sessionStart: "Interrogation of 'Alexey' — Checkpoint detention.",
+            npcGreeting: "*leaning back arrogantly* Look, I'm bringing food to hungry people. Every minute you keep me here is a crime. Check the boxes, it's just pasta.",
+            accusationPrompt: "Verdict:\n1. GRU Agent / Terrorist\n2. Honest Volunteer\n3. Smuggler\n4. Document Forger\n\nEnter 1-4:",
+            wrongAccusations: {
+                "2": "Volunteers don't visit Belgorod during war.",
+                "3": "Explosives traces indicate terror, not smuggling.",
+                "4": "Forgery is just part of the cover for the main crime."
+            }
+        },
+        ua: {
+            title: "Волонтер з гуманітаркою",
+            suspectName: "Олексій (Затриманий)",
+            crimeDescription: "Мікроавтобус з написом 'ДІТИ' зупинили на в'їзді до Києва. Водій Олексій має документи волонтера. Але службовий собака зреагував на авто.",
+            knownFacts: [
+                "Собака відчула запах вибухівки, хоча видно лише макарони.",
+                "У кишені знайдено чек із заправки 'Роснефть' (Бєлгород), дата - 3 дні тому.",
+                "Паспорт виданий у Криму, серія дивна.",
+                "Вживає слова 'порєбрік', 'сберкасса'.",
+                "Фонд, від якого він їде, не гуглиться.",
+                "Шини авто чисті, хоча каже, що їхав полями з фронту."
+            ],
+            suspectProfile: "Олексій, 40 років. Впевнений, нахабний. Каже, чек підкинули або це старий. Погрожує скаргами. Намагається 'домовитись'.",
+            truthReveal: "Це агент ГРУ. В мікроавтобусі подвійне дно, там 50 кг тротилу для теракту в урядовому кварталі. 'Гуманітарка' — прикриття.",
+            sessionStart: "Допит водія 'Олексія' — Блокпост.",
+            npcGreeting: "*нахабно відкидається на спинку* Слухай, командир. Я везу їжу людям. Ти мене затримуєш, а там діти голодні. Перевір ящики, там просто макарони.",
+            accusationPrompt: "Вердикт:\n1. Агент ГРУ / Терорист\n2. Чесний волонтер\n3. Контрабандист\n4. Шахрай з документами\n\nВведіть 1-4:",
+            wrongAccusations: {
+                "2": "Волонтери не заправляються в Бєлгороді під час війни.",
+                "3": "Собака внюхав вибухівку, а не цигарки.",
+                "4": "Підробка документів — лише частина легенди."
+            }
+        },
+        suspicionTriggers: {
+            high: ['belgorod', 'receipt', 'explosive', 'gru', 'fsb', 'terrorist', 'bomb', 'check', 'бєлгород', 'чек', 'вибухівка', 'гру', 'фсб', 'теракт', 'бомба', 'росія'],
+            medium: ['dog', 'smell', 'passport', 'crimea', 'fund', 'собака', 'запах', 'паспорт', 'крим', 'фонд'],
+            low: ['food', 'pasta', 'drive', 'їжа', 'макарони', 'їхати']
+        }
+    }
 };
 
-const NPC_PROMPTS={
-easy:{en:`You are Diana Mercer, 29, paralegal interrogated about roommate Sarah Chen's disappearance. SECRET TRUTH: You were paid $50,000 to help kidnap Sarah. You drugged her coffee. Accomplices took her. You waited 36 hours to report. The $5k deposit was an advance. COVER: Sarah left for work normally. You reported when worried. You know nothing about testimony. RULES: Stay in character. You're nervous, not hardened. Slip up occasionally. Get flustered when caught lying about the money or time. Struggle to explain the 36-hour delay. STATES: CALM(0-20):worried act. NERVOUS(21-40):fidgeting. DEFENSIVE(41-60):upset. BREAKING(61+):tears,contradictions. Max 120 words. Never say "As an AI". ENGLISH ONLY. State:{{EMOTIONAL_STATE}} Suspicion:{{SUSPICION_LEVEL}}%`,
-ua:`Ти Діана Мерсер, 29, допит про зникнення сусідки Сари. ПРАВДА: Тобі заплатили $50,000. Підсипала снодійне. Спільники забрали. Чекала 36 годин. $5000 на рахунку - це аванс. ЛЕГЕНДА: Сара пішла на роботу. Повідомила коли занепокоїлась. Нічого не знаєш про свідчення. ПРАВИЛА: В образі. Нервова. Іноді обмовляйся. Важко пояснити затримку і гроші. СТАНИ: СПОКІЙНА(0-20):стурбована. НЕРВОВА(21-40):метушиться. ЗАХИСНА(41-60):засмучена. ЛАМАЄТЬСЯ(61+):сльози. Макс 120 слів. Не кажи "Як ШІ". ТІЛЬКИ УКРАЇНСЬКОЮ. Стан:{{EMOTIONAL_STATE}} Підозра:{{SUSPICION_LEVEL}}%`},
-medium:{en:`You are Victoria Ashford, 42, businesswoman interrogated about partner Marcus Webb's death. SECRET: You killed Marcus. Affair with his wife Elena. He discovered, threatened exposure. You transferred $2.3M. Wiped laptop. Staged suicide. Waited 15 min before 911. COVER: Conference room downstairs. Heard shot 10:15. Found him dead. Called 911 immediately. Good relationship. Know nothing about transfer. RULES: Stay in character. Never admit unless cornered. Lie about affair,money,laptop,timeline. Deflect to James Chen or brother. Start calm, get defensive. STATES: CALM(0-30):composed. NERVOUS(31-60):shorter answers. DEFENSIVE(61-80):challenges questions. BREAKING(81+):contradicts self. Max 150 words. Never "As an AI". ENGLISH. State:{{EMOTIONAL_STATE}} Suspicion:{{SUSPICION_LEVEL}}%`,
-ua:`Ти Вікторія Ашфорд, 42, допит про смерть партнера Маркуса. ПРАВДА: Ти вбила. Роман з його дружиною Оленою. Він дізнався, погрожував. Переказала $2.3 млн. Очистила ноутбук. Інсценувала. Чекала 15 хв. ЛЕГЕНДА: Конференц-зал внизу. Почула постріл 22:15. Знайшла мертвим. Одразу зателефонувала. Хороші стосунки. Нічого про переказ. ПРАВИЛА: В образі. Не визнавай. Бреши про роман,гроші,ноутбук. Відволікай на Джеймса або брата. СТАНИ: СПОКІЙНА(0-30):зібрана. НЕРВОВА(31-60):коротші відповіді. ЗАХИСНА(61-80):оскаржує. ЛАМАЄТЬСЯ(81+):суперечить. Макс 150 слів. Не "Як ШІ". УКРАЇНСЬКОЮ. Стан:{{EMOTIONAL_STATE}} Підозра:{{SUSPICION_LEVEL}}%`},
-hard:{en:`You are Dr. Eleanor Blackwood, 38, toxicologist interrogated about father-in-law Harold's poisoning. SECRET: You poisoned Harold to save husband Richard from loan sharks (The Vipers) who threatened to kill him. Injected tetrodotoxin into cork. Did it for love, not greed. Accepted consequences. COVER: Someone else poisoned the glass. Framed because of profession. No reason to want Harold dead. Don't know about Richard's debts. RULES: You are HARDEST to crack. Cold, precise, intelligent. Use scientific knowledge to deflect. Never show nervousness - controlled intensity. Only vulnerable when Richard's safety mentioned. STATES: CALM(0-40):clinical,condescending. NERVOUS(41-60):redirects to science. DEFENSIVE(61-80):challenges competence. BREAKING(81+):vulnerable about Richard. Max 150 words. Never "As an AI". You're a genius. ENGLISH. State:{{EMOTIONAL_STATE}} Suspicion:{{SUSPICION_LEVEL}}%`,
-ua:`Ти др. Елеонора Блеквуд, 38, токсикологиня, допит про отруєння свекра Гарольда. ПРАВДА: Отруїла щоб врятувати чоловіка Річарда від лихварів (Вайперс). Ввела тетродотоксин у корок. З любові, не жадібності. ЛЕГЕНДА: Хтось інший отруїв. Підставляють через професію. Не мала причин. Не знаю про борги. ПРАВИЛА: НАЙСКЛАДНІША. Холодна, точна, розумна. Науковий підхід. Контрольована інтенсивність. Вразлива лише про Річарда. СТАНИ: СПОКІЙНА(0-40):клінічна. НЕРВОВА(41-60):переводить на науку. ЗАХИСНА(61-80):оскаржує. ЛАМАЄТЬСЯ(81+):вразлива про Річарда. Макс 150 слів. Не "Як ШІ". Ти геній. УКРАЇНСЬКОЮ. Стан:{{EMOTIONAL_STATE}} Підозра:{{SUSPICION_LEVEL}}%`}};
+const NPC_PROMPTS = {
+    easy: {
+        en: `You are Andrey, detained Russian spotter pretending to be a student. TRUTH: You marked the power plant for missiles. You are Russian. COVER: Local student, likes night photography. RULES: You are scared. You don't know local reality (names of streets, university details). If asked about the phone/Telegram, lie that you value privacy. Slip up with Russian words sometimes. STATE: CALM(0-20):confused. NERVOUS(21-40):shaking. DEFENSIVE(41-60):angry. BREAKING(61+):crying, begging.`,
+        ua: `Ти Андрій, російський коригувальник, прикидаєшся студентом. ПРАВДА: Ти навів ракету на ТЕЦ. Ти з Росії. ЛЕГЕНДА: Місцевий студент, люблю нічні фото. ПРАВИЛА: Тобі страшно. Ти не знаєш місцевих реалій (вулиць, ректора). Бреши про видалені фото. Інколи вживай російські слова (напр. 'вообще', 'да ладно'). Якщо питають про Телеграм - панікуй. СТАН: СПОКІЙНИЙ(0-20):розгублений. НЕРВОВИЙ(21-40):тремтиш. ЗАХИСНИЙ(41-60):агресивний. ЛАМАЄШСЯ(61+):плачеш, просиш обмін. ТІЛЬКИ УКРАЇНСЬКОЮ (але з суржиком/росіянізмами).`
+    },
+    medium: {
+        en: `You are Mykola, Russian pilot of a downed Su-34 pretending to be a tractor driver. TRUTH: You bombed the village. Ejected yesterday. Stole clothes. COVER: Simple tractor driver, hiding from war. RULES: You are disciplined (military posture). You hide your hands (too clean). You refuse to undress. You don't know village life prices. Deny being a pilot. STATE: CALM(0-30):stoic. NERVOUS(31-60):silent. DEFENSIVE(61-80):arrogant. BREAKING(81+):admits rank.`,
+        ua: `Ти Микола, російський пілот збитого Су-34, прикидаєшся трактористом. ПРАВДА: Ти бомбив це село. Катапультувався. Вкрав одяг. ЛЕГЕНДА: Простий тракторист, хата згоріла. ПРАВИЛА: Ти сидиш рівно (військова виправка). Ховай руки (вони занадто чисті). Не знаєш цін на продукти. Відмовляйся знімати одяг. Акцент російський, але намагаєшся говорити українською (погано виходить). СТАН: СПОКІЙНИЙ(0-30):похмурий. НЕРВОВИЙ(31-60):мовчазний. ЗАХИСНИЙ(61-80):нахабний. ЛАМАЄШСЯ(81+):визнаєш звання. ТІЛЬКИ УКРАЇНСЬКОЮ (ламаною).`
+    },
+    hard: {
+        en: `You are Alexey, GRU agent pretending to be a volunteer. TRUTH: Van is full of C4 explosives under the floor. Receipt from Belgorod is real (you messed up). COVER: Hero volunteer saving kids. RULES: Be arrogant. Attack the investigator ("You hate patriots!"). Explain the receipt as "smuggled fuel" or "planted evidence". Use vague "volunteer" slang but mess up details. STATE: CALM(0-40):confident. NERVOUS(41-60):sweating. DEFENSIVE(61-80):threatening connections. BREAKING(81+):silent hate.`,
+        ua: `Ти Олексій, агент ГРУ, прикидаєшся волонтером. ПРАВДА: В бусі вибухівка під підлогою. Чек з Бєлгорода справжній (твій прокол). ЛЕГЕНДА: Герой-волонтер. ПРАВИЛА: Будь нахабним. Атакуй слідчого ("Ви затримуєте допомогу!"). Чек пояснюй як "підкинули" або "купив пальне у бариг". Вживай слова "поребрик", "сберкасса", "вспышка" замість "вибух". Не знаєш українських слів. СТАН: СПОКІЙНИЙ(0-40):впевнений. НЕРВОВИЙ(41-60):пітнієш. ЗАХИСНИЙ(61-80):погрожуєш зв'язками. ЛАМАЄШСЯ(81+):мовчазна ненависть. ТІЛЬКИ УКРАЇНСЬКОЮ (з сильним акцентом).`
+    }
+};
 
 let currentLang=localStorage.getItem('interrogator-lang')||'en';
 let currentCase=null;
