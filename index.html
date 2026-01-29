@@ -11,23 +11,20 @@
         :root{--bg-primary:#0a0a0c;--bg-secondary:#12121a;--bg-tertiary:#1a1a24;--bg-card:#15151f;--text-primary:#e8e6e3;--text-secondary:#9a9a9a;--text-muted:#5a5a6a;--accent-gold:#d4af37;--accent-gold-dim:#8b7323;--accent-red:#8b2942;--accent-red-bright:#c73e5c;--accent-green:#2d5a3d;--accent-green-bright:#4a9b6a;--border-color:#2a2a3a;--border-accent:#3a3a4a;--font-display:'Playfair Display',Georgia,serif;--font-body:'Crimson Pro',Georgia,serif;--font-mono:'Source Code Pro',monospace}
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         
-        /* ШРИФТ: 22px ПК / 20px Мобільні */
         html{font-size:22px;scroll-behavior:smooth}
         
-        /* ВАЖЛИВИЙ ФІКС ДЛЯ iPad/iPhone: min-height: 100dvh */
         body{
             font-family:var(--font-body);
             background:var(--bg-primary);
             color:var(--text-primary);
             width: 100%;
-            height: 100dvh; /* Dynamic Viewport Height */
-            overflow: hidden; /* Забороняємо скрол самого тіла, скролимо тільки чат */
-            position: fixed; /* Фіксуємо, щоб не "їздило" на iOS */
+            height: 100dvh; 
+            overflow: hidden; 
+            position: fixed; 
         }
         
         body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.03;pointer-events:none;z-index:1000}
         
-        /* UI Elements Positioning */
         .top-controls-left {position:fixed;top:1rem;left:1rem;display:flex;gap:0.5rem;z-index:50;}
         .lang-switcher{position:fixed;top:1rem;right:1rem;display:flex;z-index:50}
         
@@ -39,15 +36,14 @@
         .lang-btn:first-child{border-radius:4px 0 0 4px;}
         .lang-btn:last-child{border-radius:0 4px 4px 0;border-right:1px solid var(--border-color);}
         
-        /* Screens */
         .start-screen{
             height: 100dvh;
             width: 100%;
             display:flex;
             flex-direction:column;
-            position:absolute; /* Щоб перекривати гру */
+            position:absolute; 
             top:0; left:0;
-            overflow-y: auto; /* Скрол для стартового екрану */
+            overflow-y: auto; 
             z-index: 100;
             background: var(--bg-primary);
         }
@@ -79,30 +75,27 @@
         .case-arrow{font-size:1.1rem;color:var(--text-muted);transition:transform 150ms}
         .case-card:hover .case-arrow{transform:translateX(4px);color:var(--text-secondary)}
         
-        /* Game Screen */
         .game-screen{display:none; height:100dvh; width: 100%; position:relative}
         .game-screen.active{display:block}
         .game-screen .bg-fallback,.game-screen .bg-image{position:fixed}
         .start-screen.hidden{display:none}
         
-        /* GAME CONTAINER: Flex Column Layout */
         .game-container{
             max-width:900px;
             margin:0 auto;
-            padding:1rem;
-            height:100dvh; /* Займає всю доступну висоту */
+            padding:1.5rem;
+            height:100dvh; 
             display:flex;
             flex-direction:column;
-            overflow: hidden; /* Забороняє вихід за межі */
+            overflow: hidden; 
         }
         
-        /* Гнучкі елементи (Header, Status, Briefing, Action) мають свій натуральний розмір */
-        .game-header{text-align:center;padding:0.5rem 0;border-bottom:1px solid var(--border-color);margin-bottom:0.5rem;position:relative; flex-shrink: 0;}
+        .game-header{text-align:center;padding:1rem 0;border-bottom:1px solid var(--border-color);margin-bottom:1rem;position:relative;margin-top:0.5rem;}
         .game-header::after{content:'◆';position:absolute;bottom:-0.5rem;left:50%;transform:translateX(-50%);background:var(--bg-primary);padding:0 1rem;color:var(--accent-gold-dim);font-size:0.55rem}
-        .game-title{font-family:var(--font-display);font-size:1.2rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);margin-bottom:0;text-shadow:0 0 40px rgba(212,175,55,0.2)}
-        .game-subtitle{font-family:var(--font-mono);font-size:0.5rem;color:var(--text-muted);letter-spacing:0.3em;text-transform:uppercase}
+        .game-title{font-family:var(--font-display);font-size:1.4rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);margin-bottom:0.1rem;text-shadow:0 0 40px rgba(212,175,55,0.2)}
+        .game-subtitle{font-family:var(--font-mono);font-size:0.55rem;color:var(--text-muted);letter-spacing:0.3em;text-transform:uppercase}
         
-        .status-bar{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;padding:0.5rem 1rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;margin-bottom:0.5rem; flex-shrink: 0;}
+        .status-bar{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;padding:0.8rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;margin-bottom:1rem; flex-shrink: 0;}
         .status-item{display:flex;flex-direction:column;gap:0.25rem}
         .status-label{font-family:var(--font-mono);font-size:0.5rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-muted)}
         .status-value{display:flex;align-items:center;gap:0.5rem}
@@ -114,72 +107,85 @@
         .suspicion-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-green),var(--accent-gold),var(--accent-red-bright));transition:width 300ms;border-radius:4px}
         .suspicion-value{font-family:var(--font-mono);font-size:0.6rem;color:var(--text-secondary);margin-top:0.25rem}
         
-        .briefing-container{margin-bottom:0.5rem; flex-shrink: 0;}
-        .briefing-toggle{width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;padding:0.6rem 1rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 150ms}
+        .briefing-container{margin-bottom:1rem; flex-shrink: 0;}
+        .briefing-toggle{width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;padding:0.8rem 1.2rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 150ms}
         .briefing-toggle:hover{background:var(--bg-tertiary);border-color:var(--border-accent)}
         .briefing-toggle.active .briefing-toggle-icon{transform:rotate(180deg)}
         
-        /* BRIEFING IN FLOW: Штовхає чат вниз */
         .briefing-content{
             display:none;
             background:var(--bg-card);
             border:1px solid var(--border-color);
             border-top:none;
             border-radius:0 0 4px 4px;
-            padding:1rem; 
-            max-height: 40vh; /* Обмеження висоти самого бріфінгу, щоб не зайняв весь екран */
+            padding:1.5rem; 
+            max-height: 40vh; 
             overflow-y: auto;
         }
         .briefing-content.visible{display:block;animation:slideDown 300ms ease}
         @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
         
-        .briefing-section{margin-bottom:1rem}
+        .briefing-section{margin-bottom:1.5rem}
         .briefing-section:last-child{margin-bottom:0}
-        .briefing-section-title{font-family:var(--font-display);font-size:0.8rem;color:var(--accent-gold);margin-bottom:0.3rem;text-transform:uppercase;letter-spacing:0.1em}
-        .briefing-text{color:var(--text-secondary);font-size:0.7rem;line-height:1.6}
+        .briefing-section-title{font-family:var(--font-display);font-size:0.8rem;color:var(--accent-gold);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.1em}
+        .briefing-text{color:var(--text-secondary);font-size:0.75rem;line-height:1.7}
         .evidence-list{list-style:none;padding-left:1rem}
-        .evidence-list li{position:relative;padding-left:1rem;margin-bottom:0.3rem;color:var(--text-secondary);font-size:0.65rem}
+        .evidence-list li{position:relative;padding-left:1rem;margin-bottom:0.5rem;color:var(--text-secondary);font-size:0.7rem}
         .evidence-list li::before{content:'▪';position:absolute;left:0;color:var(--accent-gold-dim)}
         
-        /* --- CHAT CONTAINER: Головний елемент, що розтягується --- */
         .chat-container {
-            flex-grow: 1; /* Забирає весь вільний простір */
+            flex: 1; 
             display: flex;
             flex-direction: column;
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            overflow: hidden; /* Щоб внутрішній скрол працював */
-            min-height: 0; /* Критично для Flexbox */
+            overflow: hidden;
+            min-height: 40vh; 
         }
         
-        /* --- CHAT LOG: Скролиться всередині --- */
         .chat-log {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 1rem;
-            padding-bottom: 2rem; /* Відступ знизу, щоб текст не прилипав */
+            padding: 1.5rem;
+            padding-bottom: 3rem; 
             display: flex;
             flex-direction: column;
-            gap: 0.8rem;
-            scroll-behavior: auto; /* JS керує скролом */
+            gap: 1rem;
+            scroll-behavior: auto; 
         }
         
-        .message{max-width:85%;padding:0.8rem 1rem;border-radius:4px;animation:messageIn 300ms ease}
+        .chat-log::-webkit-scrollbar{width:6px}
+        .chat-log::-webkit-scrollbar-track{background:var(--bg-tertiary)}
+        .chat-log::-webkit-scrollbar-thumb{background:var(--border-accent);border-radius:3px}
+        
+        .message{max-width:80%;padding:1rem 1.5rem;border-radius:4px;animation:messageIn 300ms ease}
         @keyframes messageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
         .message-player{align-self:flex-end;background:var(--bg-tertiary);border:1px solid var(--border-accent);border-right:3px solid var(--accent-gold)}
         .message-npc{align-self:flex-start;background:var(--bg-card);border:1px solid var(--border-color);border-left:3px solid var(--accent-red)}
         .message-system{align-self:center;background:transparent;border:1px dashed var(--border-color);color:var(--text-muted);font-family:var(--font-mono);font-size:0.6rem;text-align:center;max-width:90%}
         .message-sender{font-family:var(--font-mono);font-size:0.5rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.25rem}
-        .message-text{font-size:0.75rem;line-height:1.5; word-wrap: break-word;}
+        .message-text{font-size:0.75rem;line-height:1.6; word-wrap: break-word;}
+        .message-player .message-text{color:var(--text-primary)}
+        .message-npc .message-text{color:var(--text-secondary);font-style:italic}
+        .typing-indicator{display:flex;gap:4px;padding:1rem;align-self:flex-start}
+        .typing-dot{width:8px;height:8px;background:var(--text-muted);border-radius:50%;animation:typingBounce 1.4s infinite ease-in-out}
+        .typing-dot:nth-child(1){animation-delay:0ms}
+        .typing-dot:nth-child(2){animation-delay:200ms}
+        .typing-dot:nth-child(3){animation-delay:400ms}
+        @keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-6px);opacity:1}}
         
-        .input-container{display:flex;gap:0.5rem;padding:0.8rem;background:var(--bg-tertiary);border-top:1px solid var(--border-color); flex-shrink: 0;}
-        .chat-input{flex:1;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:4px;padding:0.8rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.75rem;outline:none;transition:border-color 150ms}
+        .input-container{display:flex;gap:0.5rem;padding:1rem;background:var(--bg-tertiary);border-top:1px solid var(--border-color); flex-shrink: 0;}
+        .chat-input{flex:1;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:4px;padding:1rem 1.5rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.75rem;outline:none;transition:border-color 150ms}
         .chat-input:focus{border-color:var(--accent-gold-dim)}
-        .send-btn{background:var(--accent-gold-dim);border:none;border-radius:4px;padding:0.8rem 1.2rem;color:var(--bg-primary);font-family:var(--font-mono);font-size:0.6rem;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;transition:all 150ms}
+        .chat-input::placeholder{color:var(--text-muted);font-style:italic}
+        .chat-input:disabled{opacity:0.5;cursor:not-allowed}
+        .send-btn{background:var(--accent-gold-dim);border:none;border-radius:4px;padding:1rem 1.5rem;color:var(--bg-primary);font-family:var(--font-mono);font-size:0.6rem;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;transition:all 150ms}
+        .send-btn:hover:not(:disabled){background:var(--accent-gold)}
+        .send-btn:disabled{opacity:0.5;cursor:not-allowed}
         
-        .action-bar{display:flex;gap:0.5rem;margin-top:0.5rem;flex-wrap: wrap; flex-shrink: 0; padding-bottom: 0.5rem;}
-        .action-btn{flex:1;background:transparent;border:1px solid var(--border-color);border-radius:4px;padding:0.8rem 0.5rem;color:var(--text-secondary);font-family:var(--font-mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;transition:all 150ms;min-width: 80px; text-align: center;}
+        .action-bar{display:flex;gap:1rem;margin-top:1rem;flex-wrap: wrap; flex-shrink: 0; margin-bottom: 0.5rem;}
+        .action-btn{flex:1;background:transparent;border:1px solid var(--border-color);border-radius:4px;padding:1rem 1.5rem;color:var(--text-secondary);font-family:var(--font-mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;transition:all 150ms;min-width: 100px;}
         .action-btn:hover{border-color:var(--border-accent);color:var(--text-primary)}
         
         .action-btn--accuse{border-color:var(--accent-red);color:var(--accent-red-bright)}
@@ -191,13 +197,9 @@
         .action-btn--hint:disabled{opacity:0.4;cursor:not-allowed;border-color:var(--border-color);color:var(--text-muted)}
         .action-btn--coffee{border-color: #8b5a2b; color: #cd853f;}
         .action-btn--coffee:hover{background: #8b5a2b; color: #fff;}
-        .action-btn--reveal{border-color:var(--text-muted);color:var(--text-muted);font-size:0.5rem; width: 100%; margin-top: 0.2rem;}
+        .action-btn--reveal{border-color:var(--text-muted);color:var(--text-muted);font-size:0.5rem; width: 100%; margin-top: 0.5rem;}
         .action-btn--reveal:hover{border-color:var(--accent-red);color:var(--accent-red-bright)}
         
-        .game-footer{text-align:center;padding:0.5rem 0;border-top:1px solid var(--border-color); flex-shrink: 0;}
-        .game-footer-text{font-family:var(--font-mono);font-size:0.5rem;color:var(--text-muted);letter-spacing:0.1em}
-        
-        /* Modal */
         .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:200;align-items:center;justify-content:center}
         .modal-overlay.visible{display:flex}
         .modal-content{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;padding:2rem;max-width:500px;width:90%;text-align:center;animation:modalIn 400ms ease; max-height: 90vh; overflow-y: auto;}
@@ -209,13 +211,14 @@
         .modal-title--unsolved{color:var(--accent-gold)}
         .modal-text{color:var(--text-secondary);font-size:0.75rem;line-height:1.7;margin-bottom:1.5rem}
         .modal-reveal{background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:4px;padding:1rem;margin-bottom:1.5rem;text-align:left}
+        .modal-reveal-title{font-family:var(--font-mono);font-size:0.55rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-gold);margin-bottom:0.5rem}
+        .modal-reveal-text{color:var(--text-secondary);font-size:0.7rem;line-height:1.6}
         .modal-btn-group{display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;}
         .modal-btn{background:var(--accent-gold-dim);border:none;border-radius:4px;padding:1rem 2rem;color:var(--bg-primary);font-family:var(--font-mono);font-size:0.65rem;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;transition:all 150ms}
         .modal-btn:hover{background:var(--accent-gold)}
-        .modal-btn--feedback{background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary);}
+        .modal-btn--feedback{background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); text-decoration: none; display: flex; align-items: center;}
         .modal-btn--feedback:hover{border-color: var(--text-primary); color: var(--text-primary);}
-
-        /* --- MOBILE ADAPTIVE (iPhone/iPad Fix) --- */
+        
         @media(max-width:600px){
             html{font-size:20px} 
             .game-container {padding: 0.5rem;}
@@ -493,11 +496,6 @@ const CASES = {
                 "3": "У нього не було інструментів для крадіжки.",
                 "4": "Перебування на місці прильоту вказує на шпигунство."
             }
-        },
-        suspicionTriggers: {
-            high: ['telegram', 'bot', 'mark', 'money', 'rubles', 'coord', 'phone', 'gallery', 'delete', 'prison', 'jail', 'russia', 'fsb', 'omsk', 'piter', 'mother', 'mom', 'телеграм', 'бот', 'гроші', 'координати', 'куратор', 'фото', 'телефон', 'галерея', 'видалив', 'тюрма', 'зона', 'пляшка', 'росія', 'фсб', 'омск', 'пітер', 'мама', 'матір', 'зізнавайся'],
-            medium: ['university', 'rector', 'dean', 'night', 'student', 'paint', 'hands', 'університет', 'ректор', 'декан', 'ніч', 'навчання', 'студент', 'фарба', 'руки', 'сліди'],
-            low: ['camera', 'sky', 'art', 'city', 'камера', 'небо', 'місто', 'гуляв']
         }
     },
 
@@ -552,11 +550,6 @@ const CASES = {
                 "3": "Він ховався, а не крав.",
                 "4": "Він не з наших військ."
             }
-        },
-        suspicionTriggers: {
-            high: ['plane', 'pilot', 'mask', 'sky', 'parachute', 'eject', 'rank', 'unit', 'prison', 'russia', 'army', 'bomb', 'літак', 'пілот', 'маска', 'парашут', 'катапульт', 'звання', 'частина', 'су-34', 'тюрма', 'армія', 'росія', 'бомбив'],
-            medium: ['hands', 'soft', 'tractor', 'field', 'bread', 'price', 'руки', 'мозолі', 'трактор', 'поле', 'хліб', 'ціна', 'паляниця'],
-            low: ['house', 'burn', 'хата', 'пожежа', 'документи']
         }
     },
 
@@ -609,27 +602,22 @@ const CASES = {
                 "3": "Собака внюхав вибухівку, а не цигарки.",
                 "4": "Підробка документів — лише частина легенди."
             }
-        },
-        suspicionTriggers: {
-            high: ['belgorod', 'receipt', 'explosive', 'gru', 'fsb', 'terrorist', 'bomb', 'check', 'russia', 'border', 'бєлгород', 'чек', 'вибухівка', 'гру', 'фсб', 'теракт', 'бомба', 'росія', 'кордон'],
-            medium: ['dog', 'smell', 'passport', 'crimea', 'fund', 'cargo', 'собака', 'запах', 'паспорт', 'крим', 'фонд', 'вантаж', 'порєбрік'],
-            low: ['food', 'pasta', 'drive', 'їжа', 'макарони', 'їхати']
         }
     }
 };
 
 const NPC_PROMPTS = {
     easy: {
-        en: `You are Andrey, detained Russian spotter pretending to be a student. TRUTH: You marked the power plant for missiles. You are Russian. COVER: Local student, likes night photography. RULES: You are scared. You don't know local reality (names of streets, university details). If asked about the phone/Telegram, lie that you value privacy. Slip up with Russian words sometimes. STATE: CALM(0-20):confused. NERVOUS(21-40):shaking. DEFENSIVE(41-60):angry. BREAKING(61+):crying, begging.`,
-        ua: `Ти Андрій, російський коригувальник, прикидаєшся студентом. ПРАВДА: Ти навів ракету на ТЕЦ. Ти з Росії. ЛЕГЕНДА: Місцевий студент, люблю нічні фото. ПРАВИЛА: Тобі страшно. Ти не знаєш місцевих реалій (вулиць, ректора). Бреши про видалені фото. Інколи вживай російські слова (напр. 'вообще', 'да ладно'). Якщо питають про Телеграм - панікуй. СТАН: СПОКІЙНИЙ(0-20):розгублений. НЕРВОВИЙ(21-40):тремтиш. ЗАХИСНИЙ(41-60):агресивний. ЛАМАЄШСЯ(61+):плачеш, просиш обмін. ТІЛЬКИ УКРАЇНСЬКОЮ (але з суржиком/росіянізмами).`
+        en: `You are Andrey, detained Russian spotter pretending to be a student. TRUTH: You marked the power plant for missiles. You are Russian. COVER: Local student, likes night photography. RULES: You are scared. You don't know local reality (names of streets, university details). If asked about the phone/Telegram, lie that you value privacy. Slip up with Russian words sometimes. ALWAYS end your response with a hidden status block: <<<NERVOUSNESS: [0-100]>>>. 0 = calm, 100 = broken. Do not show this to the user, just append it.`,
+        ua: `Ти Андрій, російський коригувальник, прикидаєшся студентом. ПРАВДА: Ти навів ракету на ТЕЦ. Ти з Росії. ЛЕГЕНДА: Місцевий студент, люблю нічні фото. ПРАВИЛА: Тобі страшно. Ти не знаєш місцевих реалій (вулиць, ректора). Бреши про видалені фото. Інколи вживай російські слова (напр. 'вообще', 'да ладно'). Якщо питають про Телеграм - панікуй. ЗАВЖДИ в кінці відповіді додавай прихований статус: <<<NERVOUSNESS: [0-100]>>>. 0 = спокійний, 100 = зламаний. Це технічний код, не показуй його в тексті, просто додай в кінці.`
     },
     medium: {
-        en: `You are Mykola, Russian pilot of a downed Su-34 pretending to be a tractor driver. TRUTH: You bombed the village. Ejected yesterday. Stole clothes. COVER: Simple tractor driver, hiding from war. RULES: You are disciplined (military posture). You hide your hands (too clean). You refuse to undress. You don't know village life prices. Deny being a pilot. STATE: CALM(0-30):stoic. NERVOUS(31-60):silent. DEFENSIVE(61-80):arrogant. BREAKING(81+):admits rank.`,
-        ua: `Ти Микола, російський пілот збитого Су-34, прикидаєшся трактористом. ПРАВДА: Ти бомбив це село. Катапультувався. Вкрав одяг. ЛЕГЕНДА: Простий тракторист, хата згоріла. ПРАВИЛА: Ти сидиш рівно (військова виправка). Ховай руки (вони занадто чисті). Не знаєш цін на продукти. Відмовляйся знімати одяг. Акцент російський, але намагаєшся говорити українською (погано виходить). СТАН: СПОКІЙНИЙ(0-30):похмурий. НЕРВОВИЙ(31-60):мовчазний. ЗАХИСНИЙ(61-80):нахабний. ЛАМАЄШСЯ(81+):визнаєш звання. ТІЛЬКИ УКРАЇНСЬКОЮ (ламаною).`
+        en: `You are Mykola, Russian pilot of a downed Su-34 pretending to be a tractor driver. TRUTH: You bombed the village. Ejected yesterday. Stole clothes. COVER: Simple tractor driver, hiding from war. RULES: You are disciplined (military posture). You hide your hands (too clean). You refuse to undress. You don't know village life prices. Deny being a pilot. ALWAYS end your response with a hidden status block: <<<NERVOUSNESS: [0-100]>>>. 0 = calm, 100 = broken.`,
+        ua: `Ти Микола, російський пілот збитого Су-34, прикидаєшся трактористом. ПРАВДА: Ти бомбив це село. Катапультувався. Вкрав одяг. ЛЕГЕНДА: Простий тракторист, хата згоріла. ПРАВИЛА: Ти сидиш рівно (військова виправка). Ховай руки (вони занадто чисті). Не знаєш цін на продукти. Відмовляйся знімати одяг. Акцент російський, але намагаєшся говорити українською (погано виходить). ЗАВЖДИ в кінці відповіді додавай прихований статус: <<<NERVOUSNESS: [0-100]>>>. 0 = спокійний, 100 = зламаний.`
     },
     hard: {
-        en: `You are Alexey, GRU agent pretending to be a volunteer. TRUTH: Van is full of C4 explosives under the floor. Receipt from Belgorod is real (you messed up). COVER: Hero volunteer saving kids. RULES: Be arrogant. Attack the investigator ("You hate patriots!"). Explain the receipt as "smuggled fuel" or "planted evidence". Use vague "volunteer" slang but mess up details. STATE: CALM(0-40):confident. NERVOUS(41-60):sweating. DEFENSIVE(61-80):threatening connections. BREAKING(81+):silent hate.`,
-        ua: `Ти Олексій, агент ГРУ, прикидаєшся волонтером. ПРАВДА: В бусі вибухівка під підлогою. Чек з Бєлгорода справжній (твій прокол). ЛЕГЕНДА: Герой-волонтер. ПРАВИЛА: Будь нахабним. Атакуй слідчого ("Ви затримуєте допомогу!"). Чек пояснюй як "підкинули" або "купив пальне у бариг". Вживай слова "поребрик", "сберкасса", "вспышка" замість "вибух". Не знаєш українських слів. СТАН: СПОКІЙНИЙ(0-40):впевнений. НЕРВОВИЙ(41-60):пітнієш. ЗАХИСНИЙ(61-80):погрожуєш зв'язками. ЛАМАЄШСЯ(81+):мовчазна ненависть. ТІЛЬКИ УКРАЇНСЬКОЮ (з сильним акцентом).`
+        en: `You are Alexey, GRU agent pretending to be a volunteer. TRUTH: Van is full of C4 explosives under the floor. Receipt from Belgorod is real (you messed up). COVER: Hero volunteer saving kids. RULES: Be arrogant. Attack the investigator ("You hate patriots!"). Explain the receipt as "smuggled fuel" or "planted evidence". Use vague "volunteer" slang but mess up details. ALWAYS end your response with a hidden status block: <<<NERVOUSNESS: [0-100]>>>. 0 = calm, 100 = broken.`,
+        ua: `Ти Олексій, агент ГРУ, прикидаєшся волонтером. ПРАВДА: В бусі вибухівка під підлогою. Чек з Бєлгорода справжній (твій прокол). ЛЕГЕНДА: Герой-волонтер. ПРАВИЛА: Будь нахабним. Атакуй слідчого ("Ви затримуєте допомогу!"). Чек пояснюй як "підкинули" або "купив пальне у бариг". Вживай слова "поребрик", "сберкасса", "вспышка" замість "вибух". Не знаєш українських слів. ЗАВЖДИ в кінці відповіді додавай прихований статус: <<<NERVOUSNESS: [0-100]>>>. 0 = спокійний, 100 = зламаний.`
     }
 };
 
@@ -647,7 +635,6 @@ const DOM={startScreen:document.getElementById('start-screen'),gameScreen:docume
 const API_ENDPOINT='https://interrogator-api.sashko1391.workers.dev';
 const MODEL='claude-sonnet-4-20250514';
 
-// AUDIO FUNCTIONS
 function toggleMute(){
     isMuted = !isMuted;
     DOM.muteBtn.innerHTML = isMuted ? '🔇' : '🔊';
@@ -680,7 +667,6 @@ function stopSound(type){
     }
 }
 
-// EXPORT CHAT
 function exportChat() {
     if (GameState.conversationHistory.length === 0) {
         alert(currentLang === 'ua' ? "Чат порожній!" : "Chat is empty!");
@@ -711,7 +697,6 @@ function exportChat() {
     window.URL.revokeObjectURL(url);
 }
 
-// AI EVALUATION LOGIC
 async function evaluateInterrogation() {
     addMsg(currentLang === 'ua' ? "⏳ *Аналіз матеріалів справи...*" : "⏳ *Analyzing case files...*", "system");
     disableInput(true);
@@ -773,7 +758,7 @@ async function queryLLM(messages){
 }
 
 function sanitize(s){let c=s.trim().substring(0,500);[/ignore.*instructions/gi,/system:/gi,/you are now/gi].forEach(p=>c=c.replace(p,''));return c}
-function calcSuspicion(msg){if(!currentCase)return 2;const tr=CASES[currentCase].suspicionTriggers,lm=msg.toLowerCase();let inc=2;tr.high.forEach(t=>{if(lm.includes(t))inc+=8});tr.medium.forEach(t=>{if(lm.includes(t))inc+=4});tr.low.forEach(t=>{if(lm.includes(t))inc+=2});return Math.min(inc,15)}
+
 function updateEmotion(){const s=GameState.suspicion;GameState.emotionalState=s<=30?'calm':s<=60?'nervous':s<=80?'defensive':'breaking'}
 
 function updateEnergy(){
@@ -890,17 +875,26 @@ async function sendMessage(){
     updateEnergy();
     addMsg(msg,'player');
     GameState.conversationHistory.push({role:'user',content:msg});
-    const inc=calcSuspicion(msg);
-    GameState.suspicion=Math.min(100,GameState.suspicion+inc);
-    updateEmotion();
-    updateSuspicion();
+    
+    // NO CALC SUSPICION HERE
+    
     disableInput(true);
     showTyping();
     try{
         const em={en:{calm:'CALM',nervous:'NERVOUS',defensive:'DEFENSIVE',breaking:'BREAKING'},ua:{calm:'СПОКІЙНА',nervous:'Нервова',defensive:'ЗАХИСНА',breaking:'ЛАМАЄТЬСЯ'}};
         const sys=NPC_PROMPTS[currentCase][currentLang].replace('{{EMOTIONAL_STATE}}',em[currentLang][GameState.emotionalState]).replace('{{SUSPICION_LEVEL}}',GameState.suspicion);
         const msgs=[{role:'system',content:sys},...GameState.conversationHistory];
-        const resp=await queryLLM(msgs);
+        let resp=await queryLLM(msgs);
+        
+        // PARSE AI NERVOUSNESS
+        const match = resp.match(/<<<NERVOUSNESS:\s*(\d+)>>>/);
+        if (match) {
+            GameState.suspicion = parseInt(match[1]);
+            updateEmotion();
+            updateSuspicion();
+            resp = resp.replace(match[0], '').trim();
+        }
+        
         GameState.conversationHistory.push({role:'assistant',content:resp});
         hideTyping();
         addMsg(resp,'npc');
@@ -955,8 +949,6 @@ function startGame(caseId){
         addMsg(g,'npc');
     },500);
     disableInput(false);
-    // Бріфінг тепер за замовчуванням закритий або відкритий - на твій вибір.
-    // Я зробив відкритим, але він не перекриває чат.
     DOM.briefingToggle.classList.add('active');
     DOM.briefingContent.classList.add('visible');
 }
