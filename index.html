@@ -21,7 +21,8 @@
             position: relative;
         }
         
-        body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.03;pointer-events:none;z-index:1000}
+        /* NOISE EFFECT */
+        body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.05;pointer-events:none;z-index:1000}
 
         .bg-fallback{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 20%,rgba(139,41,66,0.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(212,175,55,0.1) 0%,transparent 50%),linear-gradient(180deg,#0a0a0c 0%,#12121a 100%);z-index:-2}
         .bg-image{position:fixed;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;z-index:-1; opacity: 0.4;}
@@ -33,6 +34,7 @@
         
         .icon-btn{background:rgba(18,18,26,0.9);border:1px solid var(--border-color);color:var(--text-muted);padding:0.6rem;font-family:var(--font-mono);font-size:0.8rem;cursor:pointer;border-radius:4px;min-width:40px;display:flex;align-items:center;justify-content:center;}
         .icon-btn:hover{border-color:var(--accent-gold);}
+        .icon-btn.active{color:var(--accent-gold); border-color:var(--accent-gold);}
         
         .lang-btn{background:rgba(18,18,26,0.9);border:1px solid var(--border-color);color:var(--text-muted);padding:0.6rem;font-family:var(--font-mono);font-size:0.8rem;cursor:pointer;min-width:40px;}
         .lang-btn:first-child{border-radius:4px 0 0 4px; border-right: none;}
@@ -227,14 +229,12 @@
 (function(){
 'use strict';
 
-// --- CONFIG ---
 const API_ENDPOINT='https://interrogator-api.sashko1391.workers.dev';
 let currentCaseData = null;
 let isMuted=false;
 let lastVisualState = 'neutral';
-let currentLang = 'ua'; // Default lang
+let currentLang = 'ua'; 
 
-// --- I18N ---
 const i18n = {
     ua: {
         title: "Слідчий",
@@ -309,7 +309,6 @@ const DOM={
     langBtns:document.querySelectorAll('.lang-btn')
 };
 
-// --- TRANSLATION ---
 function t(key) { return i18n[currentLang][key] || key; }
 
 function updateTexts() {
@@ -319,8 +318,13 @@ function updateTexts() {
     DOM.chatInput.placeholder = t('prompt');
 }
 
-// --- CORE LOGIC ---
 async function generateCase(category) {
+    // AUDIO UNLOCK FOR IOS
+    if (!isMuted) {
+        DOM.audioBg.play().catch(() => {});
+        DOM.audioBg.pause();
+    }
+
     DOM.startScreen.classList.add('hidden');
     DOM.loadingScreen.classList.add('visible');
     
@@ -364,7 +368,10 @@ function startGame() {
     DOM.chatLog.innerHTML = '';
     DOM.suspectImg.src = "https://placehold.co/400x400/1a1a24/d4af37?text=?";
     
-    if(!isMuted) DOM.audioBg.play().catch(e=>{});
+    if(!isMuted) {
+        DOM.audioBg.currentTime = 0;
+        DOM.audioBg.play().catch(e=>{});
+    }
     
     addMsg(t('startMsg'), 'system');
     
@@ -499,13 +506,49 @@ function updateUI() {
     DOM.coffeeBtn.disabled = GameState.energy >= 15;
 }
 
+// RESTORED TYPEWRITER EFFECT
+function typeWriter(element, text, speed = 20) {
+    let i = 0;
+    
+    if(!isMuted) {
+        DOM.audioType.currentTime = 0;
+        DOM.audioType.play().catch(()=>{});
+    }
+
+    const interval = setInterval(() => {
+        if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
+            DOM.chatLog.scrollTop = DOM.chatLog.scrollHeight;
+        } else {
+            clearInterval(interval);
+            if(!isMuted) DOM.audioType.pause();
+        }
+    }, speed);
+}
+
 function addMsg(text, type) {
     const d = document.createElement('div');
     d.className = `message message-${type}`;
-    d.innerHTML = `<div class="message-sender">${type==='player'?'Detective':'Suspect'}</div><div class="message-text">${text}</div>`;
+    
+    const sender = document.createElement('div');
+    sender.className = 'message-sender';
+    sender.textContent = type==='player' ? 'Detective' : 'Suspect';
+    
+    const txtDiv = document.createElement('div');
+    txtDiv.className = 'message-text';
+    
+    d.appendChild(sender);
+    d.appendChild(txtDiv);
     DOM.chatLog.appendChild(d);
+    
+    if(type === 'npc') {
+        typeWriter(txtDiv, text);
+    } else {
+        txtDiv.textContent = text;
+    }
+    
     DOM.chatLog.scrollTop = DOM.chatLog.scrollHeight;
-    if(type==='npc' && !isMuted) { DOM.audioType.currentTime=0; DOM.audioType.play().catch(()=>{}); }
 }
 
 function showTyping(){
@@ -524,7 +567,7 @@ function showModal(type, text) {
     DOM.modalRevealText.textContent = currentCaseData.truthReveal;
 }
 
-// --- EVENTS ---
+// EVENTS
 DOM.langBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         currentLang = btn.dataset.lang;
@@ -548,7 +591,6 @@ DOM.modalBtn.addEventListener('click', () => { DOM.modalOverlay.classList.remove
 DOM.muteBtn.addEventListener('click', () => { isMuted=!isMuted; DOM.muteBtn.textContent=isMuted?'🔇':'🔊'; if(isMuted) DOM.audioBg.pause(); else DOM.audioBg.play(); });
 DOM.exportBtn.addEventListener('click', () => alert("Export not implemented in generator mode yet."));
 
-// Init
 updateTexts();
 
 })();
