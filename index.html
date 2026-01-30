@@ -21,7 +21,6 @@
             position: relative;
         }
         
-        /* NOISE EFFECT */
         body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.05;pointer-events:none;z-index:1000}
 
         .bg-fallback{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 20%,rgba(139,41,66,0.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(212,175,55,0.1) 0%,transparent 50%),linear-gradient(180deg,#0a0a0c 0%,#12121a 100%);z-index:-2}
@@ -55,6 +54,7 @@
         .cat-title{font-family:var(--font-display);font-size:1.2rem;color:var(--accent-gold);}
         .cat-desc{font-size:0.75rem;color:var(--text-secondary);line-height:1.6;}
         
+        /* LOADING SCREEN */
         .loading-screen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg-primary);z-index:200;align-items:center;justify-content:center;flex-direction:column;}
         .loading-screen.visible{display:flex;}
         .loader{width:50px;height:50px;border:3px solid var(--bg-tertiary);border-top:3px solid var(--accent-gold);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:1rem;}
@@ -66,8 +66,30 @@
         .game-screen.active{display:block;}
         .game-container{max-width:900px;margin:0 auto;padding:1.5rem;min-height:100vh;display:flex;flex-direction:column;}
         .game-header{display:flex;align-items:center;gap:1.5rem;padding:1rem 0;border-bottom:1px solid var(--border-color);margin-bottom:1rem;}
-        .suspect-image-container{width:100px;height:100px;border-radius:4px;overflow:hidden;border:1px solid var(--border-color);background:#000;position:relative;flex-shrink:0;}
-        .suspect-image{width:100%;height:100%;object-fit:cover;}
+        
+        /* SUSPECT IMAGE STYLES */
+        .suspect-image-container{
+            width:100px; height:100px; 
+            border-radius:4px; overflow:hidden; 
+            border:1px solid var(--border-color); 
+            background:#000; 
+            position:relative; flex-shrink:0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .suspect-image{width:100%; height:100%; object-fit:cover; display: none; animation: fadeIn 1s ease;}
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* MINI SPINNER FOR AVATAR */
+        .loader-mini {
+            width: 20px; height: 20px;
+            border: 2px solid var(--bg-tertiary);
+            border-top: 2px solid var(--accent-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none; /* Hidden by default */
+        }
+        .loader-mini.visible { display: block; }
+
         .game-header-text{flex:1;}
         .game-title{font-family:var(--font-display);font-size:1.2rem;text-transform:uppercase;color:var(--text-primary);}
         .game-subtitle{font-family:var(--font-mono);font-size:0.55rem;color:var(--text-muted);text-transform:uppercase;}
@@ -171,7 +193,8 @@
         <div class="game-container">
             <header class="game-header">
                 <div class="suspect-image-container">
-                    <img id="suspect-img" class="suspect-image" src="" alt="Suspect" style="display:none;">
+                    <img id="suspect-img" class="suspect-image" src="" alt="Suspect">
+                    <div class="loader-mini" id="suspect-loader-mini"></div>
                 </div>
                 <div class="game-header-text">
                     <h1 class="game-title" id="game-title">Case #???</h1>
@@ -289,6 +312,7 @@ const DOM={
     gameTitle:document.getElementById('game-title'),
     gameSuspectName:document.getElementById('game-suspect-name'),
     suspectImg:document.getElementById('suspect-img'),
+    suspectLoaderMini:document.getElementById('suspect-loader-mini'),
     modalOverlay:document.getElementById('modal-overlay'),
     modalTitle:document.getElementById('modal-title'),
     modalText:document.getElementById('modal-text'),
@@ -319,7 +343,7 @@ function updateTexts() {
 }
 
 async function generateCase(category) {
-    // AUDIO UNLOCK FOR IOS
+    // AUDIO UNLOCK
     if (!isMuted) {
         DOM.audioBg.play().catch(() => {});
         DOM.audioBg.pause();
@@ -366,7 +390,11 @@ function startGame() {
     DOM.caseEvidence.innerHTML = currentCaseData.knownFacts.map(f => `<li>${f}</li>`).join('');
     
     DOM.chatLog.innerHTML = '';
-    DOM.suspectImg.src = "https://placehold.co/400x400/1a1a24/d4af37?text=?";
+    
+    // Hide old image, show loader
+    DOM.suspectImg.style.display = 'none';
+    DOM.suspectImg.src = "";
+    DOM.suspectLoaderMini.classList.add('visible');
     
     if(!isMuted) {
         DOM.audioBg.currentTime = 0;
@@ -404,8 +432,14 @@ async function generateSuspectImage() {
             body: JSON.stringify({ prompt: prompt })
         });
         const data = await r.json();
-        if(data.imageUrl) DOM.suspectImg.src = data.imageUrl;
-        DOM.suspectImg.style.display = 'block';
+        
+        if(data.imageUrl) {
+            DOM.suspectImg.src = data.imageUrl;
+            DOM.suspectImg.onload = () => {
+                DOM.suspectLoaderMini.classList.remove('visible');
+                DOM.suspectImg.style.display = 'block';
+            };
+        }
     } catch(e) {
         console.log("Image gen skip/fail");
     }
@@ -506,7 +540,7 @@ function updateUI() {
     DOM.coffeeBtn.disabled = GameState.energy >= 15;
 }
 
-// RESTORED TYPEWRITER EFFECT
+// TYPEWRITER
 function typeWriter(element, text, speed = 20) {
     let i = 0;
     
