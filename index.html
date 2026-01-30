@@ -3,377 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Interrogator: War Crimes</title>
+    <title>The Interrogator: AI Generator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Code+Pro:wght@400;500&family=Crimson+Pro:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root{--bg-primary:#0a0a0c;--bg-secondary:#12121a;--bg-tertiary:#1a1a24;--bg-card:#15151f;--text-primary:#e8e6e3;--text-secondary:#9a9a9a;--text-muted:#5a5a6a;--accent-gold:#d4af37;--accent-gold-dim:#8b7323;--accent-red:#8b2942;--accent-red-bright:#c73e5c;--accent-green:#2d5a3d;--accent-green-bright:#4a9b6a;--border-color:#2a2a3a;--border-accent:#3a3a4a;--font-display:'Playfair Display',Georgia,serif;--font-body:'Crimson Pro',Georgia,serif;--font-mono:'Source Code Pro',monospace}
+        :root{--bg-primary:#0a0a0c;--bg-secondary:#12121a;--bg-tertiary:#1a1a24;--bg-card:#15151f;--text-primary:#e8e6e3;--text-secondary:#9a9a9a;--text-muted:#5a5a6a;--accent-gold:#d4af37;--accent-gold-dim:#8b7323;--accent-red:#8b2942;--accent-green:#2d5a3d;--border-color:#2a2a3a;--border-accent:#3a3a4a;--font-display:'Playfair Display',Georgia,serif;--font-body:'Crimson Pro',Georgia,serif;--font-mono:'Source Code Pro',monospace}
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-        
         html{font-size:22px;scroll-behavior:smooth}
-        
-        body{
-            font-family:var(--font-body);
-            background:var(--bg-primary);
-            color:var(--text-primary);
-            min-height: 100vh;
-            /* ПОВЕРНУВ ПОВНИЙ СКРОЛ */
-            overflow-y: auto; 
-            position: static; 
-        }
-        
+        body{font-family:var(--font-body);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-y:auto;}
         body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.03;pointer-events:none;z-index:1000}
         
         .top-controls-left {position:fixed;top:1rem;left:1rem;display:flex;gap:0.5rem;z-index:50;}
-        .lang-switcher{position:fixed;top:1rem;right:1rem;display:flex;z-index:50}
+        .icon-btn{background:rgba(18,18,26,0.9);border:1px solid var(--border-color);color:var(--text-muted);padding:0.4rem 0.7rem;font-family:var(--font-mono);font-size:0.6rem;cursor:pointer;border-radius:4px;min-width:32px;}
+        .icon-btn.active{background:var(--accent-gold-dim);color:var(--bg-primary)}
         
-        .icon-btn{background:rgba(18,18,26,0.9);border:1px solid var(--border-color);color:var(--text-muted);padding:0.4rem 0.7rem;font-family:var(--font-mono);font-size:0.6rem;cursor:pointer;transition:all 150ms;border-radius:4px;display:flex;align-items:center;justify-content:center;min-width:32px;}
-        .icon-btn:hover{border-color:var(--border-accent);color:var(--text-secondary)}
-        .icon-btn.active{background:var(--accent-gold-dim);border-color:var(--accent-gold-dim);color:var(--bg-primary)}
-        
-        .lang-btn{border-radius:0;border-right:none;}
-        .lang-btn:first-child{border-radius:4px 0 0 4px;}
-        .lang-btn:last-child{border-radius:0 4px 4px 0;border-right:1px solid var(--border-color);}
-        
-        /* Start Screen */
-        .start-screen{
-            min-height: 100vh;
-            width: 100%;
-            display:flex;
-            flex-direction:column;
-            position:absolute; 
-            top:0; left:0;
-            z-index: 100;
-            background: var(--bg-primary);
-        }
-        
-        .bg-fallback{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 20%,rgba(139,41,66,0.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(212,175,55,0.1) 0%,transparent 50%),linear-gradient(180deg,#0a0a0c 0%,#12121a 100%);z-index:-2}
-        .bg-image{position:fixed;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;z-index:-1}
-        .bg-image::after{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to bottom,rgba(10,10,12,0.4) 0%,rgba(10,10,12,0.7) 50%,rgba(10,10,12,0.95) 100%)}
-        .bg-landscape{background-image:url('bg-landscape.jpg');display:block}
-        .bg-portrait{background-image:url('bg-portrait.jpg');display:none}
-        @media(orientation:portrait){.bg-landscape{display:none}.bg-portrait{display:block}}
-        
-        .start-content{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center;position:relative;z-index:1}
-        .start-title{font-family:var(--font-display);font-size:2.5rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);margin-bottom:0.5rem;text-shadow:0 0 60px rgba(212,175,55,0.3)}
-        .start-tagline{font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted);letter-spacing:0.3em;text-transform:uppercase;margin-bottom:2.5rem}
-        .start-description{max-width:500px;color:var(--text-secondary);font-size:0.85rem;line-height:1.8;margin-bottom:2.5rem}
-        
-        .case-selection{width:100%;max-width:700px; padding-bottom: 2rem;}
-        .case-selection-title{font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:1.5rem}
-        .case-cards{display:flex;flex-direction:column;gap:1rem}
-        .case-card{background:rgba(21,21,31,0.9);border:1px solid var(--border-color);border-radius:4px;padding:1.25rem;cursor:pointer;transition:all 300ms;text-align:left;display:grid;grid-template-columns:auto 1fr auto;gap:1.25rem;align-items:center}
-        .case-card:hover{border-color:var(--border-accent);background:rgba(26,26,36,0.95);transform:translateX(4px)}
-        .case-difficulty{width:55px;height:55px;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:0.5rem;text-transform:uppercase;letter-spacing:0.1em}
-        .case-difficulty--easy{background:rgba(45,90,61,0.3);border:1px solid var(--accent-green);color:var(--accent-green-bright)}
-        .case-difficulty--medium{background:rgba(139,115,35,0.3);border:1px solid var(--accent-gold-dim);color:var(--accent-gold)}
-        .case-difficulty--hard{background:rgba(139,41,66,0.3);border:1px solid var(--accent-red);color:var(--accent-red-bright)}
-        .case-info{flex:1}
-        .case-title{font-family:var(--font-display);font-size:0.95rem;color:var(--text-primary);margin-bottom:0.25rem}
-        .case-subtitle{font-size:0.7rem;color:var(--text-secondary);line-height:1.5}
-        .case-arrow{font-size:1.1rem;color:var(--text-muted);transition:transform 150ms}
-        .case-card:hover .case-arrow{transform:translateX(4px);color:var(--text-secondary)}
-        
-        .game-screen{display:none; min-height:100vh; width: 100%; position:relative}
-        .game-screen.active{display:block}
-        .game-screen .bg-fallback,.game-screen .bg-image{position:fixed}
+        .start-screen{min-height:100vh;width:100%;display:flex;flex-direction:column;position:absolute;top:0;left:0;z-index:100;background:var(--bg-primary);}
         .start-screen.hidden{display:none}
+        .start-content{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center;}
+        .start-title{font-family:var(--font-display);font-size:2.5rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);margin-bottom:0.5rem;text-shadow:0 0 60px rgba(212,175,55,0.3)}
+        .start-tagline{font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted);letter-spacing:0.3em;text-transform:uppercase;margin-bottom:2rem}
         
-        .game-container{
-            max-width:900px;
-            margin:0 auto;
-            padding:1.5rem;
-            min-height:100vh; 
-            display:flex;
-            flex-direction:column;
-        }
+        /* CATEGORY CARDS */
+        .category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;width:100%;max-width:900px;padding:0 1rem;}
+        .cat-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:4px;padding:2rem;cursor:pointer;transition:all 0.3s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1rem;}
+        .cat-card:hover{border-color:var(--accent-gold);transform:translateY(-5px);background:var(--bg-tertiary);}
+        .cat-icon{font-size:3rem;margin-bottom:0.5rem;}
+        .cat-title{font-family:var(--font-display);font-size:1.2rem;color:var(--accent-gold);}
+        .cat-desc{font-size:0.75rem;color:var(--text-secondary);line-height:1.6;}
         
-        .game-header{
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 1rem;
-            flex-shrink: 0;
-        }
-        
-        /* PHOTO CONTAINER */
-        .suspect-image-container {
-            width: 100px;
-            height: 100px;
-            border-radius: 4px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            background: #000;
-            position: relative;
-            flex-shrink: 0;
-        }
-        
-        .suspect-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 0.5s ease;
-        }
-        
-        .suspect-loader {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.5rem;
-            color: var(--accent-gold);
-            font-family: var(--font-mono);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .suspect-loader.visible { opacity: 1; }
+        /* LOADING SCREEN */
+        .loading-screen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg-primary);z-index:200;align-items:center;justify-content:center;flex-direction:column;}
+        .loading-screen.visible{display:flex;}
+        .loader{width:50px;height:50px;border:3px solid var(--bg-tertiary);border-top:3px solid var(--accent-gold);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:1rem;}
+        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        .loading-text{font-family:var(--font-mono);font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;animation:pulse 2s infinite;}
+        @keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}
 
-        .game-header-text { flex: 1; text-align: left; }
-        .game-title{font-family:var(--font-display);font-size:1.2rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);margin-bottom:0.2rem;text-shadow:0 0 40px rgba(212,175,55,0.2)}
-        .game-subtitle{font-family:var(--font-mono);font-size:0.55rem;color:var(--text-muted);letter-spacing:0.3em;text-transform:uppercase}
+        /* GAME SCREEN (Same as before) */
+        .game-screen{display:none;min-height:100vh;width:100%;}
+        .game-screen.active{display:block;}
+        .game-container{max-width:900px;margin:0 auto;padding:1.5rem;min-height:100vh;display:flex;flex-direction:column;}
+        .game-header{display:flex;align-items:center;gap:1.5rem;padding:1rem 0;border-bottom:1px solid var(--border-color);margin-bottom:1rem;}
+        .suspect-image-container{width:100px;height:100px;border-radius:4px;overflow:hidden;border:1px solid var(--border-color);background:#000;position:relative;flex-shrink:0;}
+        .suspect-image{width:100%;height:100%;object-fit:cover;}
+        .game-header-text{flex:1;}
+        .game-title{font-family:var(--font-display);font-size:1.2rem;text-transform:uppercase;color:var(--text-primary);}
+        .game-subtitle{font-family:var(--font-mono);font-size:0.55rem;color:var(--text-muted);text-transform:uppercase;}
         
-        .status-bar{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;padding:0.8rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;margin-bottom:1rem; flex-shrink: 0;}
+        .status-bar{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;padding:0.8rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;margin-bottom:1rem;}
         .status-item{display:flex;flex-direction:column;gap:0.25rem}
         .status-label{font-family:var(--font-mono);font-size:0.5rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-muted)}
         .status-value{display:flex;align-items:center;gap:0.5rem}
         .energy-display{font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--accent-gold)}
-        .energy-max{font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted)}
-        .hint-counter{font-family:var(--font-mono);font-size:0.55rem;color:var(--accent-green-bright);margin-left:0.5rem}
+        
         .suspicion-container{flex:1}
         .suspicion-bar-bg{height:8px;background:var(--bg-tertiary);border-radius:4px;overflow:hidden}
-        .suspicion-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-green),var(--accent-gold),var(--accent-red-bright));transition:width 300ms;border-radius:4px}
-        .suspicion-value{font-family:var(--font-mono);font-size:0.6rem;color:var(--text-secondary);margin-top:0.25rem}
+        .suspicion-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#2d5a3d,#d4af37,#c73e5c);transition:width 300ms;border-radius:4px}
         
-        .briefing-container{margin-bottom:1rem; flex-shrink: 0;}
-        .briefing-toggle{width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;padding:0.8rem 1.2rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 150ms}
-        .briefing-toggle:hover{background:var(--bg-tertiary);border-color:var(--border-accent)}
-        .briefing-toggle.active .briefing-toggle-icon{transform:rotate(180deg)}
+        .briefing-toggle{width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.8rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.65rem;text-transform:uppercase;cursor:pointer;margin-bottom:1rem;}
+        .briefing-content{display:none;background:var(--bg-card);border:1px solid var(--border-color);padding:1.5rem;margin-bottom:1rem;}
+        .briefing-content.visible{display:block;}
+        .briefing-section-title{color:var(--accent-gold);font-family:var(--font-display);font-size:0.9rem;margin-bottom:0.5rem;}
+        .briefing-text{font-size:0.75rem;color:var(--text-secondary);line-height:1.6;margin-bottom:1rem;}
         
-        .briefing-content{
-            display:none;
-            background:var(--bg-card);
-            border:1px solid var(--border-color);
-            border-top:none;
-            border-radius:0 0 4px 4px;
-            padding:1.5rem; 
-        }
-        .briefing-content.visible{display:block;animation:slideDown 300ms ease}
-        @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+        .chat-container{flex:1;display:flex;flex-direction:column;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;overflow:hidden;height:50vh;min-height:400px;}
+        .chat-log{flex-grow:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;}
+        .message{max-width:85%;padding:1rem;border-radius:4px;}
+        .message-player{align-self:flex-end;background:var(--bg-tertiary);border-right:3px solid var(--accent-gold);}
+        .message-npc{align-self:flex-start;background:var(--bg-card);border-left:3px solid var(--accent-red);}
+        .message-text{font-size:0.75rem;line-height:1.5;}
         
-        .briefing-section{margin-bottom:1.5rem}
-        .briefing-section:last-child{margin-bottom:0}
-        .briefing-section-title{font-family:var(--font-display);font-size:0.8rem;color:var(--accent-gold);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.1em}
-        .briefing-text{color:var(--text-secondary);font-size:0.75rem;line-height:1.7}
-        .evidence-list{list-style:none;padding-left:1rem}
-        .evidence-list li{position:relative;padding-left:1rem;margin-bottom:0.5rem;color:var(--text-secondary);font-size:0.7rem}
-        .evidence-list li::before{content:'▪';position:absolute;left:0;color:var(--accent-gold-dim)}
+        .input-container{display:flex;gap:0.5rem;padding:1rem;background:var(--bg-tertiary);border-top:1px solid var(--border-color);}
+        .chat-input{flex:1;background:var(--bg-primary);border:1px solid var(--border-color);padding:1rem;color:var(--text-primary);font-size:0.75rem;}
+        .send-btn{background:var(--accent-gold-dim);border:none;padding:0 1.5rem;color:var(--bg-primary);font-family:var(--font-mono);font-size:0.6rem;font-weight:600;cursor:pointer;}
         
-        /* CHAT CONTAINER: Fixed height with internal scroll */
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            overflow: hidden;
-            /* Height is fixed to screen percentage to ensure scrolling works inside */
-            height: 50vh; 
-            min-height: 400px;
-        }
+        .action-bar{display:flex;gap:0.5rem;margin-top:0.5rem;flex-wrap:wrap;padding-bottom:1rem;}
+        .action-btn{flex:1;background:transparent;border:1px solid var(--border-color);padding:0.8rem;color:var(--text-secondary);font-family:var(--font-mono);font-size:0.6rem;text-transform:uppercase;cursor:pointer;min-width:80px;text-align:center;}
+        .action-btn:hover{border-color:var(--border-accent);color:var(--text-primary);}
+        .action-btn--accuse{border-color:var(--accent-red);color:var(--accent-red-bright);}
         
-        .chat-log {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 1.5rem;
-            padding-bottom: 3rem; 
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            scroll-behavior: auto; 
-        }
-        
-        .chat-log::-webkit-scrollbar{width:6px}
-        .chat-log::-webkit-scrollbar-track{background:var(--bg-tertiary)}
-        .chat-log::-webkit-scrollbar-thumb{background:var(--border-accent);border-radius:3px}
-        
-        .message{max-width:80%;padding:1rem 1.5rem;border-radius:4px;animation:messageIn 300ms ease}
-        @keyframes messageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-        .message-player{align-self:flex-end;background:var(--bg-tertiary);border:1px solid var(--border-accent);border-right:3px solid var(--accent-gold)}
-        .message-npc{align-self:flex-start;background:var(--bg-card);border:1px solid var(--border-color);border-left:3px solid var(--accent-red)}
-        .message-system{align-self:center;background:transparent;border:1px dashed var(--border-color);color:var(--text-muted);font-family:var(--font-mono);font-size:0.6rem;text-align:center;max-width:90%}
-        .message-sender{font-family:var(--font-mono);font-size:0.5rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.25rem}
-        .message-text{font-size:0.75rem;line-height:1.6; word-wrap: break-word;}
-        .message-player .message-text{color:var(--text-primary)}
-        .message-npc .message-text{color:var(--text-secondary);font-style:italic}
-        .typing-indicator{display:flex;gap:4px;padding:1rem;align-self:flex-start}
-        .typing-dot{width:8px;height:8px;background:var(--text-muted);border-radius:50%;animation:typingBounce 1.4s infinite ease-in-out}
-        .typing-dot:nth-child(1){animation-delay:0ms}
-        .typing-dot:nth-child(2){animation-delay:200ms}
-        .typing-dot:nth-child(3){animation-delay:400ms}
-        @keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-6px);opacity:1}}
-        
-        .input-container{display:flex;gap:0.5rem;padding:1rem;background:var(--bg-tertiary);border-top:1px solid var(--border-color); flex-shrink: 0;}
-        .chat-input{flex:1;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:4px;padding:1rem 1.5rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.75rem;outline:none;transition:border-color 150ms}
-        .chat-input:focus{border-color:var(--accent-gold-dim)}
-        .chat-input::placeholder{color:var(--text-muted);font-style:italic}
-        .chat-input:disabled{opacity:0.5;cursor:not-allowed}
-        .send-btn{background:var(--accent-gold-dim);border:none;border-radius:4px;padding:1rem 1.5rem;color:var(--bg-primary);font-family:var(--font-mono);font-size:0.6rem;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;transition:all 150ms}
-        .send-btn:hover:not(:disabled){background:var(--accent-gold)}
-        .send-btn:disabled{opacity:0.5;cursor:not-allowed}
-        
-        .action-bar{display:flex;gap:1rem;margin-top:1rem;flex-wrap: wrap; flex-shrink: 0; margin-bottom: 0.5rem;}
-        .action-btn{flex:1;background:transparent;border:1px solid var(--border-color);border-radius:4px;padding:1rem 1.5rem;color:var(--text-secondary);font-family:var(--font-mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;transition:all 150ms;min-width: 100px;}
-        .action-btn:hover{border-color:var(--border-accent);color:var(--text-primary)}
-        
-        .action-btn--accuse{border-color:var(--accent-red);color:var(--accent-red-bright)}
-        .action-btn--accuse:hover{background:var(--accent-red);color:var(--text-primary)}
-        .action-btn--restart{border-color:var(--accent-gold-dim);color:var(--accent-gold)}
-        .action-btn--restart:hover{background:var(--accent-gold-dim);color:var(--bg-primary)}
-        .action-btn--hint{border-color:var(--accent-green);color:var(--accent-green-bright)}
-        .action-btn--hint:hover{background:var(--accent-green);color:var(--text-primary)}
-        .action-btn--hint:disabled{opacity:0.4;cursor:not-allowed;border-color:var(--border-color);color:var(--text-muted)}
-        .action-btn--coffee{border-color: #8b5a2b; color: #cd853f;}
-        .action-btn--coffee:hover{background: #8b5a2b; color: #fff;}
-        .action-btn--reveal{border-color:var(--text-muted);color:var(--text-muted);font-size:0.5rem; width: 100%; margin-top: 0.5rem;}
-        .action-btn--reveal:hover{border-color:var(--accent-red);color:var(--accent-red-bright)}
-        
-        .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:200;align-items:center;justify-content:center}
+        .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:200;align-items:center;justify-content:center}
         .modal-overlay.visible{display:flex}
-        .modal-content{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;padding:2rem;max-width:500px;width:90%;text-align:center;animation:modalIn 400ms ease; max-height: 90vh; overflow-y: auto;}
-        
-        .modal-icon{font-size:2.5rem;margin-bottom:1rem}
-        .modal-title{font-family:var(--font-display);font-size:1.2rem;text-transform:uppercase;letter-spacing:0.15em;margin-bottom:1rem}
-        .modal-title--win{color:var(--accent-green-bright)}
-        .modal-title--lose{color:var(--accent-red-bright)}
-        .modal-title--unsolved{color:var(--accent-gold)}
-        .modal-text{color:var(--text-secondary);font-size:0.75rem;line-height:1.7;margin-bottom:1.5rem}
-        .modal-reveal{background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:4px;padding:1rem;margin-bottom:1.5rem;text-align:left}
-        .modal-reveal-title{font-family:var(--font-mono);font-size:0.55rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-gold);margin-bottom:0.5rem}
-        .modal-reveal-text{color:var(--text-secondary);font-size:0.7rem;line-height:1.6}
-        .modal-btn-group{display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;}
-        .modal-btn{background:var(--accent-gold-dim);border:none;border-radius:4px;padding:1rem 2rem;color:var(--bg-primary);font-family:var(--font-mono);font-size:0.65rem;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;transition:all 150ms}
-        .modal-btn:hover{background:var(--accent-gold)}
-        .modal-btn--feedback{background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); text-decoration: none; display: flex; align-items: center;}
-        .modal-btn--feedback:hover{border-color: var(--text-primary); color: var(--text-primary);}
-        
-        .game-footer{text-align:center;padding:0.5rem 0;border-top:1px solid var(--border-color); flex-shrink: 0;}
-        .game-footer-text{font-family:var(--font-mono);font-size:0.5rem;color:var(--text-muted);letter-spacing:0.1em}
-        
+        .modal-content{background:var(--bg-secondary);border:1px solid var(--border-color);padding:2rem;max-width:500px;width:90%;text-align:center;}
+        .modal-title{font-family:var(--font-display);font-size:1.5rem;margin-bottom:1rem;color:var(--accent-gold);}
+        .modal-btn{background:var(--accent-gold-dim);border:none;padding:1rem 2rem;margin-top:1rem;cursor:pointer;font-family:var(--font-mono);font-size:0.7rem;}
+
         @media(max-width:600px){
             html{font-size:20px} 
             .game-container {padding: 0.5rem;}
-            .game-header {flex-direction: column; align-items: center; gap: 0.5rem;}
+            .game-header {flex-direction: column; align-items: center;}
             .game-header-text {text-align: center;}
-            .start-title{font-size:1.8rem}
-            .game-title{font-size:1.2rem}
-            .status-bar{grid-template-columns:1fr; gap: 0.5rem;}
-            .action-bar{gap: 0.5rem;}
-            .action-btn{flex-basis: 45%; padding: 0.8rem 0.2rem;}
-            .case-card{grid-template-columns:auto 1fr}
-            .case-arrow{display:none}
-            .input-container {padding: 0.5rem; gap: 0.5rem;}
-            .chat-input {padding: 0.6rem 0.8rem;}
-            .send-btn {padding: 0.6rem 0.5rem; font-size: 0.55rem; white-space: nowrap;}
+            .category-grid {grid-template-columns: 1fr;}
         }
     </style>
 </head>
 <body>
-    <div class="lang-switcher">
-        <button class="icon-btn lang-btn active" data-lang="en">EN</button>
-        <button class="icon-btn lang-btn" data-lang="ua">UA</button>
-    </div>
-
     <div class="top-controls-left">
-        <button class="icon-btn" id="mute-btn" title="Toggle Sound">🔊</button>
-        <button class="icon-btn" id="export-btn" title="Export Chat">💾</button>
-        <button class="icon-btn" id="back-btn" data-i18n="backBtn">← Back</button>
+        <button class="icon-btn" id="mute-btn">🔊</button>
+        <button class="icon-btn" id="export-btn">💾</button>
+        <button class="icon-btn" id="back-btn">←</button>
     </div>
 
     <div class="start-screen" id="start-screen">
-        <div class="bg-fallback"></div>
-        <div class="bg-image bg-landscape"></div>
-        <div class="bg-image bg-portrait"></div>
         <div class="start-content">
-            <h1 class="start-title" data-i18n="startTitle">The Interrogator</h1>
-            <p class="start-tagline" data-i18n="startTagline">AI-Powered Detective Game</p>
-            <p class="start-description" data-i18n="startDescription">You are a Ukrainian investigator. The war is ongoing. Saboteurs are trying to infiltrate. Interrogate suspects using your own words. An AI Senior Detective will evaluate your skills.</p>
-            <div class="case-selection">
-                <h2 class="case-selection-title" data-i18n="selectCase">Select Your Case</h2>
-                <div class="case-cards">
-                    <div class="case-card case-card--easy" data-case="easy">
-                        <div class="case-difficulty case-difficulty--easy"><span class="case-difficulty-icon">★</span><span data-i18n="diffEasy">Easy</span></div>
-                        <div class="case-info"><h3 class="case-title" data-i18n="case1Title">The Night Photographer</h3><p class="case-subtitle" data-i18n="case1Subtitle">Detained near a power plant. Claims to be a student.</p></div>
-                        <span class="case-arrow">→</span>
-                    </div>
-                    <div class="case-card case-card--medium" data-case="medium">
-                        <div class="case-difficulty case-difficulty--medium"><span class="case-difficulty-icon">★★</span><span data-i18n="diffMedium">Medium</span></div>
-                        <div class="case-info"><h3 class="case-title" data-i18n="case2Title">The Lost Tractor Driver</h3><p class="case-subtitle" data-i18n="case2Subtitle">Found in a basement. Suspicious marks on face.</p></div>
-                        <span class="case-arrow">→</span>
-                    </div>
-                    <div class="case-card case-card--hard" data-case="hard">
-                        <div class="case-difficulty case-difficulty--hard"><span class="case-difficulty-icon">★★★</span><span data-i18n="diffHard">Hard</span></div>
-                        <div class="case-info"><h3 class="case-title" data-i18n="case3Title">The Humanitarian Volunteer</h3><p class="case-subtitle" data-i18n="case3Subtitle">Stopped at a checkpoint. Dogs smell explosives.</p></div>
-                        <span class="case-arrow">→</span>
-                    </div>
+            <h1 class="start-title">The Interrogator</h1>
+            <p class="start-tagline">AI-Generated Detective Stories</p>
+            
+            <div class="category-grid">
+                <div class="cat-card" data-category="war">
+                    <div class="cat-icon">⚔️</div>
+                    <div class="cat-title">War Zone</div>
+                    <div class="cat-desc">Україна, наші дні. Шпигуни, диверсанти, зрадники. Знайди ворога серед своїх.</div>
+                </div>
+                <div class="cat-card" data-category="history">
+                    <div class="cat-icon">📜</div>
+                    <div class="cat-title">History</div>
+                    <div class="cat-desc">Історія України. Козаки, УПА, підпілля. Розкрий таємниці минулого.</div>
+                </div>
+                <div class="cat-card" data-category="hollywood">
+                    <div class="cat-icon">🎬</div>
+                    <div class="cat-title">Hollywood 90s</div>
+                    <div class="cat-desc">Лос-Анджелес. Вбивства на знімальному майданчику, сталкери, брудні секрети зірок.</div>
                 </div>
             </div>
         </div>
     </div>
-    
+
+    <div class="loading-screen" id="loading-screen">
+        <div class="loader"></div>
+        <div class="loading-text">Генерую справу...<br><span style="font-size:0.6rem; opacity:0.7">(Це може зайняти 10-15 секунд)</span></div>
+    </div>
+
     <div class="game-screen" id="game-screen">
-        <div class="bg-fallback"></div>
-        <div class="bg-image bg-landscape"></div>
-        <div class="bg-image bg-portrait"></div>
-        
         <div class="game-container">
             <header class="game-header">
                 <div class="suspect-image-container">
                     <img id="suspect-img" class="suspect-image" src="" alt="Suspect" style="display:none;">
-                    <div class="suspect-loader" id="suspect-loader">Loading...</div>
                 </div>
                 <div class="game-header-text">
-                    <h1 class="game-title" id="game-title">The Interrogator</h1>
-                    <p class="game-subtitle" id="game-case-name">Case #001</p>
+                    <h1 class="game-title" id="game-title">Справа #???</h1>
+                    <p class="game-subtitle" id="game-suspect-name">...</p>
                 </div>
             </header>
             
             <div class="status-bar">
-                <div class="status-item"><span class="status-label" data-i18n="energyLabel">Energy</span><div class="status-value"><span class="energy-display" id="energy-current">15</span><span class="energy-max">/ 15</span></div></div>
-                <div class="status-item"><span class="status-label" data-i18n="suspicionLabel">Pressure</span><div class="suspicion-container"><div class="suspicion-bar-bg"><div class="suspicion-bar-fill" id="suspicion-bar"></div></div><span class="suspicion-value" id="suspicion-text">0%</span></div></div>
+                <div class="status-item"><span class="status-label">Energy</span><div class="status-value"><span class="energy-display" id="energy-current">15</span></div></div>
+                <div class="status-item"><span class="status-label">Pressure</span><div class="suspicion-container"><div class="suspicion-bar-bg"><div class="suspicion-bar-fill" id="suspicion-bar"></div></div><span class="suspicion-value" id="suspicion-text">0%</span></div></div>
             </div>
             
             <div class="briefing-container">
-                <button class="briefing-toggle" id="briefing-toggle"><span data-i18n="briefingToggle">📁 Case Briefing</span><span class="briefing-toggle-icon">▼</span></button>
+                <button class="briefing-toggle" id="briefing-toggle">📁 Матеріали справи ▼</button>
                 <div class="briefing-content" id="briefing-content">
-                    <div class="briefing-section"><h3 class="briefing-section-title" data-i18n="crimeTitle">The Context</h3><p class="briefing-text" id="case-description"></p></div>
-                    <div class="briefing-section"><h3 class="briefing-section-title" data-i18n="factsTitle">Known Facts</h3><ul class="evidence-list" id="case-evidence"></ul></div>
-                    <div class="briefing-section"><h3 class="briefing-section-title" data-i18n="suspectTitle">The Suspect</h3><p class="briefing-text" id="suspect-info"></p></div>
+                    <div class="briefing-section"><h3 class="briefing-section-title">Обставини</h3><p class="briefing-text" id="case-description"></p></div>
+                    <div class="briefing-section"><h3 class="briefing-section-title">Відомі факти</h3><ul class="evidence-list" id="case-evidence"></ul></div>
+                    <div class="briefing-section"><h3 class="briefing-section-title">Підозрюваний</h3><p class="briefing-text" id="suspect-info"></p></div>
                 </div>
             </div>
             
             <div class="chat-container">
                 <div class="chat-log" id="chat-log"></div>
                 <div class="input-container">
-                    <input type="text" class="chat-input" id="chat-input" data-i18n-placeholder="inputPlaceholder" placeholder="Ask..." maxlength="500">
-                    <button class="send-btn" id="send-btn" data-i18n="sendBtn">Send</button>
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Задайте питання...">
+                    <button class="send-btn" id="send-btn">Send</button>
                 </div>
             </div>
             
             <div class="action-bar">
-                <button class="action-btn action-btn--hint" id="hint-btn" data-i18n="hintBtn">💡 Hint <span class="hint-counter" id="hint-counter">(3)</span></button>
-                <button class="action-btn action-btn--coffee" id="coffee-btn" data-i18n="coffeeBtn">☕ Coffee (+5)</button>
-                <button class="action-btn action-btn--accuse" id="accuse-btn" data-i18n="accuseBtn">⚖️ Verdict</button>
-                <button class="action-btn action-btn--restart" id="restart-btn" data-i18n="restartBtn">↺ Restart</button>
-                <button class="action-btn action-btn--reveal" id="reveal-btn" data-i18n="revealBtn">🔓 Reveal Answer</button>
+                <button class="action-btn action-btn--hint" id="hint-btn">💡 Hint</button>
+                <button class="action-btn action-btn--coffee" id="coffee-btn">☕ Coffee</button>
+                <button class="action-btn action-btn--accuse" id="accuse-btn">⚖️ Вердикт</button>
+                <button class="action-btn action-btn--restart" id="restart-btn">↺ Restart</button>
+                <button class="action-btn action-btn--reveal" id="reveal-btn">🔓 Reveal</button>
             </div>
-            
-            <footer class="game-footer"><p class="game-footer-text">The Interrogator • v3.3</p></footer>
         </div>
     </div>
     
@@ -382,12 +184,9 @@
             <div class="modal-icon" id="modal-icon">🔍</div>
             <h2 class="modal-title" id="modal-title">Case Closed</h2>
             <p class="modal-text" id="modal-text"></p>
-            <div class="modal-reveal"><h4 class="modal-reveal-title" data-i18n="truthTitle">The Truth</h4><p class="modal-reveal-text" id="modal-reveal-text"></p></div>
-            
-            <div class="modal-btn-group">
-                <button class="modal-btn" id="modal-btn" data-i18n="newCaseBtn">Back</button>
-                <a href="https://forms.gle/xtrEqNsFb8wx7uyq5" target="_blank" class="modal-btn modal-btn--feedback" id="feedback-btn" data-i18n="feedbackBtn">💬 Send Feedback</a>
-            </div>
+            <div class="modal-reveal"><h4 class="modal-reveal-title">Правда</h4><p class="modal-reveal-text" id="modal-reveal-text"></p></div>
+            <button class="modal-btn" id="modal-btn">Назад в меню</button>
+            <a href="https://forms.gle/xtrEqNsFb8wx7uyq5" target="_blank" style="display:block; margin-top:1rem; color:#666; font-size:0.6rem; text-decoration:none;">💬 Надіслати відгук</a>
         </div>
     </div>
     
@@ -397,686 +196,295 @@
     <script>
 (function(){
 'use strict';
-const i18n = {
-    en: {
-        startTitle: "The Interrogator",
-        startTagline: "AI-Powered Detective Game",
-        startDescription: "You are a Ukrainian investigator. The war is ongoing. Saboteurs are trying to infiltrate. Interrogate suspects using your own words. An AI Senior Detective will evaluate your skills.",
-        selectCase: "Select Your Case",
-        diffEasy: "Easy",
-        diffMedium: "Medium",
-        diffHard: "Hard",
-        case1Title: "The Night Photographer",
-        case1Subtitle: "Detained near a power plant during a raid. Claims to be a student.",
-        case2Title: "The Lost Tractor Driver",
-        case2Subtitle: "Found hiding in a basement. Suspicious marks on face, soft hands.",
-        case3Title: "The Humanitarian Volunteer",
-        case3Subtitle: "Stopped at a checkpoint. Dogs smell explosives, but he delivers food.",
-        backBtn: "← Back",
-        energyLabel: "Energy",
-        suspicionLabel: "Pressure",
-        briefingToggle: "📁 Case Briefing",
-        crimeTitle: "The Context",
-        factsTitle: "Known Facts",
-        suspectTitle: "The Suspect",
-        inputPlaceholder: "Ask your question...",
-        sendBtn: "Send",
-        accuseBtn: "⚖️ Verdict",
-        restartBtn: "↺ Restart",
-        truthTitle: "The Truth",
-        newCaseBtn: "Back",
-        feedbackBtn: "💬 Send Feedback",
-        calm: "Calm",
-        nervous: "Nervous",
-        defensive: "Defensive",
-        breaking: "Breaking",
-        detective: "Investigator",
-        system: "System",
-        winTitle: "Threat Neutralized",
-        winText: "You identified the enemy correctly. Good work.",
-        loseTitle: "Wrong Verdict",
-        loseTextDefault: "Your accusation doesn't hold up.",
-        loseTextWeak: "Right track, but not enough pressure to prove it.",
-        unsolvedTitle: "Suspect Released",
-        unsolvedText: "Questions exhausted. We had to let them go.",
-        hintBtn: "💡 Hint",
-        coffeeBtn: "☕ Coffee (+5)",
-        revealBtn: "🔓 Reveal Answer",
-        revealConfirm: "⚠️ WARNING!\n\nRevealing the truth exposes state secrets and ends the session.\n\nAre you sure? Type YES to confirm:",
-        revealConfirmWord: "YES",
-        hint1: "Check biography details (streets, prices, local knowledge).",
-        hint2: "Press on inconsistencies in their cover story.",
-        hint3: "Confront them with physical evidence (phone, marks, receipts)."
-    },
-    ua: {
-        startTitle: "Слідчий",
-        startTagline: "Детективна гра на базі ШІ",
-        startDescription: "Ви — український слідчий. Йде війна. Диверсанти намагаються проникнути в тил. Допитуйте підозрюваних своїми словами. ШІ 'Старший слідчий' оцінить ваші навички та ефективність.",
-        selectCase: "Оберіть справу",
-        diffEasy: "Легко",
-        diffMedium: "Середньо",
-        diffHard: "Складно",
-        case1Title: "Нічний фотограф",
-        case1Subtitle: "Затриманий біля ТЕЦ під час нальоту. Каже, що студент-художник.",
-        case2Title: "Загублений тракторист",
-        case2Subtitle: "Знайдений у підвалі. Підозрілі сліди на обличчі, м'які руки.",
-        case3Title: "Волонтер з гуманітаркою",
-        case3Subtitle: "Зупинений на блокпосту. Собаки чують вибухівку, але він везе їжу.",
-        backBtn: "← Назад",
-        energyLabel: "Енергія",
-        suspicionLabel: "Тиск",
-        briefingToggle: "📁 Матеріали справи",
-        crimeTitle: "Обставини",
-        factsTitle: "Відомі факти",
-        suspectTitle: "Підозрюваний",
-        inputPlaceholder: "Задайте питання...",
-        sendBtn: "Надіслати",
-        accuseBtn: "⚖️ Вердикт",
-        restartBtn: "↺ Спочатку",
-        truthTitle: "Правда",
-        newCaseBtn: "Назад",
-        feedbackBtn: "💬 Надіслати відгук",
-        calm: "Спокійний",
-        nervous: "Нервує",
-        defensive: "Захищається",
-        breaking: "Ламається",
-        detective: "Слідчий",
-        system: "Система",
-        winTitle: "Загрозу ліквідовано",
-        winText: "Ви правильно ідентифікували ворога. Гарна робота.",
-        loseTitle: "Помилковий вердикт",
-        loseTextDefault: "Звинувачення не підтвердилося фактами.",
-        loseTextWeak: "Правильний шлях, але тиску недостатньо для зізнання.",
-        unsolvedTitle: "Підозрюваного відпущено",
-        unsolvedText: "Питання вичерпано. Доказів для арешту забракло.",
-        hintBtn: "💡 Підказка",
-        coffeeBtn: "☕ Кава (+5)",
-        revealBtn: "🔓 Розкрити відповідь",
-        revealConfirm: "⚠️ УВАГА!\n\nРозкриття відповіді означає розголошення державної таємниці. Сесію буде завершено.\n\nВи впевнені? Введіть ТАК для підтвердження:",
-        revealConfirmWord: "ТАК",
-        hint1: "Перевірте знання місцевості (вулиці, ціни, заклади).",
-        hint2: "Тисніть на невідповідності в легенді.",
-        hint3: "Використайте речові докази (телефон, сліди на тілі, документи)."
-    }
-};
 
-const CASES = {
-    easy: {
-        id: "easy",
-        caseNumber: "#001",
-        winThreshold: 40,
-        visualPrompt: "Portrait of a young 22 year old man, terrified student, wearing a hoodie, dark interrogation room lighting, high detail, realistic, 8k",
-        en: {
-            title: "The Night Photographer",
-            suspectName: "Andrey (Suspect)",
-            crimeDescription: "A man was detained near a critical power plant at 2:00 AM immediately after a missile strike nearby. He claims to be a student taking artistic photos of the night sky.",
-            knownFacts: [
-                "Detained 500m from the thermal power plant impact zone.",
-                "Phone gallery is completely empty (recently deleted).",
-                "Telegram app hidden inside a 'Calculator' folder.",
-                "Hands have traces of fluorescent marker (used for marking targets).",
-                "Cannot name the Rector of the university he claims to attend.",
-                "Found with a high-capacity power bank and two SIM cards."
-            ],
-            suspectProfile: "Claiming to be Andrey, 22, student. Nervous, constantly looks at his phone. Speaks with a slight distinct accent not typical for this region.",
-            truthReveal: "He is a Russian spotter hired via Telegram bot. He marked the target for the missile strike. He deleted photos when caught. He is not a student.",
-            sessionStart: "Interrogation of detainee 'Andrey' — Caught near critical infrastructure.",
-            npcGreeting: "*shaking slightly* Officer, this is a mistake. I'm just an art student. I like... industrial aesthetics. Why am I here?",
-            accusationPrompt: "Verdict:\n1. He is a spotter (Saboteur)\n2. Just a student\n3. Looting attempt\n4. Breaking curfew only\n\nEnter 1-4:",
-            wrongAccusations: {
-                "2": "Students don't carry target markers and hide Telegram apps.",
-                "3": "He had no tools for stealing, only for communication.",
-                "4": "Presence at impact site implies more than just curfew violation."
-            }
-        },
-        ua: {
-            title: "Нічний фотограф",
-            suspectName: "Андрій (Затриманий)",
-            crimeDescription: "Біля ТЕЦ о 2-й ночі затримано чоловіка одразу після прильоту ракети. Стверджує, що він студент і робив художні фото нічного неба. Телефон 'чистий'.",
-            knownFacts: [
-                "Затриманий за 500м від місця влучання в ТЕЦ.",
-                "Галерея телефону повністю пуста (недавно видалена).",
-                "Телеграм приховано в папці 'Калькулятор'.",
-                "На руках сліди люмінесцентної фарби (для міток).",
-                "Не може назвати ректора університету, де нібито вчиться.",
-                "При собі мав потужний павербанк і дві сім-карти."
-            ],
-            suspectProfile: "Називається Андрієм, 22 роки. Нервує, постійно коситься на телефон. Використовує слова, нетипові для місцевих.",
-            truthReveal: "Це російський коригувальник, завербований через бот. Він наводив удар по ТЕЦ. Фото видалив при затриманні. Студентський квиток підробний.",
-            sessionStart: "Допит затриманого біля об'єкта інфраструктури.",
-            npcGreeting: "*тремтить* Офіцере, це помилка. Я просто фотограф-аматор. Люблю... індустріальну естетику. За що мене взяли?",
-            accusationPrompt: "Вердикт:\n1. Це коригувальник (Диверсант)\n2. Просто студент\n3. Мародер\n4. Порушник комендантської години\n\nВведіть 1-4:",
-            wrongAccusations: {
-                "2": "Студенти не ховають Телеграм і не мають фарби для міток.",
-                "3": "У нього не було інструментів для крадіжки.",
-                "4": "Перебування на місці прильоту вказує на шпигунство."
-            }
-        }
-    },
-
-    medium: {
-        id: "medium",
-        caseNumber: "#002",
-        winThreshold: 50,
-        visualPrompt: "Portrait of a 35 year old man, military posture, wearing ill-fitting civilian clothes, red marks on face from oxygen mask, dark room, realistic, 8k",
-        en: {
-            title: "The Lost Tractor Driver",
-            suspectName: "Mykola (Suspect)",
-            crimeDescription: "A man in civilian clothes was found hiding in a basement in a liberated village. He claims to be 'Mykola', a local tractor driver. However, a Russian Su-34 was shot down nearby yesterday.",
-            knownFacts: [
-                "Found 3km from the jet crash site.",
-                "Wearing civilian clothes that are too large for him.",
-                "Face has distinctive red marks (typical from pilot oxygen masks).",
-                "Hands are soft and clean, not typical for a tractor driver.",
-                "Doesn't know the price of bread in the local shop.",
-                "A half-burned parachute was found in the forest nearby.",
-                "Speaks Russian with a distinct accent, struggles with Ukrainian words."
-            ],
-            suspectProfile: "Male, approx 35. Calm, disciplined posture. Claims he lost his documents when his house burned down. Refuses to show his torso (possible tattoos/injuries).",
-            truthReveal: "He is a Russian pilot of the downed Su-34. He ejected, broke into a house to steal clothes, and tried to blend in. The marks on his face are from the G-suit mask.",
-            sessionStart: "Interrogation of 'Mykola' — Found in liberated zone.",
-            npcGreeting: "*sitting straight, avoiding eye contact* I am a simple man, citizen chief. My tractor burned, my house burned. I was just hiding from the noise.",
-            accusationPrompt: "Verdict:\n1. Russian Pilot\n2. Local Tractor Driver\n3. Looter\n4. Deserter\n\nEnter 1-4:",
-            wrongAccusations: {
-                "2": "His hands and face marks betray him. He is military.",
-                "3": "He is hiding, not stealing.",
-                "4": "He is not Ukrainian military."
-            }
-        },
-        ua: {
-            title: "Загублений тракторист",
-            suspectName: "Микола (Затриманий)",
-            crimeDescription: "У звільненому селі в підвалі знайшли чоловіка в цивільному. Каже, що він місцевий тракторист Микола. Вчора поруч було збито російський Су-34.",
-            knownFacts: [
-                "Знайдений за 3 км від місця падіння літака.",
-                "Одягнений у цивільне, яке явно велике на нього.",
-                "На обличчі характерні червоні сліди (від кисневої маски пілота).",
-                "Руки доглянуті, м'які, без мозолів (не схоже на тракториста).",
-                "Не знає ціну на хліб у місцевому магазині.",
-                "У лісі поруч знайдено прикопаний парашут.",
-                "Не може вимовити слово 'Паляниця' без акценту."
-            ],
-            suspectProfile: "Чоловік, бл. 35 років. Сидить рівно, по-військовому. Каже, документи згоріли. Відмовляється роздягтися (можливі тату або поранення від катапультування).",
-            truthReveal: "Це пілот збитого Су-34. Він катапультувався, вкрав одяг у хаті і намагається вийти до своїх. Сліди на обличчі — від шоломофона та маски.",
-            sessionStart: "Допит 'Миколи' — Знайдений у зоні бойових дій.",
-            npcGreeting: "*сидить прямо, очі опустив* Я проста людина, начальник. Трактор згорів, хата згоріла. Я просто ховався від вибухів.",
-            accusationPrompt: "Вердикт:\n1. Російський пілот\n2. Місцевий тракторист\n3. Мародер\n4. Дезертир\n\nВведіть 1-4:",
-            wrongAccusations: {
-                "2": "Руки та сліди маски видають його. Це військовий.",
-                "3": "Він ховався, а не крав.",
-                "4": "Він не з наших військ."
-            }
-        }
-    },
-
-    hard: {
-        id: "hard",
-        caseNumber: "#003",
-        winThreshold: 60,
-        visualPrompt: "Portrait of a 40 year old man, arrogant expression, volunteer vest over civilian clothes, stubble, cinematic lighting, realistic, 8k",
-        en: {
-            title: "The Humanitarian Volunteer",
-            suspectName: "Alexey (Suspect)",
-            crimeDescription: "A van marked 'VOLUNTEER' was stopped at a checkpoint entering Kyiv. The driver, Alexey, has papers confirming he delivers food. But K-9 dogs reacted to the vehicle.",
-            knownFacts: [
-                "Dogs reacted to the scent of explosives, but only food is visible.",
-                "Driver's passport was issued in Crimea in 2013 (before annexation? No, 2015).",
-                "Found a receipt from a gas station in Belgorod (Russia) dated 3 days ago.",
-                "Uses specific military slang ('green zone', 'cargo 200').",
-                "The 'Volunteer Fund' he works for has no Facebook page.",
-                "Car tires have soil traces not matching this region."
-            ],
-            suspectProfile: "Alexey, 40. Confident, slightly arrogant. Claims he buys fuel from smugglers, explaining the receipt. Insists on calling his 'lawyer'.",
-            truthReveal: "He is a GRU sleeper agent. The van has a double floor filled with C4 explosives meant for a terrorist act in the capital. The 'food' is a cover.",
-            sessionStart: "Interrogation of 'Alexey' — Checkpoint detention.",
-            npcGreeting: "*leaning back arrogantly* Look, I'm bringing food to hungry people. Every minute you keep me here is a crime. Check the boxes, it's just pasta.",
-            accusationPrompt: "Verdict:\n1. GRU Agent / Terrorist\n2. Honest Volunteer\n3. Smuggler\n4. Document Forger\n\nEnter 1-4:",
-            wrongAccusations: {
-                "2": "Volunteers don't visit Belgorod during war.",
-                "3": "Explosives traces indicate terror, not smuggling.",
-                "4": "Forgery is just part of the cover for the main crime."
-            }
-        },
-        ua: {
-            title: "Волонтер з гуманітаркою",
-            suspectName: "Олексій (Затриманий)",
-            crimeDescription: "Мікроавтобус з написом 'ДІТИ' зупинили на в'їзді до Києва. Водій Олексій має документи волонтера. Але службовий собака зреагував на авто.",
-            knownFacts: [
-                "Собака відчула запах вибухівки, хоча видно лише макарони.",
-                "У кишені знайдено чек із заправки 'Роснефть' (Бєлгород), дата - 3 дні тому.",
-                "Паспорт виданий у Криму, серія дивна.",
-                "Вживає слова 'порєбрік', 'сберкасса'.",
-                "Фонд, від якого він їде, не гуглиться.",
-                "Шини авто чисті, хоча каже, що їхав полями з фронту."
-            ],
-            suspectProfile: "Олексій, 40 років. Впевнений, нахабний. Каже, чек підкинули або це старий. Погрожує скаргами. Намагається 'домовитись'.",
-            truthReveal: "Це агент ГРУ. В мікроавтобусі подвійне дно, там 50 кг тротилу для теракту в урядовому кварталі. 'Гуманітарка' — прикриття.",
-            sessionStart: "Допит водія 'Олексія' — Блокпост.",
-            npcGreeting: "*нахабно відкидається на спинку* Слухай, командир. Я везу їжу людям. Ти мене затримуєш, а там діти голодні. Перевір ящики, там просто макарони.",
-            accusationPrompt: "Вердикт:\n1. Агент ГРУ / Терорист\n2. Чесний волонтер\n3. Контрабандист\n4. Шахрай з документами\n\nВведіть 1-4:",
-            wrongAccusations: {
-                "2": "Волонтери не заправляються в Бєлгороді під час війни.",
-                "3": "Собака внюхав вибухівку, а не цигарки.",
-                "4": "Підробка документів — лише частина легенди."
-            }
-        }
-    }
-};
-
-const NPC_PROMPTS = {
-    easy: {
-        en: `You are Andrey, detained Russian spotter pretending to be a student. TRUTH: You marked the power plant for missiles. You are Russian. COVER: Local student, likes night photography. RULES: You are scared. You don't know local reality (names of streets, university details). If asked about the phone/Telegram, lie that you value privacy. Slip up with Russian words sometimes. ALWAYS end your response with a hidden status block: <<<NERVOUSNESS: [0-100]>>>. 0 = calm, 100 = broken. Do not show this to the user, just append it.`,
-        ua: `Ти Андрій, російський коригувальник, прикидаєшся студентом. ПРАВДА: Ти навів ракету на ТЕЦ. Ти з Росії. ЛЕГЕНДА: Місцевий студент, люблю нічні фото. ПРАВИЛА: Тобі страшно. Ти не знаєш місцевих реалій (вулиць, ректора). Бреши про видалені фото. Інколи вживай російські слова (напр. 'вообще', 'да ладно'). Якщо питають про Телеграм - панікуй. ЗАВЖДИ в кінці відповіді додавай прихований статус: <<<NERVOUSNESS: [0-100]>>>. 0 = спокійний, 100 = зламаний. Це технічний код, не показуй його в тексті, просто додай в кінці.`
-    },
-    medium: {
-        en: `You are Mykola, Russian pilot of a downed Su-34 pretending to be a tractor driver. TRUTH: You bombed the village. Ejected yesterday. Stole clothes. COVER: Simple tractor driver, hiding from war. RULES: You are disciplined (military posture). You hide your hands (too clean). You refuse to undress. You don't know village life prices. Deny being a pilot. ALWAYS end your response with a hidden status block: <<<NERVOUSNESS: [0-100]>>>. 0 = calm, 100 = broken.`,
-        ua: `Ти Микола, російський пілот збитого Су-34, прикидаєшся трактористом. ПРАВДА: Ти бомбив це село. Катапультувався. Вкрав одяг. ЛЕГЕНДА: Простий тракторист, хата згоріла. ПРАВИЛА: Ти сидиш рівно (військова виправка). Ховай руки (вони занадто чисті). Не знаєш цін на продукти. Відмовляйся знімати одяг. Акцент російський, але намагаєшся говорити українською (погано виходить). ЗАВЖДИ в кінці відповіді додавай прихований статус: <<<NERVOUSNESS: [0-100]>>>. 0 = спокійний, 100 = зламаний.`
-    },
-    hard: {
-        en: `You are Alexey, GRU agent pretending to be a volunteer. TRUTH: Van is full of C4 explosives under the floor. Receipt from Belgorod is real (you messed up). COVER: Hero volunteer saving kids. RULES: Be arrogant. Attack the investigator ("You hate patriots!"). Explain the receipt as "smuggled fuel" or "planted evidence". Use vague "volunteer" slang but mess up details. ALWAYS end your response with a hidden status block: <<<NERVOUSNESS: [0-100]>>>. 0 = calm, 100 = broken.`,
-        ua: `Ти Олексій, агент ГРУ, прикидаєшся волонтером. ПРАВДА: В бусі вибухівка під підлогою. Чек з Бєлгорода справжній (твій прокол). ЛЕГЕНДА: Герой-волонтер. ПРАВИЛА: Будь нахабним. Атакуй слідчого ("Ви затримуєте допомогу!"). Чек пояснюй як "підкинули" або "купив пальне у бариг". Вживай слова "поребрик", "сберкасса", "вспышка" замість "вибух". Не знаєш українських слів. ЗАВЖДИ в кінці відповіді додавай прихований статус: <<<NERVOUSNESS: [0-100]>>>. 0 = спокійний, 100 = зламаний.`
-    }
-};
-
-let currentLang=localStorage.getItem('interrogator-lang')||'en';
-let currentCase=null;
+const API_ENDPOINT='https://interrogator-api.sashko1391.workers.dev';
+let currentCaseData = null; // Тепер дані справи живуть тут
 let isMuted=false;
 let lastVisualState = 'neutral'; 
 
 const GameState={energy:15,maxEnergy:15,suspicion:0,hintsRemaining:3,emotionalState:'calm',conversationHistory:[],gameOver:false,
 reset(){this.energy=15;this.suspicion=0;this.hintsRemaining=3;this.emotionalState='calm';this.conversationHistory=[];this.gameOver=false; lastVisualState='neutral';}};
 
-function t(k){return i18n[currentLang][k]||i18n.en[k]||k}
-function tCase(k){return currentCase?CASES[currentCase][currentLang][k]||CASES[currentCase].en[k]:''}
+const DOM={
+    startScreen:document.getElementById('start-screen'),
+    loadingScreen:document.getElementById('loading-screen'),
+    gameScreen:document.getElementById('game-screen'),
+    chatLog:document.getElementById('chat-log'),
+    chatInput:document.getElementById('chat-input'),
+    sendBtn:document.getElementById('send-btn'),
+    energyCurrent:document.getElementById('energy-current'),
+    suspicionBar:document.getElementById('suspicion-bar'),
+    suspicionText:document.getElementById('suspicion-text'),
+    briefingToggle:document.getElementById('briefing-toggle'),
+    briefingContent:document.getElementById('briefing-content'),
+    caseDescription:document.getElementById('case-description'),
+    caseEvidence:document.getElementById('case-evidence'),
+    suspectInfo:document.getElementById('suspect-info'),
+    gameTitle:document.getElementById('game-title'),
+    gameSuspectName:document.getElementById('game-suspect-name'),
+    suspectImg:document.getElementById('suspect-img'),
+    modalOverlay:document.getElementById('modal-overlay'),
+    modalTitle:document.getElementById('modal-title'),
+    modalText:document.getElementById('modal-text'),
+    modalRevealText:document.getElementById('modal-reveal-text'),
+    modalIcon:document.getElementById('modal-icon'),
+    // Buttons
+    catCards:document.querySelectorAll('.cat-card'),
+    backBtn:document.getElementById('back-btn'),
+    modalBtn:document.getElementById('modal-btn'),
+    hintBtn:document.getElementById('hint-btn'),
+    revealBtn:document.getElementById('reveal-btn'),
+    accuseBtn:document.getElementById('accuse-btn'),
+    restartBtn:document.getElementById('restart-btn'),
+    coffeeBtn:document.getElementById('coffee-btn'),
+    muteBtn:document.getElementById('mute-btn'),
+    exportBtn:document.getElementById('export-btn'),
+    audioBg:document.getElementById('audio-background'),
+    audioType:document.getElementById('audio-typewriter')
+};
 
-const DOM={startScreen:document.getElementById('start-screen'),gameScreen:document.getElementById('game-screen'),chatLog:document.getElementById('chat-log'),chatInput:document.getElementById('chat-input'),sendBtn:document.getElementById('send-btn'),energyCurrent:document.getElementById('energy-current'),energyMax:document.querySelector('.energy-max'),suspicionBar:document.getElementById('suspicion-bar'),suspicionText:document.getElementById('suspicion-text'),briefingToggle:document.getElementById('briefing-toggle'),briefingContent:document.getElementById('briefing-content'),caseDescription:document.getElementById('case-description'),caseEvidence:document.getElementById('case-evidence'),suspectInfo:document.getElementById('suspect-info'),accuseBtn:document.getElementById('accuse-btn'),restartBtn:document.getElementById('restart-btn'),backBtn:document.getElementById('back-btn'),modalOverlay:document.getElementById('modal-overlay'),modalIcon:document.getElementById('modal-icon'),modalTitle:document.getElementById('modal-title'),modalText:document.getElementById('modal-text'),modalRevealText:document.getElementById('modal-reveal-text'),modalBtn:document.getElementById('modal-btn'),langBtns:document.querySelectorAll('.lang-btn'),caseCards:document.querySelectorAll('.case-card'),gameTitle:document.getElementById('game-title'),gameCaseName:document.getElementById('game-case-name'),hintBtn:document.getElementById('hint-btn'),hintCounter:document.getElementById('hint-counter'),revealBtn:document.getElementById('reveal-btn'),coffeeBtn:document.getElementById('coffee-btn'),muteBtn:document.getElementById('mute-btn'),exportBtn:document.getElementById('export-btn'),audioTypewriter:document.getElementById('audio-typewriter'),audioBackground:document.getElementById('audio-background'),suspectImg:document.getElementById('suspect-img'),suspectLoader:document.getElementById('suspect-loader')};
-
-const API_ENDPOINT='https://interrogator-api.sashko1391.workers.dev';
-const MODEL='claude-sonnet-4-20250514';
-
-function toggleMute(){
-    isMuted = !isMuted;
-    DOM.muteBtn.innerHTML = isMuted ? '🔇' : '🔊';
-    DOM.muteBtn.classList.toggle('active', isMuted);
-    DOM.audioBackground.muted = isMuted;
-    DOM.audioTypewriter.muted = isMuted;
-    
-    if(!isMuted && currentCase && !GameState.gameOver){
-        DOM.audioBackground.play().catch(e=>console.log("Audio autoplay block"));
-    }
-}
-
-function playSound(type){
-    if(isMuted) return;
-    if(type === 'bg'){
-        DOM.audioBackground.volume = 0.3;
-        DOM.audioBackground.play().catch(e=>{});
-    } else if(type === 'type'){
-        DOM.audioTypewriter.currentTime = 0;
-        DOM.audioTypewriter.volume = 0.6;
-        DOM.audioTypewriter.play().catch(e=>{});
-    }
-}
-
-function stopSound(type){
-    if(type === 'bg'){
-        DOM.audioBackground.pause();
-    } else if(type === 'type'){
-        DOM.audioTypewriter.pause();
-    }
-}
-
-// === IMAGE GENERATION LOGIC WITH FALLBACK ===
-async function generateSuspectImage() {
-    let newState = 'calm';
-    if (GameState.suspicion > 80) newState = 'broken';
-    else if (GameState.suspicion > 60) newState = 'defensive';
-    else if (GameState.suspicion > 30) newState = 'nervous';
-    
-    if (newState === lastVisualState && DOM.suspectImg.src) return;
-    
-    lastVisualState = newState;
-    DOM.suspectLoader.classList.add('visible');
-    
-    const basePrompt = CASES[currentCase].visualPrompt;
-    let emotionPrompt = "";
-    if(newState === 'calm') emotionPrompt = "calm face, neutral expression";
-    if(newState === 'nervous') emotionPrompt = "nervous, sweating, eyes looking down, anxious";
-    if(newState === 'defensive') emotionPrompt = "angry, defensive, aggressive expression, shouting";
-    if(newState === 'broken') emotionPrompt = "crying, tears, despair, looking down, broken man";
-    
-    const fullPrompt = `${basePrompt}, ${emotionPrompt}`;
+// --- CORE GENERATION LOGIC ---
+async function generateCase(category) {
+    DOM.startScreen.classList.add('hidden');
+    DOM.loadingScreen.classList.add('visible');
     
     try {
-        const response = await fetch(API_ENDPOINT + '/image', {
+        const r = await fetch(API_ENDPOINT + '/generate', {
             method: 'POST',
-            body: JSON.stringify({ prompt: fullPrompt })
+            body: JSON.stringify({ category: category })
         });
         
-        if (!response.ok) throw new Error("Image gen failed");
-        
-        const data = await response.json();
-        if (data.imageUrl) {
-            DOM.suspectImg.src = data.imageUrl;
-            DOM.suspectImg.style.display = 'block';
-        }
-    } catch (e) {
-        console.error("Image generation failed", e);
-        // FALLBACK IMAGE (Generic silhouette if API fails)
-        DOM.suspectImg.src = "https://placehold.co/400x400/1a1a24/d4af37?text=?";
-        DOM.suspectImg.style.display = 'block';
-    } finally {
-        DOM.suspectLoader.classList.remove('visible');
-    }
-}
-
-function exportChat() {
-    if (GameState.conversationHistory.length === 0) {
-        alert(currentLang === 'ua' ? "Чат порожній!" : "Chat is empty!");
-        return;
-    }
-    let exportText = "=== THE INTERROGATOR LOG ===\n";
-    exportText += `Date: ${new Date().toLocaleString()}\n`;
-    exportText += `Case: ${tCase('title')} (${CASES[currentCase].caseNumber})\n`;
-    exportText += `Suspect: ${tCase('suspectName')}\n`;
-    exportText += "--------------------------------\n\n";
-    
-    const greeting = document.querySelector('.message-npc .message-text')?.textContent || "";
-    if(greeting) exportText += `[SUSPECT]: ${greeting}\n\n`;
-
-    GameState.conversationHistory.forEach(msg => {
-        if (msg.role === 'user') exportText += `[INVESTIGATOR]: ${msg.content}\n\n`;
-        else if (msg.role === 'assistant') exportText += `[SUSPECT]: ${msg.content}\n\n`;
-    });
-
-    const blob = new Blob([exportText], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `interrogation_${new Date().toISOString().slice(0,10)}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-}
-
-async function evaluateInterrogation() {
-    addMsg(currentLang === 'ua' ? "⏳ *Аналіз матеріалів справи...*" : "⏳ *Analyzing case files...*", "system");
-    disableInput(true);
-
-    const caseData = CASES[currentCase][currentLang];
-    const trueStory = CASES[currentCase].en.truthReveal; 
-    
-    const chatLog = GameState.conversationHistory.map(m => 
-        `${m.role === 'user' ? 'DETECTIVE' : 'SUSPECT'}: ${m.content}`
-    ).join('\n');
-
-    const judgeSystemPrompt = `
-    You are a Senior Detective evaluating an interrogation.
-    CASE DETAILS:
-    Suspect: ${CASES[currentCase].en.suspectName}
-    Crime: ${CASES[currentCase].en.crimeDescription}
-    THE TRUTH (Secret): ${trueStory}
-    TASK: Analyze the interrogation log. Did the player (Detective) uncover the truth OR pressure the suspect into a breakdown?
-    OUTPUT FORMAT: JSON ONLY. { "verdict": "WIN" or "LOSE", "reason": "Short explanation in ${currentLang === 'ua' ? 'Ukrainian' : 'English'}." }
-    `;
-
-    try {
-        const r = await fetch(API_ENDPOINT, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                model: MODEL,
-                system: judgeSystemPrompt,
-                messages: [{role: 'user', content: `LOG:\n${chatLog}`}]
-            })
-        });
-
         if (!r.ok) throw new Error("API Error");
-        const d = await r.json();
-        let content = d.content?.[0]?.text || "{}";
-        content = content.replace(/```json/g, '').replace(/```/g, '').trim();
-        const result = JSON.parse(content);
-
-        if (result.verdict === "WIN") showModal('win', result.reason);
-        else showModal('lose', result.reason || t('loseTextWeak'));
-
+        
+        const data = await r.json();
+        currentCaseData = data;
+        
+        startGame();
+        
     } catch (e) {
         console.error(e);
-        const th = CASES[currentCase].winThreshold;
-        if (GameState.suspicion >= th) showModal('win');
-        else showModal('lose', t('loseTextWeak'));
+        alert("Помилка генерації! Перевірте інтернет або API.");
+        DOM.loadingScreen.classList.remove('visible');
+        DOM.startScreen.classList.remove('hidden');
     }
 }
 
-async function queryLLM(messages){
-    const sys=messages.find(m=>m.role==='system');
-    const conv=messages.filter(m=>m.role!=='system');
-    try{
-        const r=await fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:MODEL,system:sys?.content||'',messages:conv})});
-        if(!r.ok)return currentLang==='ua'?'*мовчить* [ПОМИЛКА]':'*silent* [ERROR]';
-        const d=await r.json();
-        return d.content?.[0]?.text||(currentLang==='ua'?'*чекає*':'*waits*');
-    }catch(e){console.error(e);return currentLang==='ua'?'*мовчить*':'*silent*'}
-}
-
-function sanitize(s){let c=s.trim().substring(0,500);[/ignore.*instructions/gi,/system:/gi,/you are now/gi].forEach(p=>c=c.replace(p,''));return c}
-
-function updateEmotion(){const s=GameState.suspicion;GameState.emotionalState=s<=30?'calm':s<=60?'nervous':s<=80?'defensive':'breaking'}
-
-function updateEnergy(){
-    DOM.energyCurrent.textContent=GameState.energy;
-    DOM.energyMax.textContent="/ "+GameState.maxEnergy;
-    DOM.energyCurrent.style.color=GameState.energy<=3?'var(--accent-red-bright)':'var(--accent-gold)';
-    DOM.coffeeBtn.disabled = GameState.energy >= GameState.maxEnergy || GameState.gameOver;
-}
-
-function drinkCoffee(){
-    if(GameState.gameOver || GameState.energy >= GameState.maxEnergy) return;
-    GameState.energy = Math.min(GameState.maxEnergy, GameState.energy + 5);
-    updateEnergy();
-    const msg = currentLang === 'ua' ? '*п’є каву і думає*' : '*sips coffee and thinks*';
-    addMsg(msg, 'system');
-}
-
-function updateSuspicion(){DOM.suspicionBar.style.width=GameState.suspicion+'%';DOM.suspicionText.textContent=GameState.suspicion+'% — '+t(GameState.emotionalState)}
-
-function scrollToBottom() {
-    const log = DOM.chatLog;
-    log.scrollTop = log.scrollHeight;
-    requestAnimationFrame(() => {
-        log.scrollTop = log.scrollHeight;
-    });
-}
-
-function typeWriterEffect(element, text, speed = 20) { 
-    let i = 0;
-    playSound('type');
-    if (element.dataset.typingInterval) clearInterval(parseInt(element.dataset.typingInterval));
-    const interval = setInterval(() => {
-        if (i < text.length) {
-            element.textContent += text.charAt(i);
-            i++;
-            scrollToBottom();
-        } else {
-            clearInterval(interval);
-            stopSound('type');
-            scrollToBottom();
-        }
-    }, speed);
-    element.dataset.typingInterval = interval;
-}
-
-function addMsg(content,type){
-    const d=document.createElement('div');
-    d.className='message message-'+type;
-    if(type!=='system'){
-        const s=document.createElement('div');
-        s.className='message-sender';
-        s.textContent=type==='player'?t('detective'):tCase('suspectName');
-        d.appendChild(s)
-    }
-    const txt=document.createElement('div');
-    txt.className='message-text';
-    d.appendChild(txt);
-    DOM.chatLog.appendChild(d);
-    if(type === 'npc'){
-        typeWriterEffect(txt, content);
-    } else {
-        txt.textContent=content;
-        scrollToBottom();
-    }
-}
-
-function showTyping(){const i=document.createElement('div');i.className='typing-indicator';i.id='typing';i.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';DOM.chatLog.appendChild(i);DOM.chatLog.scrollTop=DOM.chatLog.scrollHeight}
-function hideTyping(){document.getElementById('typing')?.remove()}
-function disableInput(d){DOM.chatInput.disabled=d;DOM.sendBtn.disabled=d;DOM.accuseBtn.disabled=d}
-
-function showModal(type, customText = null) {
-    const c = {
-        win: { icon: '✓', title: t('winTitle'), cls: 'modal-title--win', text: customText || t('winText') },
-        lose: { icon: '✗', title: t('loseTitle'), cls: 'modal-title--lose', text: customText || t('loseTextDefault') },
-        unsolved: { icon: '?', title: t('unsolvedTitle'), cls: 'modal-title--unsolved', text: t('unsolvedText') }
-    }[type];
-    DOM.modalIcon.textContent = c.icon;
-    DOM.modalTitle.textContent = c.title;
-    DOM.modalTitle.className = 'modal-title ' + c.cls;
-    DOM.modalText.textContent = c.text;
-    DOM.modalRevealText.textContent = tCase('truthReveal');
-    DOM.modalOverlay.classList.add('visible');
-    GameState.gameOver = true;
-    disableInput(true);
-    stopSound('bg');
-    stopSound('type');
-}
-
-function hideModal(){DOM.modalOverlay.classList.remove('visible')}
-
-async function handleAccuse(){
-    if(GameState.gameOver)return;
-    const ch=prompt(tCase('accusationPrompt'));
-    if(!ch)return;
-    const n=parseInt(ch);
-    if(n===1){
-        await evaluateInterrogation();
-    } else if(n>=2&&n<=4){
-        showModal('lose',tCase('wrongAccusations')[n]);
-    }
-}
-
-function useHint(){if(GameState.gameOver||GameState.hintsRemaining<=0)return;GameState.hintsRemaining--;updateHintCounter();const hintNum=3-GameState.hintsRemaining;const hintText=t('hint'+hintNum);addMsg('💡 '+hintText,'system')}
-function updateHintCounter(){DOM.hintCounter.textContent='('+GameState.hintsRemaining+')';DOM.hintBtn.disabled=GameState.hintsRemaining<=0||GameState.gameOver}
-function revealAnswer(){if(GameState.gameOver)return;const confirm=prompt(t('revealConfirm'));if(confirm&&confirm.toUpperCase()===t('revealConfirmWord')){GameState.gameOver=true;disableInput(true);DOM.hintBtn.disabled=true;DOM.revealBtn.disabled=true;const truth=tCase('truthReveal');addMsg('🔓 '+t('truthTitle')+': '+truth,'system');stopSound('bg');}}
-
-async function sendMessage(){
-    if(GameState.gameOver||GameState.energy<=0)return;
-    const raw=DOM.chatInput.value;
-    if(!raw.trim())return;
-    const msg=sanitize(raw);
-    DOM.chatInput.value='';
-    GameState.energy--;
-    updateEnergy();
-    addMsg(msg,'player');
-    GameState.conversationHistory.push({role:'user',content:msg});
-    
-    disableInput(true);
-    showTyping();
-    try{
-        const em={en:{calm:'CALM',nervous:'NERVOUS',defensive:'DEFENSIVE',breaking:'BREAKING'},ua:{calm:'СПОКІЙНА',nervous:'Нервова',defensive:'ЗАХИСНА',breaking:'ЛАМАЄТЬСЯ'}};
-        const sys=NPC_PROMPTS[currentCase][currentLang].replace('{{EMOTIONAL_STATE}}',em[currentLang][GameState.emotionalState]).replace('{{SUSPICION_LEVEL}}',GameState.suspicion);
-        const msgs=[{role:'system',content:sys},...GameState.conversationHistory];
-        let resp=await queryLLM(msgs);
-        
-        // PARSE AI NERVOUSNESS TAG
-        const match = resp.match(/<<<NERVOUSNESS:\s*(\d+)>>>/);
-        if (match) {
-            GameState.suspicion = parseInt(match[1]);
-            updateEmotion();
-            updateSuspicion();
-            generateSuspectImage(); // <-- TRIGGER IMAGE GEN
-            resp = resp.replace(match[0], '').trim();
-        }
-        
-        GameState.conversationHistory.push({role:'assistant',content:resp});
-        hideTyping();
-        addMsg(resp,'npc');
-    }catch(e){
-        hideTyping();
-        addMsg(currentLang==='ua'?'*мовчить*':'*silent*','npc')
-    }
-    disableInput(false);DOM.chatInput.focus();
-    if(GameState.energy<=0)setTimeout(()=>showModal('unsolved'),1000)
-}
-
-function updateUI(){
-    document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.getAttribute('data-i18n')));
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.getAttribute('data-i18n-placeholder')));
-    document.documentElement.lang=currentLang==='ua'?'uk':'en';
-    document.title=t('startTitle');
-    DOM.langBtns.forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang));
-    updateHintCounter();
-}
-
-function setLang(l){currentLang=l;localStorage.setItem('interrogator-lang',l);updateUI();if(currentCase)startGame(currentCase)}
-
-function showStart(){
-    DOM.startScreen.classList.remove('hidden');
-    DOM.gameScreen.classList.remove('active');
-    currentCase=null;
-    hideModal();
-    stopSound('bg');
-}
-
-function startGame(caseId){
-    currentCase=caseId;
-    GameState.reset();
-    DOM.startScreen.classList.add('hidden');
+function startGame() {
+    DOM.loadingScreen.classList.remove('visible');
     DOM.gameScreen.classList.add('active');
-    DOM.gameTitle.textContent=t('startTitle');
-    DOM.gameCaseName.textContent=tCase('title')+' '+CASES[caseId].caseNumber;
-    DOM.caseDescription.textContent=tCase('crimeDescription');
-    DOM.caseEvidence.innerHTML=tCase('knownFacts').map(f=>'<li>'+f+'</li>').join('');
-    DOM.suspectInfo.textContent=tCase('suspectProfile');
-    updateEnergy();
-    updateSuspicion();
-    updateHintCounter();
+    
+    GameState.reset();
     updateUI();
-    DOM.chatLog.innerHTML='';
-    DOM.revealBtn.disabled=false;
     
-    // Reset image with FALLBACK safe mode
-    lastVisualState = 'neutral'; 
-    DOM.suspectImg.style.display = 'none';
-    generateSuspectImage(); 
+    // Fill Data
+    DOM.gameTitle.textContent = currentCaseData.title;
+    DOM.gameSuspectName.textContent = currentCaseData.suspectName;
+    DOM.caseDescription.textContent = currentCaseData.crimeDescription;
+    DOM.suspectInfo.textContent = currentCaseData.suspectProfile;
     
-    playSound('bg');
-    addMsg(tCase('sessionStart'),'system');
-    setTimeout(()=>{
-        const g=tCase('npcGreeting');
-        GameState.conversationHistory.push({role:'assistant',content:g});
-        addMsg(g,'npc');
-    },500);
-    disableInput(false);
+    DOM.caseEvidence.innerHTML = currentCaseData.knownFacts.map(f => `<li>${f}</li>`).join('');
+    
+    DOM.chatLog.innerHTML = '';
+    DOM.suspectImg.src = "https://placehold.co/400x400/1a1a24/d4af37?text=?"; // Fallback placeholder
+    
+    // Start Audio
+    if(!isMuted) DOM.audioBg.play().catch(e=>{});
+    
+    addMsg("Допит розпочато.", 'system');
+    
+    // Initial Image Gen
+    generateSuspectImage();
+    
+    // NPC Greeting
+    setTimeout(() => {
+        GameState.conversationHistory.push({role:'assistant', content: currentCaseData.npcGreeting});
+        addMsg(currentCaseData.npcGreeting, 'npc');
+    }, 500);
+    
     DOM.briefingToggle.classList.add('active');
     DOM.briefingContent.classList.add('visible');
 }
 
-DOM.langBtns.forEach(b=>b.addEventListener('click',()=>{if(b.dataset.lang!==currentLang){setLang(b.dataset.lang)}}));
-DOM.caseCards.forEach(c=>c.addEventListener('click',()=>startGame(c.dataset.case)));
-DOM.sendBtn.addEventListener('click',sendMessage);
-DOM.chatInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
-DOM.briefingToggle.addEventListener('click',()=>{DOM.briefingToggle.classList.toggle('active');DOM.briefingContent.classList.toggle('visible')});
-DOM.accuseBtn.addEventListener('click',handleAccuse);
-DOM.restartBtn.addEventListener('click',()=>startGame(currentCase));
-DOM.backBtn.addEventListener('click',showStart);
-DOM.modalBtn.addEventListener('click',showStart);
-DOM.hintBtn.addEventListener('click',useHint);
-DOM.revealBtn.addEventListener('click',revealAnswer);
-DOM.coffeeBtn.addEventListener('click', drinkCoffee);
-DOM.muteBtn.addEventListener('click', toggleMute);
+// --- IMAGE GEN ---
+async function generateSuspectImage() {
+    // Logic: Only gen on major emotional shifts
+    let newState = 'calm';
+    if (GameState.suspicion > 80) newState = 'broken';
+    else if (GameState.suspicion > 50) newState = 'nervous';
+    
+    if (newState === lastVisualState && DOM.suspectImg.src.includes('replicate')) return;
+    lastVisualState = newState;
+    
+    let prompt = currentCaseData.visualPrompt;
+    if(newState === 'nervous') prompt += ", nervous, sweating, anxious eyes";
+    if(newState === 'broken') prompt += ", crying, looking down, defeated, despair";
+    
+    try {
+        const r = await fetch(API_ENDPOINT + '/image', {
+            method: 'POST',
+            body: JSON.stringify({ prompt: prompt })
+        });
+        const data = await r.json();
+        if(data.imageUrl) DOM.suspectImg.src = data.imageUrl;
+    } catch(e) {
+        console.log("Image gen skip/fail");
+    }
+}
+
+// --- CHAT LOGIC ---
+async function sendMessage() {
+    if(GameState.gameOver || GameState.energy <= 0) return;
+    
+    const txt = DOM.chatInput.value.trim();
+    if(!txt) return;
+    
+    DOM.chatInput.value = '';
+    GameState.energy--;
+    updateUI();
+    
+    addMsg(txt, 'player');
+    GameState.conversationHistory.push({role:'user', content: txt});
+    
+    // UI Updates
+    showTyping();
+    
+    // Prepare Prompt with Dynamic Pressure
+    const sysPrompt = `${currentCaseData.systemPrompt}\n\nCURRENT STATE:\nSuspicion Level: ${GameState.suspicion}%\nEnergy Left: ${GameState.energy}\n\nINSTRUCTIONS: Respond to the detective. If they catch you in a lie or press hard, increase your nervousness. ALWAYS append hidden tag <<<NERVOUSNESS: [0-100]>>> at the end.`;
+    
+    try {
+        const r = await fetch(API_ENDPOINT + '/chat', {
+            method: 'POST',
+            body: JSON.stringify({
+                system: sysPrompt,
+                messages: GameState.conversationHistory
+            })
+        });
+        
+        const data = await r.json();
+        let reply = data.content[0].text;
+        
+        // Parse Nervousness
+        const match = reply.match(/<<<NERVOUSNESS:\s*(\d+)>>>/);
+        if(match) {
+            GameState.suspicion = parseInt(match[1]);
+            reply = reply.replace(match[0], '').trim();
+            updateUI();
+            generateSuspectImage();
+        }
+        
+        GameState.conversationHistory.push({role:'assistant', content: reply});
+        hideTyping();
+        addMsg(reply, 'npc');
+        
+    } catch(e) {
+        hideTyping();
+        addMsg("*мовчить*", 'npc');
+    }
+    
+    if(GameState.energy <= 0) setTimeout(()=>showModal('lose', "Енергія вичерпана. Допит завершено."), 1000);
+}
+
+// --- VERDICT LOGIC (AI JUDGE) ---
+async function handleAccuse() {
+    if(GameState.gameOver) return;
+    
+    const choice = prompt("Ваш вердикт:\n1. Винен (Повне обґрунтування)\n2. Невинуватий / Недостатньо доказів\n\nВведіть 1 або 2:");
+    if(choice !== '1') {
+        showModal('lose', "Ви відпустили підозрюваного або не наважилися на звинувачення.");
+        return;
+    }
+    
+    addMsg("⏳ *Аналіз вердикту...*", 'system');
+    
+    // Judge Prompt
+    const log = GameState.conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n');
+    const judgePrompt = `
+    Case: ${currentCaseData.title}
+    Truth: ${currentCaseData.truthReveal}
+    
+    Analyze the interrogation log below. Did the user uncover the truth or break the suspect?
+    Reply JSON ONLY: { "verdict": "WIN" or "LOSE", "reason": "Reason in Ukrainian" }
+    
+    LOG:
+    ${log}
+    `;
+    
+    try {
+        const r = await fetch(API_ENDPOINT + '/chat', {
+            method: 'POST',
+            body: JSON.stringify({
+                system: "You are a Senior Detective Judge.",
+                messages: [{role:'user', content: judgePrompt}]
+            })
+        });
+        const data = await r.json();
+        const res = JSON.parse(data.content[0].text.replace(/```json/g,'').replace(/```/g,''));
+        
+        showModal(res.verdict.toLowerCase(), res.reason);
+        
+    } catch(e) {
+        // Fallback
+        GameState.suspicion > 60 ? showModal('win', "За сукупністю доказів.") : showModal('lose', "Недостатньо тиску.");
+    }
+}
+
+// --- UTILS ---
+function updateUI() {
+    DOM.energyCurrent.textContent = GameState.energy;
+    DOM.suspicionBar.style.width = GameState.suspicion + '%';
+    DOM.suspicionText.textContent = GameState.suspicion + '%';
+    DOM.coffeeBtn.disabled = GameState.energy >= 15;
+}
+
+function addMsg(text, type) {
+    const d = document.createElement('div');
+    d.className = `message message-${type}`;
+    d.innerHTML = `<div class="message-sender">${type==='player'?'Слідчий':'Підозрюваний'}</div><div class="message-text">${text}</div>`;
+    DOM.chatLog.appendChild(d);
+    DOM.chatLog.scrollTop = DOM.chatLog.scrollHeight;
+    
+    if(type==='npc' && !isMuted) {
+        DOM.audioType.currentTime=0; DOM.audioType.play().catch(()=>{});
+    }
+}
+
+function showTyping(){
+    const d=document.createElement('div'); d.id='typing'; d.className='typing-indicator';
+    d.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+    DOM.chatLog.appendChild(d); DOM.chatLog.scrollTop=DOM.chatLog.scrollHeight;
+}
+function hideTyping(){ document.getElementById('typing')?.remove(); }
+
+function showModal(type, text) {
+    GameState.gameOver = true;
+    DOM.modalOverlay.classList.add('visible');
+    DOM.modalIcon.textContent = type==='win' ? '✅' : '❌';
+    DOM.modalTitle.textContent = type==='win' ? 'Справу розкрито' : 'Провал';
+    DOM.modalText.textContent = text;
+    DOM.modalRevealText.textContent = currentCaseData.truthReveal;
+}
+
+// --- EVENTS ---
+DOM.catCards.forEach(c => c.addEventListener('click', () => generateCase(c.dataset.category)));
+DOM.sendBtn.addEventListener('click', sendMessage);
+DOM.chatInput.addEventListener('keypress', e => { if(e.key==='Enter') sendMessage() });
+DOM.briefingToggle.addEventListener('click', () => DOM.briefingContent.classList.toggle('visible'));
+DOM.hintBtn.addEventListener('click', () => { 
+    if(GameState.hintsRemaining > 0) {
+        GameState.hintsRemaining--;
+        // Тут можна брати підказки з currentCaseData.knownFacts якщо вони є, або просто генерити
+        addMsg("💡 Зверни увагу на дрібні деталі в його історії.", 'system');
+    }
+});
+DOM.coffeeBtn.addEventListener('click', () => { if(GameState.energy<15){GameState.energy=Math.min(15, GameState.energy+5); updateUI(); addMsg("*випив кави*", 'system')} });
+DOM.accuseBtn.addEventListener('click', handleAccuse);
+DOM.revealBtn.addEventListener('click', () => { if(confirm("Здатися?")) showModal('lose', "Ви здалися."); });
+DOM.restartBtn.addEventListener('click', () => startGame()); // Restart same case
+DOM.backBtn.addEventListener('click', () => { DOM.gameScreen.classList.remove('active'); DOM.startScreen.classList.remove('hidden'); });
+DOM.modalBtn.addEventListener('click', () => { DOM.modalOverlay.classList.remove('visible'); DOM.gameScreen.classList.remove('active'); DOM.startScreen.classList.remove('hidden'); });
+DOM.muteBtn.addEventListener('click', () => { isMuted=!isMuted; DOM.muteBtn.textContent=isMuted?'🔇':'🔊'; if(isMuted) DOM.audioBg.pause(); else DOM.audioBg.play(); });
 DOM.exportBtn.addEventListener('click', exportChat);
 
-setLang(currentLang);
 })();
 </script>
 </body>
