@@ -11,17 +11,16 @@
         :root{--bg-primary:#0a0a0c;--bg-secondary:#12121a;--bg-tertiary:#1a1a24;--bg-card:#15151f;--text-primary:#e8e6e3;--text-secondary:#9a9a9a;--text-muted:#5a5a6a;--accent-gold:#d4af37;--accent-gold-dim:#8b7323;--accent-red:#8b2942;--accent-red-bright:#c73e5c;--accent-green:#2d5a3d;--accent-green-bright:#4a9b6a;--border-color:#2a2a3a;--border-accent:#3a3a4a;--font-display:'Playfair Display',Georgia,serif;--font-body:'Crimson Pro',Georgia,serif;--font-mono:'Source Code Pro',monospace}
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         
-        /* ШРИФТ: 22px ПК / 20px Мобільні */
         html{font-size:22px;scroll-behavior:smooth}
         
         body{
             font-family:var(--font-body);
             background:var(--bg-primary);
             color:var(--text-primary);
-            min-height:100vh;
-            line-height:1.6;
-            /* ПОВЕРНУВ СКРОЛ СТОРІНКИ */
-            overflow-y: auto; 
+            width: 100%;
+            height: 100dvh; 
+            overflow: hidden; 
+            position: fixed; 
         }
         
         body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.03;pointer-events:none;z-index:1000}
@@ -37,14 +36,14 @@
         .lang-btn:first-child{border-radius:4px 0 0 4px;}
         .lang-btn:last-child{border-radius:0 4px 4px 0;border-right:1px solid var(--border-color);}
         
-        /* Start Screen - тепер теж скролиться */
         .start-screen{
-            min-height: 100vh;
+            height: 100dvh;
             width: 100%;
             display:flex;
             flex-direction:column;
             position:absolute; 
             top:0; left:0;
+            overflow-y: auto; 
             z-index: 100;
             background: var(--bg-primary);
         }
@@ -85,14 +84,58 @@
             max-width:900px;
             margin:0 auto;
             padding:1.5rem;
-            min-height:100vh; /* Дозволяє рости */
+            min-height:100vh; 
             display:flex;
             flex-direction:column;
         }
         
-        .game-header{text-align:center;padding:1rem 0;border-bottom:1px solid var(--border-color);margin-bottom:1rem;position:relative;margin-top:0.5rem;}
-        .game-header::after{content:'◆';position:absolute;bottom:-0.5rem;left:50%;transform:translateX(-50%);background:var(--bg-primary);padding:0 1rem;color:var(--accent-gold-dim);font-size:0.55rem}
-        .game-title{font-family:var(--font-display);font-size:1.4rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);margin-bottom:0.1rem;text-shadow:0 0 40px rgba(212,175,55,0.2)}
+        .game-header{
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+            flex-shrink: 0;
+        }
+        
+        /* НОВИЙ БЛОК: ФОТО ПІДОЗРЮВАНОГО */
+        .suspect-image-container {
+            width: 100px;
+            height: 100px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: #000;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .suspect-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.5s ease;
+        }
+        
+        .suspect-loader {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.5rem;
+            color: var(--accent-gold);
+            font-family: var(--font-mono);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .suspect-loader.visible { opacity: 1; }
+
+        .game-header-text { flex: 1; text-align: left; }
+        .game-title{font-family:var(--font-display);font-size:1.2rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);margin-bottom:0.2rem;text-shadow:0 0 40px rgba(212,175,55,0.2)}
         .game-subtitle{font-family:var(--font-mono);font-size:0.55rem;color:var(--text-muted);letter-spacing:0.3em;text-transform:uppercase}
         
         .status-bar{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;padding:0.8rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;margin-bottom:1rem; flex-shrink: 0;}
@@ -112,7 +155,6 @@
         .briefing-toggle:hover{background:var(--bg-tertiary);border-color:var(--border-accent)}
         .briefing-toggle.active .briefing-toggle-icon{transform:rotate(180deg)}
         
-        /* BRIEFING: Тепер просто частина потоку */
         .briefing-content{
             display:none;
             background:var(--bg-card);
@@ -132,19 +174,16 @@
         .evidence-list li{position:relative;padding-left:1rem;margin-bottom:0.5rem;color:var(--text-secondary);font-size:0.7rem}
         .evidence-list li::before{content:'▪';position:absolute;left:0;color:var(--accent-gold-dim)}
         
-        /* --- CHAT CONTAINER --- */
-        /* Повертаємо логіку "фіксованої/мінімальної висоти" для скролу всередині */
         .chat-container {
-            flex: 1;
+            flex: 1; 
             display: flex;
             flex-direction: column;
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 4px;
             overflow: hidden;
-            /* Адаптивна висота */
-            min-height: 50vh; 
-            max-height: 70vh; /* Обмеження, щоб з'явився скрол */
+            min-height: 40vh; 
+            max-height: 70vh;
         }
         
         .chat-log {
@@ -228,6 +267,8 @@
         @media(max-width:600px){
             html{font-size:20px} 
             .game-container {padding: 0.5rem;}
+            .game-header {flex-direction: column; align-items: center; gap: 0.5rem;}
+            .game-header-text {text-align: center;}
             .start-title{font-size:1.8rem}
             .game-title{font-size:1.2rem}
             .status-bar{grid-template-columns:1fr; gap: 0.5rem;}
@@ -291,8 +332,14 @@
         
         <div class="game-container">
             <header class="game-header">
-                <h1 class="game-title" id="game-title">The Interrogator</h1>
-                <p class="game-subtitle" id="game-case-name">Case #001</p>
+                <div class="suspect-image-container">
+                    <img id="suspect-img" class="suspect-image" src="" alt="Suspect" style="display:none;">
+                    <div class="suspect-loader" id="suspect-loader">Loading...</div>
+                </div>
+                <div class="game-header-text">
+                    <h1 class="game-title" id="game-title">The Interrogator</h1>
+                    <p class="game-subtitle" id="game-case-name">Case #001</p>
+                </div>
             </header>
             
             <div class="status-bar">
@@ -325,7 +372,7 @@
                 <button class="action-btn action-btn--reveal" id="reveal-btn" data-i18n="revealBtn">🔓 Reveal Answer</button>
             </div>
             
-            <footer class="game-footer"><p class="game-footer-text">The Interrogator • v3.1</p></footer>
+            <footer class="game-footer"><p class="game-footer-text">The Interrogator • v3.2</p></footer>
         </div>
     </div>
     
@@ -457,6 +504,7 @@ const CASES = {
         id: "easy",
         caseNumber: "#001",
         winThreshold: 40,
+        visualPrompt: "Portrait of a young 22 year old man, terrified student, wearing a hoodie, dark interrogation room lighting, high detail, realistic, 8k",
         en: {
             title: "The Night Photographer",
             suspectName: "Andrey (Suspect)",
@@ -509,6 +557,7 @@ const CASES = {
         id: "medium",
         caseNumber: "#002",
         winThreshold: 50,
+        visualPrompt: "Portrait of a 35 year old man, military posture, wearing ill-fitting civilian clothes, red marks on face from oxygen mask, dark room, realistic, 8k",
         en: {
             title: "The Lost Tractor Driver",
             suspectName: "Mykola (Suspect)",
@@ -563,6 +612,7 @@ const CASES = {
         id: "hard",
         caseNumber: "#003",
         winThreshold: 60,
+        visualPrompt: "Portrait of a 40 year old man, arrogant expression, volunteer vest over civilian clothes, stubble, cinematic lighting, realistic, 8k",
         en: {
             title: "The Humanitarian Volunteer",
             suspectName: "Alexey (Suspect)",
@@ -630,13 +680,15 @@ const NPC_PROMPTS = {
 let currentLang=localStorage.getItem('interrogator-lang')||'en';
 let currentCase=null;
 let isMuted=false;
+let lastVisualState = 'neutral'; 
+
 const GameState={energy:15,maxEnergy:15,suspicion:0,hintsRemaining:3,emotionalState:'calm',conversationHistory:[],gameOver:false,
-reset(){this.energy=15;this.suspicion=0;this.hintsRemaining=3;this.emotionalState='calm';this.conversationHistory=[];this.gameOver=false}};
+reset(){this.energy=15;this.suspicion=0;this.hintsRemaining=3;this.emotionalState='calm';this.conversationHistory=[];this.gameOver=false; lastVisualState='neutral';}};
 
 function t(k){return i18n[currentLang][k]||i18n.en[k]||k}
 function tCase(k){return currentCase?CASES[currentCase][currentLang][k]||CASES[currentCase].en[k]:''}
 
-const DOM={startScreen:document.getElementById('start-screen'),gameScreen:document.getElementById('game-screen'),chatLog:document.getElementById('chat-log'),chatInput:document.getElementById('chat-input'),sendBtn:document.getElementById('send-btn'),energyCurrent:document.getElementById('energy-current'),energyMax:document.querySelector('.energy-max'),suspicionBar:document.getElementById('suspicion-bar'),suspicionText:document.getElementById('suspicion-text'),briefingToggle:document.getElementById('briefing-toggle'),briefingContent:document.getElementById('briefing-content'),caseDescription:document.getElementById('case-description'),caseEvidence:document.getElementById('case-evidence'),suspectInfo:document.getElementById('suspect-info'),accuseBtn:document.getElementById('accuse-btn'),restartBtn:document.getElementById('restart-btn'),backBtn:document.getElementById('back-btn'),modalOverlay:document.getElementById('modal-overlay'),modalIcon:document.getElementById('modal-icon'),modalTitle:document.getElementById('modal-title'),modalText:document.getElementById('modal-text'),modalRevealText:document.getElementById('modal-reveal-text'),modalBtn:document.getElementById('modal-btn'),langBtns:document.querySelectorAll('.lang-btn'),caseCards:document.querySelectorAll('.case-card'),gameTitle:document.getElementById('game-title'),gameCaseName:document.getElementById('game-case-name'),hintBtn:document.getElementById('hint-btn'),hintCounter:document.getElementById('hint-counter'),revealBtn:document.getElementById('reveal-btn'),coffeeBtn:document.getElementById('coffee-btn'),muteBtn:document.getElementById('mute-btn'),exportBtn:document.getElementById('export-btn'),audioTypewriter:document.getElementById('audio-typewriter'),audioBackground:document.getElementById('audio-background')};
+const DOM={startScreen:document.getElementById('start-screen'),gameScreen:document.getElementById('game-screen'),chatLog:document.getElementById('chat-log'),chatInput:document.getElementById('chat-input'),sendBtn:document.getElementById('send-btn'),energyCurrent:document.getElementById('energy-current'),energyMax:document.querySelector('.energy-max'),suspicionBar:document.getElementById('suspicion-bar'),suspicionText:document.getElementById('suspicion-text'),briefingToggle:document.getElementById('briefing-toggle'),briefingContent:document.getElementById('briefing-content'),caseDescription:document.getElementById('case-description'),caseEvidence:document.getElementById('case-evidence'),suspectInfo:document.getElementById('suspect-info'),accuseBtn:document.getElementById('accuse-btn'),restartBtn:document.getElementById('restart-btn'),backBtn:document.getElementById('back-btn'),modalOverlay:document.getElementById('modal-overlay'),modalIcon:document.getElementById('modal-icon'),modalTitle:document.getElementById('modal-title'),modalText:document.getElementById('modal-text'),modalRevealText:document.getElementById('modal-reveal-text'),modalBtn:document.getElementById('modal-btn'),langBtns:document.querySelectorAll('.lang-btn'),caseCards:document.querySelectorAll('.case-card'),gameTitle:document.getElementById('game-title'),gameCaseName:document.getElementById('game-case-name'),hintBtn:document.getElementById('hint-btn'),hintCounter:document.getElementById('hint-counter'),revealBtn:document.getElementById('reveal-btn'),coffeeBtn:document.getElementById('coffee-btn'),muteBtn:document.getElementById('mute-btn'),exportBtn:document.getElementById('export-btn'),audioTypewriter:document.getElementById('audio-typewriter'),audioBackground:document.getElementById('audio-background'),suspectImg:document.getElementById('suspect-img'),suspectLoader:document.getElementById('suspect-loader')};
 
 const API_ENDPOINT='https://interrogator-api.sashko1391.workers.dev';
 const MODEL='claude-sonnet-4-20250514';
@@ -670,6 +722,49 @@ function stopSound(type){
         DOM.audioBackground.pause();
     } else if(type === 'type'){
         DOM.audioTypewriter.pause();
+    }
+}
+
+// === IMAGE GENERATION LOGIC ===
+async function generateSuspectImage() {
+    // Determine strict state to avoid re-generating same image
+    let newState = 'calm';
+    if (GameState.suspicion > 80) newState = 'broken';
+    else if (GameState.suspicion > 60) newState = 'defensive';
+    else if (GameState.suspicion > 30) newState = 'nervous';
+    
+    // Only generate if state changed OR it's the first load
+    if (newState === lastVisualState && DOM.suspectImg.src) return;
+    
+    lastVisualState = newState;
+    DOM.suspectLoader.classList.add('visible');
+    
+    const basePrompt = CASES[currentCase].visualPrompt;
+    let emotionPrompt = "";
+    if(newState === 'calm') emotionPrompt = "calm face, neutral expression";
+    if(newState === 'nervous') emotionPrompt = "nervous, sweating, eyes looking down, anxious";
+    if(newState === 'defensive') emotionPrompt = "angry, defensive, aggressive expression, shouting";
+    if(newState === 'broken') emotionPrompt = "crying, tears, despair, looking down, broken man";
+    
+    const fullPrompt = `${basePrompt}, ${emotionPrompt}`;
+    
+    try {
+        const response = await fetch(API_ENDPOINT + '/image', {
+            method: 'POST',
+            body: JSON.stringify({ prompt: fullPrompt })
+        });
+        
+        if (!response.ok) throw new Error("Image gen failed");
+        
+        const data = await response.json();
+        if (data.imageUrl) {
+            DOM.suspectImg.src = data.imageUrl;
+            DOM.suspectImg.style.display = 'block';
+        }
+    } catch (e) {
+        console.error("Image generation failed", e);
+    } finally {
+        DOM.suspectLoader.classList.remove('visible');
     }
 }
 
@@ -898,6 +993,7 @@ async function sendMessage(){
             GameState.suspicion = parseInt(match[1]);
             updateEmotion();
             updateSuspicion();
+            generateSuspectImage(); // <-- TRIGGER IMAGE GEN
             resp = resp.replace(match[0], '').trim();
         }
         
@@ -947,6 +1043,12 @@ function startGame(caseId){
     updateUI();
     DOM.chatLog.innerHTML='';
     DOM.revealBtn.disabled=false;
+    
+    // Reset image
+    lastVisualState = 'neutral'; // Force new gen
+    DOM.suspectImg.style.display = 'none';
+    generateSuspectImage(); // Initial gen
+    
     playSound('bg');
     addMsg(tCase('sessionStart'),'system');
     setTimeout(()=>{
@@ -955,6 +1057,7 @@ function startGame(caseId){
         addMsg(g,'npc');
     },500);
     disableInput(false);
+    // Open briefing by default
     DOM.briefingToggle.classList.add('active');
     DOM.briefingContent.classList.add('visible');
 }
