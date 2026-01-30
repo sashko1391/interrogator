@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ua">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -17,26 +17,27 @@
             background:var(--bg-primary);
             color:var(--text-primary);
             min-height:100vh;
-            overflow-y:auto; /* Скрол працює */
+            overflow-y:auto;
             position: relative;
         }
         
-        /* Шум (Noise texture) */
         body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.03;pointer-events:none;z-index:1000}
 
-        /* --- ВІДНОВЛЕНО ФОН --- */
         .bg-fallback{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 20%,rgba(139,41,66,0.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(212,175,55,0.1) 0%,transparent 50%),linear-gradient(180deg,#0a0a0c 0%,#12121a 100%);z-index:-2}
         .bg-image{position:fixed;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;z-index:-1; opacity: 0.4;}
-        /* Якщо у тебе є файл bg-landscape.jpg, він з'явиться. Якщо ні - буде градієнт */
         .bg-landscape{background-image:url('bg-landscape.jpg');display:block} 
         
         /* CONTROLS */
-        .top-controls-left {
-            position:fixed; top:1rem; left:1rem; display:flex; gap:0.5rem; 
-            z-index: 2000; /* Поверх усього */
-        }
+        .top-controls-left {position:fixed; top:1rem; left:1rem; display:flex; gap:0.5rem; z-index: 2000;}
+        .lang-switcher {position:fixed; top:1rem; right:1rem; display:flex; z-index: 2000;}
+        
         .icon-btn{background:rgba(18,18,26,0.9);border:1px solid var(--border-color);color:var(--text-muted);padding:0.6rem;font-family:var(--font-mono);font-size:0.8rem;cursor:pointer;border-radius:4px;min-width:40px;display:flex;align-items:center;justify-content:center;}
         .icon-btn:hover{border-color:var(--accent-gold);}
+        
+        .lang-btn{border-radius:0;border-right:none;}
+        .lang-btn:first-child{border-radius:4px 0 0 4px;}
+        .lang-btn:last-child{border-radius:0 4px 4px 0;border-right:1px solid var(--border-color);}
+        .lang-btn.active{background:var(--accent-gold-dim);color:var(--bg-primary);border-color:var(--accent-gold-dim);}
         
         .start-screen{min-height:100vh;width:100%;display:flex;flex-direction:column;position:absolute;top:0;left:0;z-index:100;background:transparent;}
         .start-screen.hidden{display:none}
@@ -45,7 +46,6 @@
         .start-title{font-family:var(--font-display);font-size:2.5rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);margin-bottom:0.5rem;text-shadow:0 0 60px rgba(212,175,55,0.3)}
         .start-tagline{font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted);letter-spacing:0.3em;text-transform:uppercase;margin-bottom:2rem}
         
-        /* CATEGORY CARDS */
         .category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;width:100%;max-width:900px;padding:0 1rem;}
         .cat-card{background:rgba(21,21,31,0.9);border:1px solid var(--border-color);border-radius:4px;padding:2rem;cursor:pointer;transition:all 0.3s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1rem;}
         .cat-card:hover{border-color:var(--accent-gold);transform:translateY(-5px);background:rgba(26,26,36,0.95);}
@@ -53,7 +53,6 @@
         .cat-title{font-family:var(--font-display);font-size:1.2rem;color:var(--accent-gold);}
         .cat-desc{font-size:0.75rem;color:var(--text-secondary);line-height:1.6;}
         
-        /* LOADING SCREEN */
         .loading-screen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg-primary);z-index:200;align-items:center;justify-content:center;flex-direction:column;}
         .loading-screen.visible{display:flex;}
         .loader{width:50px;height:50px;border:3px solid var(--bg-tertiary);border-top:3px solid var(--accent-gold);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:1rem;}
@@ -61,7 +60,6 @@
         .loading-text{font-family:var(--font-mono);font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;animation:pulse 2s infinite; text-align: center;}
         @keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}
 
-        /* GAME SCREEN */
         .game-screen{display:none;min-height:100vh;width:100%;}
         .game-screen.active{display:block;}
         .game-container{max-width:900px;margin:0 auto;padding:1.5rem;min-height:100vh;display:flex;flex-direction:column;}
@@ -82,7 +80,7 @@
         .suspicion-bar-bg{height:8px;background:var(--bg-tertiary);border-radius:4px;overflow:hidden}
         .suspicion-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#2d5a3d,#d4af37,#c73e5c);transition:width 300ms;border-radius:4px}
         
-        .briefing-toggle{width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.8rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.65rem;text-transform:uppercase;cursor:pointer;margin-bottom:1rem;}
+        .briefing-toggle{width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.8rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.65rem;text-transform:uppercase;cursor:pointer;margin-bottom:1rem;display:flex;justify-content:space-between;}
         .briefing-content{display:none;background:var(--bg-card);border:1px solid var(--border-color);padding:1.5rem;margin-bottom:1rem;}
         .briefing-content.visible{display:block;}
         .briefing-section-title{color:var(--accent-gold);font-family:var(--font-display);font-size:0.9rem;margin-bottom:0.5rem;}
@@ -126,6 +124,11 @@
     <div class="bg-fallback"></div>
     <div class="bg-image bg-landscape"></div>
 
+    <div class="lang-switcher">
+        <button class="icon-btn lang-btn active" data-lang="ua">UA</button>
+        <button class="icon-btn lang-btn" data-lang="en">EN</button>
+    </div>
+
     <div class="top-controls-left">
         <button class="icon-btn" id="mute-btn">🔊</button>
         <button class="icon-btn" id="export-btn">💾</button>
@@ -134,24 +137,24 @@
 
     <div class="start-screen" id="start-screen">
         <div class="start-content">
-            <h1 class="start-title">The Interrogator</h1>
+            <h1 class="start-title" data-i18n="title">The Interrogator</h1>
             <p class="start-tagline">AI-Generated Detective Stories</p>
             
             <div class="category-grid">
                 <div class="cat-card" data-category="war">
                     <div class="cat-icon">⚔️</div>
-                    <div class="cat-title">War Zone</div>
-                    <div class="cat-desc">Україна, наші дні. Шпигуни, диверсанти, зрадники. Знайди ворога серед своїх.</div>
+                    <div class="cat-title" data-i18n="catWar">War Zone</div>
+                    <div class="cat-desc" data-i18n="catWarDesc">Україна, наші дні. Шпигуни та диверсанти.</div>
                 </div>
                 <div class="cat-card" data-category="history">
                     <div class="cat-icon">📜</div>
-                    <div class="cat-title">History</div>
-                    <div class="cat-desc">Історія України. Козаки, УПА, підпілля. Розкрий таємниці минулого.</div>
+                    <div class="cat-title" data-i18n="catHistory">History</div>
+                    <div class="cat-desc" data-i18n="catHistoryDesc">Історія України. Козаки, підпілля.</div>
                 </div>
                 <div class="cat-card" data-category="hollywood">
                     <div class="cat-icon">🎬</div>
-                    <div class="cat-title">Hollywood 90s</div>
-                    <div class="cat-desc">Лос-Анджелес. Вбивства на знімальному майданчику, сталкери, брудні секрети зірок.</div>
+                    <div class="cat-title" data-i18n="catHollywood">Hollywood</div>
+                    <div class="cat-desc" data-i18n="catHollywoodDesc">90-ті. Вбивства, скандали, зірки.</div>
                 </div>
             </div>
         </div>
@@ -159,7 +162,7 @@
 
     <div class="loading-screen" id="loading-screen">
         <div class="loader"></div>
-        <div class="loading-text">Генерую справу...<br><span style="font-size:0.6rem; opacity:0.7">(Це може зайняти 10-20 секунд)</span></div>
+        <div class="loading-text" data-i18n="generating">Генерую справу...<br><span>(Це може зайняти 15 секунд)</span></div>
     </div>
 
     <div class="game-screen" id="game-screen">
@@ -169,39 +172,39 @@
                     <img id="suspect-img" class="suspect-image" src="" alt="Suspect" style="display:none;">
                 </div>
                 <div class="game-header-text">
-                    <h1 class="game-title" id="game-title">Справа #???</h1>
+                    <h1 class="game-title" id="game-title">Case #???</h1>
                     <p class="game-subtitle" id="game-suspect-name">...</p>
                 </div>
             </header>
             
             <div class="status-bar">
-                <div class="status-item"><span class="status-label">Energy</span><div class="status-value"><span class="energy-display" id="energy-current">15</span></div></div>
-                <div class="status-item"><span class="status-label">Pressure</span><div class="suspicion-container"><div class="suspicion-bar-bg"><div class="suspicion-bar-fill" id="suspicion-bar"></div></div><span class="suspicion-value" id="suspicion-text">0%</span></div></div>
+                <div class="status-item"><span class="status-label" data-i18n="energy">Energy</span><div class="status-value"><span class="energy-display" id="energy-current">15</span></div></div>
+                <div class="status-item"><span class="status-label" data-i18n="pressure">Pressure</span><div class="suspicion-container"><div class="suspicion-bar-bg"><div class="suspicion-bar-fill" id="suspicion-bar"></div></div><span class="suspicion-value" id="suspicion-text">0%</span></div></div>
             </div>
             
             <div class="briefing-container">
-                <button class="briefing-toggle" id="briefing-toggle">📁 Матеріали справи ▼</button>
+                <button class="briefing-toggle" id="briefing-toggle"><span data-i18n="files">📁 Матеріали</span> <span>▼</span></button>
                 <div class="briefing-content" id="briefing-content">
-                    <div class="briefing-section"><h3 class="briefing-section-title">Обставини</h3><p class="briefing-text" id="case-description"></p></div>
-                    <div class="briefing-section"><h3 class="briefing-section-title">Відомі факти</h3><ul class="evidence-list" id="case-evidence"></ul></div>
-                    <div class="briefing-section"><h3 class="briefing-section-title">Підозрюваний</h3><p class="briefing-text" id="suspect-info"></p></div>
+                    <div class="briefing-section"><h3 class="briefing-section-title" data-i18n="context">Обставини</h3><p class="briefing-text" id="case-description"></p></div>
+                    <div class="briefing-section"><h3 class="briefing-section-title" data-i18n="facts">Факти</h3><ul class="evidence-list" id="case-evidence"></ul></div>
+                    <div class="briefing-section"><h3 class="briefing-section-title" data-i18n="suspect">Підозрюваний</h3><p class="briefing-text" id="suspect-info"></p></div>
                 </div>
             </div>
             
             <div class="chat-container">
                 <div class="chat-log" id="chat-log"></div>
                 <div class="input-container">
-                    <input type="text" class="chat-input" id="chat-input" placeholder="Задайте питання...">
-                    <button class="send-btn" id="send-btn">Send</button>
+                    <input type="text" class="chat-input" id="chat-input" placeholder="...">
+                    <button class="send-btn" id="send-btn" data-i18n="send">Send</button>
                 </div>
             </div>
             
             <div class="action-bar">
-                <button class="action-btn action-btn--hint" id="hint-btn">💡 Hint</button>
-                <button class="action-btn action-btn--coffee" id="coffee-btn">☕ Coffee</button>
-                <button class="action-btn action-btn--accuse" id="accuse-btn">⚖️ Вердикт</button>
-                <button class="action-btn action-btn--restart" id="restart-btn">↺ Restart</button>
-                <button class="action-btn action-btn--reveal" id="reveal-btn">🔓 Reveal</button>
+                <button class="action-btn action-btn--hint" id="hint-btn" data-i18n="hint">💡 Hint</button>
+                <button class="action-btn action-btn--coffee" id="coffee-btn" data-i18n="coffee">☕ Coffee</button>
+                <button class="action-btn action-btn--accuse" id="accuse-btn" data-i18n="verdict">⚖️ Verdict</button>
+                <button class="action-btn action-btn--restart" id="restart-btn" data-i18n="restart">↺ Restart</button>
+                <button class="action-btn action-btn--reveal" id="reveal-btn" data-i18n="reveal">🔓 Reveal</button>
             </div>
         </div>
     </div>
@@ -211,9 +214,9 @@
             <div class="modal-icon" id="modal-icon">🔍</div>
             <h2 class="modal-title" id="modal-title">Case Closed</h2>
             <p class="modal-text" id="modal-text"></p>
-            <div class="modal-reveal"><h4 class="modal-reveal-title">Правда</h4><p class="modal-reveal-text" id="modal-reveal-text"></p></div>
-            <button class="modal-btn" id="modal-btn">Назад в меню</button>
-            <a href="https://forms.gle/xtrEqNsFb8wx7uyq5" target="_blank" style="display:block; margin-top:1rem; color:#666; font-size:0.6rem; text-decoration:none;">💬 Надіслати відгук</a>
+            <div class="modal-reveal"><h4 class="modal-reveal-title" data-i18n="truth">Truth</h4><p class="modal-reveal-text" id="modal-reveal-text"></p></div>
+            <button class="modal-btn" id="modal-btn" data-i18n="back">Back</button>
+            <a href="https://forms.gle/xtrEqNsFb8wx7uyq5" target="_blank" style="display:block; margin-top:1rem; color:#666; font-size:0.6rem; text-decoration:none;" data-i18n="feedback">💬 Feedback</a>
         </div>
     </div>
     
@@ -224,10 +227,46 @@
 (function(){
 'use strict';
 
+// --- CONFIG ---
 const API_ENDPOINT='https://interrogator-api.sashko1391.workers.dev';
 let currentCaseData = null;
 let isMuted=false;
-let lastVisualState = 'neutral'; 
+let lastVisualState = 'neutral';
+let currentLang = 'ua'; // Default lang
+
+// --- I18N ---
+const i18n = {
+    ua: {
+        title: "Слідчий",
+        catWar: "Війна", catWarDesc: "Україна. Шпигуни, диверсанти.",
+        catHistory: "Історія", catHistoryDesc: "Козаки, УПА, підпілля.",
+        catHollywood: "Голлівуд", catHollywoodDesc: "90-ті. Вбивства, інтриги.",
+        generating: "Генерую справу...<br>(Це може зайняти 15 секунд)",
+        energy: "Енергія", pressure: "Тиск", files: "📁 Матеріали",
+        context: "Обставини", facts: "Факти", suspect: "Підозрюваний",
+        send: "Надіслати", hint: "💡 Підказка", coffee: "☕ Кава",
+        verdict: "⚖️ Вердикт", restart: "↺ Спочатку", reveal: "🔓 Розкрити",
+        truth: "Правда", back: "В меню", feedback: "💬 Відгук",
+        prompt: "Задайте питання...",
+        winTitle: "Справу розкрито", loseTitle: "Провал",
+        startMsg: "Допит розпочато.", hintMsg: "💡 Зверни увагу на дрібні деталі."
+    },
+    en: {
+        title: "The Interrogator",
+        catWar: "War Zone", catWarDesc: "Ukraine. Spies, saboteurs.",
+        catHistory: "History", catHistoryDesc: "Cossacks, rebels, secrets.",
+        catHollywood: "Hollywood", catHollywoodDesc: "90s. Murders, scandals.",
+        generating: "Generating case...<br>(This may take 15 seconds)",
+        energy: "Energy", pressure: "Pressure", files: "📁 Case Files",
+        context: "Context", facts: "Facts", suspect: "Suspect",
+        send: "Send", hint: "💡 Hint", coffee: "☕ Coffee",
+        verdict: "⚖️ Verdict", restart: "↺ Restart", reveal: "🔓 Reveal",
+        truth: "The Truth", back: "Menu", feedback: "💬 Feedback",
+        prompt: "Ask a question...",
+        winTitle: "Case Closed", loseTitle: "Failed",
+        startMsg: "Interrogation started.", hintMsg: "💡 Look for small inconsistencies."
+    }
+};
 
 const GameState={energy:15,maxEnergy:15,suspicion:0,hintsRemaining:3,emotionalState:'calm',conversationHistory:[],gameOver:false,
 reset(){this.energy=15;this.suspicion=0;this.hintsRemaining=3;this.emotionalState='calm';this.conversationHistory=[];this.gameOver=false; lastVisualState='neutral';}};
@@ -266,10 +305,21 @@ const DOM={
     muteBtn:document.getElementById('mute-btn'),
     exportBtn:document.getElementById('export-btn'),
     audioBg:document.getElementById('audio-background'),
-    audioType:document.getElementById('audio-typewriter')
+    audioType:document.getElementById('audio-typewriter'),
+    langBtns:document.querySelectorAll('.lang-btn')
 };
 
-// --- CORE GENERATION LOGIC ---
+// --- TRANSLATION ---
+function t(key) { return i18n[currentLang][key] || key; }
+
+function updateTexts() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.innerHTML = t(el.dataset.i18n); // innerHTML to support <br>
+    });
+    DOM.chatInput.placeholder = t('prompt');
+}
+
+// --- CORE LOGIC ---
 async function generateCase(category) {
     DOM.startScreen.classList.add('hidden');
     DOM.loadingScreen.classList.add('visible');
@@ -277,22 +327,21 @@ async function generateCase(category) {
     try {
         const r = await fetch(API_ENDPOINT + '/generate', {
             method: 'POST',
-            body: JSON.stringify({ category: category })
+            body: JSON.stringify({ category: category, lang: currentLang }) // Передаємо мову
         });
         
         if (!r.ok) {
             const errData = await r.json();
-            throw new Error(errData.error || "Unknown API Error");
+            throw new Error(errData.error || "API Error");
         }
         
         const data = await r.json();
         currentCaseData = data;
-        
         startGame();
         
     } catch (e) {
         console.error(e);
-        alert("Помилка генерації! \nДеталі: " + e.message);
+        alert(`Error: ${e.message}`);
         DOM.loadingScreen.classList.remove('visible');
         DOM.startScreen.classList.remove('hidden');
     }
@@ -317,7 +366,7 @@ function startGame() {
     
     if(!isMuted) DOM.audioBg.play().catch(e=>{});
     
-    addMsg("Допит розпочато.", 'system');
+    addMsg(t('startMsg'), 'system');
     
     generateSuspectImage();
     
@@ -330,7 +379,6 @@ function startGame() {
     DOM.briefingContent.classList.add('visible');
 }
 
-// --- IMAGE GEN ---
 async function generateSuspectImage() {
     let newState = 'calm';
     if (GameState.suspicion > 80) newState = 'broken';
@@ -356,7 +404,6 @@ async function generateSuspectImage() {
     }
 }
 
-// --- CHAT LOGIC ---
 async function sendMessage() {
     if(GameState.gameOver || GameState.energy <= 0) return;
     
@@ -400,23 +447,20 @@ async function sendMessage() {
         
     } catch(e) {
         hideTyping();
-        addMsg("*мовчить*", 'npc');
+        addMsg("*...", 'npc');
     }
     
-    if(GameState.energy <= 0) setTimeout(()=>showModal('lose', "Енергія вичерпана. Допит завершено."), 1000);
+    if(GameState.energy <= 0) setTimeout(()=>showModal('lose', t('loseTitle')), 1000);
 }
 
-// --- VERDICT LOGIC ---
 async function handleAccuse() {
     if(GameState.gameOver) return;
     
-    const choice = prompt("Ваш вердикт:\n1. Винен (Повне обґрунтування)\n2. Невинуватий / Недостатньо доказів\n\nВведіть 1 або 2:");
-    if(choice !== '1') {
-        showModal('lose', "Ви відпустили підозрюваного або не наважилися на звинувачення.");
-        return;
-    }
+    // Simple prompt for now, logic inside AI
+    const choice = confirm("Ви впевнені у звинуваченні? (OK - так, Cancel - ні)");
+    if(!choice) return;
     
-    addMsg("⏳ *Аналіз вердикту...*", 'system');
+    addMsg("⏳ ...", 'system');
     
     const log = GameState.conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n');
     const judgePrompt = `
@@ -424,7 +468,7 @@ async function handleAccuse() {
     Truth: ${currentCaseData.truthReveal}
     
     Analyze the interrogation log below. Did the user uncover the truth or break the suspect?
-    Reply JSON ONLY: { "verdict": "WIN" or "LOSE", "reason": "Reason in Ukrainian" }
+    Reply JSON ONLY: { "verdict": "WIN" or "LOSE", "reason": "Reason in ${currentLang === 'ua' ? 'Ukrainian' : 'English'}" }
     
     LOG:
     ${log}
@@ -445,7 +489,7 @@ async function handleAccuse() {
         showModal(res.verdict.toLowerCase(), res.reason);
         
     } catch(e) {
-        GameState.suspicion > 60 ? showModal('win', "За сукупністю доказів.") : showModal('lose', "Недостатньо тиску.");
+        GameState.suspicion > 60 ? showModal('win', "Success") : showModal('lose', "Fail");
     }
 }
 
@@ -459,13 +503,10 @@ function updateUI() {
 function addMsg(text, type) {
     const d = document.createElement('div');
     d.className = `message message-${type}`;
-    d.innerHTML = `<div class="message-sender">${type==='player'?'Слідчий':'Підозрюваний'}</div><div class="message-text">${text}</div>`;
+    d.innerHTML = `<div class="message-sender">${type==='player'?'Detective':'Suspect'}</div><div class="message-text">${text}</div>`;
     DOM.chatLog.appendChild(d);
     DOM.chatLog.scrollTop = DOM.chatLog.scrollHeight;
-    
-    if(type==='npc' && !isMuted) {
-        DOM.audioType.currentTime=0; DOM.audioType.play().catch(()=>{});
-    }
+    if(type==='npc' && !isMuted) { DOM.audioType.currentTime=0; DOM.audioType.play().catch(()=>{}); }
 }
 
 function showTyping(){
@@ -479,33 +520,37 @@ function showModal(type, text) {
     GameState.gameOver = true;
     DOM.modalOverlay.classList.add('visible');
     DOM.modalIcon.textContent = type==='win' ? '✅' : '❌';
-    DOM.modalTitle.textContent = type==='win' ? 'Справу розкрито' : 'Провал';
+    DOM.modalTitle.textContent = type==='win' ? t('winTitle') : t('loseTitle');
     DOM.modalText.textContent = text;
     DOM.modalRevealText.textContent = currentCaseData.truthReveal;
 }
 
 // --- EVENTS ---
+DOM.langBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        currentLang = btn.dataset.lang;
+        DOM.langBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        updateTexts();
+    });
+});
+
 DOM.catCards.forEach(c => c.addEventListener('click', () => generateCase(c.dataset.category)));
 DOM.sendBtn.addEventListener('click', sendMessage);
 DOM.chatInput.addEventListener('keypress', e => { if(e.key==='Enter') sendMessage() });
 DOM.briefingToggle.addEventListener('click', () => DOM.briefingContent.classList.toggle('visible'));
-DOM.hintBtn.addEventListener('click', () => { 
-    if(GameState.hintsRemaining > 0) {
-        GameState.hintsRemaining--;
-        addMsg("💡 Зверни увагу на дрібні деталі в його історії.", 'system');
-    }
-});
-DOM.coffeeBtn.addEventListener('click', () => { if(GameState.energy<15){GameState.energy=Math.min(15, GameState.energy+5); updateUI(); addMsg("*випив кави*", 'system')} });
+DOM.hintBtn.addEventListener('click', () => { if(GameState.hintsRemaining>0) { GameState.hintsRemaining--; addMsg(t('hintMsg'), 'system'); }});
+DOM.coffeeBtn.addEventListener('click', () => { if(GameState.energy<15){GameState.energy=Math.min(15, GameState.energy+5); updateUI(); addMsg("*sip*", 'system')} });
 DOM.accuseBtn.addEventListener('click', handleAccuse);
-DOM.revealBtn.addEventListener('click', () => { if(confirm("Здатися?")) showModal('lose', "Ви здалися."); });
-DOM.restartBtn.addEventListener('click', () => {
-    // Для рестарту треба мати currentCaseData. Якщо ми на екрані гри - просто скидаємо.
-    if(currentCaseData) startGame();
-});
+DOM.revealBtn.addEventListener('click', () => { if(confirm("Sure?")) showModal('lose', "Gave up"); });
+DOM.restartBtn.addEventListener('click', () => { if(currentCaseData) startGame(); });
 DOM.backBtn.addEventListener('click', () => { DOM.gameScreen.classList.remove('active'); DOM.startScreen.classList.remove('hidden'); });
 DOM.modalBtn.addEventListener('click', () => { DOM.modalOverlay.classList.remove('visible'); DOM.gameScreen.classList.remove('active'); DOM.startScreen.classList.remove('hidden'); });
 DOM.muteBtn.addEventListener('click', () => { isMuted=!isMuted; DOM.muteBtn.textContent=isMuted?'🔇':'🔊'; if(isMuted) DOM.audioBg.pause(); else DOM.audioBg.play(); });
-DOM.exportBtn.addEventListener('click', exportChat);
+DOM.exportBtn.addEventListener('click', () => alert("Export not implemented in generator mode yet."));
+
+// Init
+updateTexts();
 
 })();
 </script>
