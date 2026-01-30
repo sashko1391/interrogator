@@ -50,14 +50,22 @@
         .rules-list li strong{color:var(--text-primary);}
         
         /* Category Grid */
-        .category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;width:100%;max-width:750px;padding:0 1rem;margin-bottom:1.5rem;}
+        .category-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:1rem;width:100%;max-width:750px;padding:0 1rem;margin-bottom:1rem;}
         .cat-card{background:rgba(21,21,31,0.9);border:1px solid var(--border-color);border-radius:4px;padding:1.5rem;cursor:pointer;transition:all 0.3s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0.8rem;}
         .cat-card:hover{border-color:var(--accent-gold);transform:translateY(-3px);background:rgba(26,26,36,0.95);box-shadow:0 10px 40px rgba(212,175,55,0.1);}
-        .cat-card--daily{border-color:var(--accent-gold-dim);background:linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(21,21,31,0.9) 100%);}
-        .cat-card--daily:hover{border-color:var(--accent-gold);box-shadow:0 10px 40px rgba(212,175,55,0.2);}
         .cat-icon{font-size:2.5rem;}
         .cat-title{font-family:var(--font-display);font-size:1rem;color:var(--accent-gold);}
         .cat-desc{font-size:0.65rem;color:var(--text-secondary);line-height:1.5;}
+        
+        /* Daily Card - Full Width */
+        .daily-card-wrapper{width:100%;max-width:750px;padding:0 1rem;margin-bottom:1.5rem;}
+        .cat-card--daily{flex-direction:row;padding:1rem 1.5rem;border-color:var(--accent-gold-dim);background:linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(21,21,31,0.9) 100%);}
+        .cat-card--daily:hover{border-color:var(--accent-gold);box-shadow:0 10px 40px rgba(212,175,55,0.2);}
+        .cat-card--daily .cat-icon{font-size:2rem;}
+        .daily-inner{display:flex;align-items:center;gap:1rem;width:100%;}
+        .daily-text{text-align:left;}
+        .daily-text .cat-title{font-size:0.9rem;}
+        .daily-text .cat-desc{font-size:0.6rem;margin-top:0.2rem;}
         
         /* Donate Notice */
         .donate-notice{padding:1rem;background:rgba(21,21,31,0.5);border:1px dashed var(--border-color);border-radius:4px;text-align:center;max-width:450px;}
@@ -262,6 +270,10 @@
             .action-btn{padding:0.5rem;font-size:0.45rem;}
             .rules-box{padding:0.8rem;}
             .category-grid{grid-template-columns:1fr;}
+            .daily-card-wrapper{padding:0 0.5rem;}
+            .cat-card--daily{flex-direction:column;text-align:center;}
+            .daily-inner{flex-direction:column;}
+            .daily-text{text-align:center;}
         }
     </style>
 </head>
@@ -299,11 +311,6 @@
             </div>
             
             <div class="category-grid">
-                <div class="cat-card cat-card--daily" data-category="daily">
-                    <div class="cat-icon">🎯</div>
-                    <div class="cat-title" data-i18n="dailyCase">🎯 Справа дня</div>
-                    <div class="cat-desc" data-i18n="dailyCaseDesc">Та сама справа для всіх. Порівняй результати!</div>
-                </div>
                 <div class="cat-card" data-category="war">
                     <div class="cat-icon">⚔️</div>
                     <div class="cat-title" data-i18n="catWar">Війна</div>
@@ -318,6 +325,18 @@
                     <div class="cat-icon">🎬</div>
                     <div class="cat-title" data-i18n="catHollywood">Голлівуд</div>
                     <div class="cat-desc" data-i18n="catHollywoodDesc">90-ті. Зірки, скандали, вбивства.</div>
+                </div>
+            </div>
+            
+            <div class="daily-card-wrapper">
+                <div class="cat-card cat-card--daily" data-category="daily">
+                    <div class="daily-inner">
+                        <div class="cat-icon">🎯</div>
+                        <div class="daily-text">
+                            <div class="cat-title" data-i18n="dailyCase">Справа дня</div>
+                            <div class="cat-desc" data-i18n="dailyCaseDesc">Та сама справа для всіх. Порівняй результати!</div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -365,7 +384,6 @@
                 <h1 class="game-title" id="game-title">Case #???</h1>
                 <div class="game-meta">
                     <span>🔗 <span id="case-id">???</span></span>
-                    <span id="guilty-hint"></span>
                 </div>
             </header>
             
@@ -383,11 +401,11 @@
                 </div>
             </div>
             
-            <button class="briefing-toggle" id="briefing-toggle">
+            <button class="briefing-toggle active" id="briefing-toggle">
                 <span data-i18n="files">📁 Матеріали справи</span>
                 <span>▼</span>
             </button>
-            <div class="briefing-content" id="briefing-content">
+            <div class="briefing-content visible" id="briefing-content">
                 <div class="briefing-section">
                     <h3 class="briefing-section-title" data-i18n="context">Обставини</h3>
                     <p class="briefing-text" id="case-description"></p>
@@ -748,7 +766,6 @@ const DOM = {
     caseEvidence: document.getElementById('case-evidence'),
     gameTitle: document.getElementById('game-title'),
     caseId: document.getElementById('case-id'),
-    guiltyHint: document.getElementById('guilty-hint'),
     suspectTabs: document.getElementById('suspect-tabs'),
     suspectPanels: document.getElementById('suspect-panels'),
     modalOverlay: document.getElementById('modal-overlay'),
@@ -841,13 +858,6 @@ function updateUI() {
     DOM.sendBtn.disabled = GameState.gameOver || (!streamerMode && GameState.energy <= 0);
     DOM.chatInput.disabled = GameState.gameOver || (!streamerMode && GameState.energy <= 0);
     DOM.accuseBtn.disabled = GameState.gameOver;
-    
-    // Hide guilty hint in streamer mode
-    if (streamerMode && DOM.guiltyHint) {
-        DOM.guiltyHint.style.display = 'none';
-    } else if (DOM.guiltyHint) {
-        DOM.guiltyHint.style.display = '';
-    }
 }
 
 function getEmotionalState(suspicion) {
@@ -1274,10 +1284,6 @@ function startGame() {
     DOM.caseId.textContent = currentCaseData.caseId || '???';
     DOM.caseDescription.textContent = currentCaseData.crimeDescription || '';
     DOM.caseEvidence.innerHTML = (currentCaseData.knownFacts || []).map(f => `<li>${f}</li>`).join('');
-    
-    // Guilty hint
-    const guiltyMap = { one: 'guiltyOne', two: 'guiltyTwo', all: 'guiltyAll', none: 'guiltyNone' };
-    DOM.guiltyHint.textContent = t(guiltyMap[currentCaseData.guiltyPattern] || 'guiltyOne');
     
     // Build suspect tabs and panels
     DOM.suspectTabs.innerHTML = '';
