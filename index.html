@@ -114,8 +114,20 @@
         .token-input{width:100%;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:4px;padding:0.8rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.7rem;text-align:center;text-transform:uppercase;margin-bottom:0.5rem;}
         .token-btn{width:100%;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:4px;padding:0.6rem;color:var(--text-secondary);font-family:var(--font-mono);font-size:0.6rem;cursor:pointer;transition:all 0.2s;}
         .token-btn:hover{border-color:var(--accent-gold);color:var(--accent-gold);}
-        .token-error{font-size:0.55rem;color:var(--accent-red-bright);margin-top:0.5rem;min-height:1rem;}
+        .token-error{font-size:0.55rem;color:var(--accent-red-bright);margin-top:0.5rem;min-height:1rem;text-align:center;}
         .token-success{color:var(--accent-green-bright);}
+        
+        /* Premium Steps */
+        .premium-steps{text-align:left;margin:1rem 0;}
+        .step{display:flex;gap:0.8rem;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border-color);}
+        .step:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+        .step-number{width:24px;height:24px;background:var(--accent-gold-dim);color:var(--bg-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:0.65rem;font-weight:bold;flex-shrink:0;}
+        .step-content{flex:1;}
+        .step-title{font-size:0.65rem;color:var(--text-primary);margin-bottom:0.5rem;}
+        .step .donate-btn-large{display:block;padding:0.7rem 1rem;font-size:0.6rem;margin:0;}
+        .step .token-input{margin-bottom:0.4rem;}
+        .step .token-btn{margin-bottom:0;}
+        .token-note{font-size:0.5rem;color:var(--text-muted);margin-top:0.3rem;font-style:italic;}
         
         /* Limit Modal */
         .limit-options{margin:1rem 0;}
@@ -498,18 +510,38 @@
                 <div class="benefit-item">✓ Підтримка розробника 💛</div>
             </div>
             
-            <a href="https://www.paypal.com/donate/?hosted_button_id=TXNCFR9CLWNDU" target="_blank" class="donate-btn-large">
-                ☕ <span data-i18n="supportProject">Підтримати проєкт</span>
-            </a>
-            
-            <p class="premium-note">$5 = 7 днів | $10+ = 30 днів</p>
-            
-            <div class="token-section">
-                <p class="token-label" data-i18n="enterToken">Введіть код Premium</p>
-                <input type="text" class="token-input" id="premium-token-input" placeholder="PRO-XXXXXXXXXXXX" maxlength="16">
-                <button class="token-btn" id="activate-token-btn" data-i18n="activate">Активувати</button>
-                <p class="token-error" id="token-error"></p>
+            <div class="premium-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <p class="step-title" data-i18n="step1Title">Підтримай проєкт</p>
+                        <a href="https://www.paypal.com/donate/?hosted_button_id=TXNCFR9CLWNDU" target="_blank" class="donate-btn-large">
+                            ☕ PayPal ($5 = 7 днів, $10+ = 30 днів)
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <p class="step-title" data-i18n="step2Title">Введи email з PayPal</p>
+                        <input type="email" class="token-input" id="donor-email-input" placeholder="your@email.com">
+                        <button class="token-btn" id="lookup-token-btn" data-i18n="getToken">Отримати токен</button>
+                        <p class="token-note" data-i18n="tokenNote">Токен з'явиться протягом 24 годин після донату</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <p class="step-title" data-i18n="step3Title">Або введи токен вручну</p>
+                        <input type="text" class="token-input" id="premium-token-input" placeholder="PRO-XXXXXXXXXXXX" maxlength="16">
+                        <button class="token-btn" id="activate-token-btn" data-i18n="activate">Активувати</button>
+                    </div>
+                </div>
             </div>
+            
+            <p class="token-error" id="token-error"></p>
             
             <div class="modal-actions">
                 <button class="modal-btn-secondary" id="close-premium-btn" data-i18n="close">Закрити</button>
@@ -647,9 +679,16 @@ const i18n = {
         tokenActivated: "Premium активовано!",
         supportProject: "Підтримати проєкт",
         freeLimit: "Безкоштовно: 3 справи / 50 питань на день",
-        premiumBenefits: "Premium: без лімітів + нові справи",
+        premiumBenefits: "Без лімітів + нові справи",
         watchAd: "Переглянути рекламу (+1 справа)",
-        or: "або"
+        or: "або",
+        step1Title: "Підтримай проєкт",
+        step2Title: "Введи email з PayPal",
+        step3Title: "Або введи токен вручну",
+        getToken: "Отримати токен",
+        tokenNote: "Токен з'явиться протягом 24 годин після донату",
+        tokenNotFound: "Токен не знайдено. Перевір email або зачекай.",
+        tokenFound: "Токен знайдено! Копіюй:"
     },
     en: {
         title: "The Interrogator",
@@ -731,9 +770,16 @@ const i18n = {
         tokenActivated: "Premium activated!",
         supportProject: "Support project",
         freeLimit: "Free: 3 cases / 50 questions per day",
-        premiumBenefits: "Premium: no limits + fresh cases",
+        premiumBenefits: "No limits + fresh cases",
         watchAd: "Watch ad (+1 case)",
-        or: "or"
+        or: "or",
+        step1Title: "Support the project",
+        step2Title: "Enter your PayPal email",
+        step3Title: "Or enter token manually",
+        getToken: "Get token",
+        tokenNote: "Token will be available within 24h after donation",
+        tokenNotFound: "Token not found. Check email or wait.",
+        tokenFound: "Token found! Copy it:"
     }
 };
 
@@ -805,6 +851,8 @@ const DOM = {
     premiumBtn: document.getElementById('premium-btn'),
     premiumModal: document.getElementById('premium-modal'),
     premiumTokenInput: document.getElementById('premium-token-input'),
+    donorEmailInput: document.getElementById('donor-email-input'),
+    lookupTokenBtn: document.getElementById('lookup-token-btn'),
     activateTokenBtn: document.getElementById('activate-token-btn'),
     tokenError: document.getElementById('token-error'),
     closePremiumBtn: document.getElementById('close-premium-btn'),
@@ -1636,6 +1684,52 @@ async function activatePremiumToken() {
     }
 }
 
+async function lookupPremiumByEmail() {
+    const email = DOM.donorEmailInput.value.trim().toLowerCase();
+    
+    if (!email || !email.includes('@')) {
+        DOM.tokenError.textContent = t('invalidToken');
+        DOM.tokenError.classList.remove('token-success');
+        return;
+    }
+    
+    try {
+        const response = await fetch(API_ENDPOINT + '/lookup-premium', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        
+        const data = await response.json();
+        
+        if (data.found && data.token) {
+            // Show the token so user can copy/activate
+            DOM.premiumTokenInput.value = data.token;
+            DOM.tokenError.innerHTML = t('tokenFound') + ' <strong>' + data.token + '</strong>';
+            DOM.tokenError.classList.add('token-success');
+            
+            // Auto-activate
+            premiumToken = data.token;
+            localStorage.setItem('interrogator-premium', data.token);
+            updateLimitsDisplay();
+            
+            setTimeout(() => {
+                DOM.tokenError.textContent = t('tokenActivated');
+            }, 2000);
+            
+            setTimeout(() => {
+                hidePremiumModal();
+            }, 3500);
+        } else {
+            DOM.tokenError.textContent = t('tokenNotFound');
+            DOM.tokenError.classList.remove('token-success');
+        }
+    } catch (e) {
+        DOM.tokenError.textContent = t('tokenNotFound');
+        DOM.tokenError.classList.remove('token-success');
+    }
+}
+
 // ═══════════════════════════════════════════════════════════════════════
 // EVENT LISTENERS
 // ═══════════════════════════════════════════════════════════════════════
@@ -1695,6 +1789,14 @@ if (DOM.closePremiumBtn) {
 }
 if (DOM.activateTokenBtn) {
     DOM.activateTokenBtn.addEventListener('click', activatePremiumToken);
+}
+if (DOM.lookupTokenBtn) {
+    DOM.lookupTokenBtn.addEventListener('click', lookupPremiumByEmail);
+}
+if (DOM.donorEmailInput) {
+    DOM.donorEmailInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') lookupPremiumByEmail();
+    });
 }
 if (DOM.premiumTokenInput) {
     DOM.premiumTokenInput.addEventListener('keydown', e => {
