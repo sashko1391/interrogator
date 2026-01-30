@@ -8,102 +8,59 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Code+Pro:wght@400;500&family=Crimson+Pro:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        /* (СТИЛІ ТІ САМІ, ЩО БУЛИ В ПОПЕРЕДНЬОМУ ПОВІДОМЛЕННІ) */
         :root{--bg-primary:#0a0a0c;--bg-secondary:#12121a;--bg-tertiary:#1a1a24;--bg-card:#15151f;--text-primary:#e8e6e3;--text-secondary:#9a9a9a;--text-muted:#5a5a6a;--accent-gold:#d4af37;--accent-gold-dim:#8b7323;--accent-red:#8b2942;--accent-green:#2d5a3d;--border-color:#2a2a3a;--border-accent:#3a3a4a;--font-display:'Playfair Display',Georgia,serif;--font-body:'Crimson Pro',Georgia,serif;--font-mono:'Source Code Pro',monospace}
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         html{font-size:22px;scroll-behavior:smooth}
-        
-        body{
-            font-family:var(--font-body);
-            background:var(--bg-primary);
-            color:var(--text-primary);
-            min-height:100vh;
-            overflow-y:auto;
-            position: relative;
-        }
-        
+        body{font-family:var(--font-body);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-y:auto;position:relative;}
         body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.05;pointer-events:none;z-index:1000}
-
         .bg-fallback{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 20%,rgba(139,41,66,0.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(212,175,55,0.1) 0%,transparent 50%),linear-gradient(180deg,#0a0a0c 0%,#12121a 100%);z-index:-2}
         .bg-image{position:fixed;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;z-index:-1; opacity: 0.4;}
-        .bg-landscape{background-image:url('bg-landscape.jpg');display:block} 
-        
-        /* CONTROLS */
         .top-controls-left {position:fixed; top:1rem; left:1rem; display:flex; gap:0.5rem; z-index: 2000;}
         .lang-switcher {position:fixed; top:1rem; right:1rem; display:flex; z-index: 2000;}
-        
         .icon-btn{background:rgba(18,18,26,0.9);border:1px solid var(--border-color);color:var(--text-muted);padding:0.6rem;font-family:var(--font-mono);font-size:0.8rem;cursor:pointer;border-radius:4px;min-width:40px;display:flex;align-items:center;justify-content:center;}
         .icon-btn:hover{border-color:var(--accent-gold);}
-        .icon-btn.active{color:var(--accent-gold); border-color:var(--accent-gold);}
-        
         .lang-btn{background:rgba(18,18,26,0.9);border:1px solid var(--border-color);color:var(--text-muted);padding:0.6rem;font-family:var(--font-mono);font-size:0.8rem;cursor:pointer;min-width:40px;}
         .lang-btn:first-child{border-radius:4px 0 0 4px; border-right: none;}
         .lang-btn:last-child{border-radius:0 4px 4px 0; border-left: 1px solid var(--border-color);}
         .lang-btn.active{background:var(--accent-gold-dim);color:var(--bg-primary);border-color:var(--accent-gold-dim);font-weight:bold;}
-        
         .start-screen{min-height:100vh;width:100%;display:flex;flex-direction:column;position:absolute;top:0;left:0;z-index:100;background:transparent;}
         .start-screen.hidden{display:none}
         .start-content{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center;}
-        
         .start-title{font-family:var(--font-display);font-size:2.5rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);margin-bottom:0.5rem;text-shadow:0 0 60px rgba(212,175,55,0.3)}
         .start-tagline{font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted);letter-spacing:0.3em;text-transform:uppercase;margin-bottom:2rem}
-        
         .category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;width:100%;max-width:900px;padding:0 1rem;}
         .cat-card{background:rgba(21,21,31,0.9);border:1px solid var(--border-color);border-radius:4px;padding:2rem;cursor:pointer;transition:all 0.3s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1rem;}
         .cat-card:hover{border-color:var(--accent-gold);transform:translateY(-5px);background:rgba(26,26,36,0.95);}
         .cat-icon{font-size:3rem;margin-bottom:0.5rem;}
         .cat-title{font-family:var(--font-display);font-size:1.2rem;color:var(--accent-gold);}
         .cat-desc{font-size:0.75rem;color:var(--text-secondary);line-height:1.6;}
-        
-        /* LOADING SCREEN */
         .loading-screen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg-primary);z-index:200;align-items:center;justify-content:center;flex-direction:column;}
         .loading-screen.visible{display:flex;}
         .loader{width:50px;height:50px;border:3px solid var(--bg-tertiary);border-top:3px solid var(--accent-gold);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:1rem;}
         @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
         .loading-text{font-family:var(--font-mono);font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;animation:pulse 2s infinite; text-align: center;}
         @keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}
-
         .game-screen{display:none;min-height:100vh;width:100%;}
         .game-screen.active{display:block;}
         .game-container{max-width:900px;margin:0 auto;padding:1.5rem;min-height:100vh;display:flex;flex-direction:column;}
         .game-header{display:flex;align-items:center;gap:1.5rem;padding:1rem 0;border-bottom:1px solid var(--border-color);margin-bottom:1rem;}
-        
-        /* SUSPECT IMAGE STYLES */
-        .suspect-image-container{
-            width:100px; height:100px; 
-            border-radius:4px; overflow:hidden; 
-            border:1px solid var(--border-color); 
-            background:#000; 
-            position:relative; flex-shrink:0;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .suspect-image-container{width:100px; height:100px; border-radius:4px; overflow:hidden; border:1px solid var(--border-color); background:#000; position:relative; flex-shrink:0; display: flex; align-items: center; justify-content: center;}
         .suspect-image{width:100%; height:100%; object-fit:cover; display: none; animation: fadeIn 1s ease;}
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        /* MINI SPINNER FOR AVATAR */
-        .loader-mini {
-            width: 20px; height: 20px;
-            border: 2px solid var(--bg-tertiary);
-            border-top: 2px solid var(--accent-gold);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            display: none; /* Hidden by default */
-        }
+        .loader-mini {width: 20px; height: 20px; border: 2px solid var(--bg-tertiary); border-top: 2px solid var(--accent-gold); border-radius: 50%; animation: spin 1s linear infinite; display: none;}
         .loader-mini.visible { display: block; }
-
         .game-header-text{flex:1;}
         .game-title{font-family:var(--font-display);font-size:1.2rem;text-transform:uppercase;color:var(--text-primary);}
         .game-subtitle{font-family:var(--font-mono);font-size:0.55rem;color:var(--text-muted);text-transform:uppercase;}
-        
         .status-bar{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;padding:0.8rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;margin-bottom:1rem;}
         .status-item{display:flex;flex-direction:column;gap:0.25rem}
         .status-label{font-family:var(--font-mono);font-size:0.5rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-muted)}
         .status-value{display:flex;align-items:center;gap:0.5rem}
         .energy-display{font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--accent-gold)}
-        
         .suspicion-container{flex:1}
         .suspicion-bar-bg{height:8px;background:var(--bg-tertiary);border-radius:4px;overflow:hidden}
         .suspicion-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#2d5a3d,#d4af37,#c73e5c);transition:width 300ms;border-radius:4px}
-        
         .briefing-toggle{width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.8rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.65rem;text-transform:uppercase;cursor:pointer;margin-bottom:1rem;display:flex;justify-content:space-between;}
         .briefing-content{display:none;background:var(--bg-card);border:1px solid var(--border-color);padding:1.5rem;margin-bottom:1rem;}
         .briefing-content.visible{display:block;}
@@ -112,29 +69,24 @@
         .evidence-list{list-style:none;padding-left:1rem}
         .evidence-list li{position:relative;padding-left:1rem;margin-bottom:0.5rem;color:var(--text-secondary);font-size:0.7rem}
         .evidence-list li::before{content:'▪';position:absolute;left:0;color:var(--accent-gold-dim)}
-        
         .chat-container{flex:1;display:flex;flex-direction:column;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;overflow:hidden;height:50vh;min-height:400px;}
         .chat-log{flex-grow:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;}
         .message{max-width:85%;padding:1rem;border-radius:4px;}
         .message-player{align-self:flex-end;background:var(--bg-tertiary);border-right:3px solid var(--accent-gold);}
         .message-npc{align-self:flex-start;background:var(--bg-card);border-left:3px solid var(--accent-red);}
         .message-text{font-size:0.75rem;line-height:1.5;}
-        
         .input-container{display:flex;gap:0.5rem;padding:1rem;background:var(--bg-tertiary);border-top:1px solid var(--border-color);}
         .chat-input{flex:1;background:var(--bg-primary);border:1px solid var(--border-color);padding:1rem;color:var(--text-primary);font-size:0.75rem;}
         .send-btn{background:var(--accent-gold-dim);border:none;padding:0 1.5rem;color:var(--bg-primary);font-family:var(--font-mono);font-size:0.6rem;font-weight:600;cursor:pointer;}
-        
         .action-bar{display:flex;gap:0.5rem;margin-top:0.5rem;flex-wrap:wrap;padding-bottom:1rem;}
         .action-btn{flex:1;background:transparent;border:1px solid var(--border-color);padding:0.8rem;color:var(--text-secondary);font-family:var(--font-mono);font-size:0.6rem;text-transform:uppercase;cursor:pointer;min-width:80px;text-align:center;}
         .action-btn:hover{border-color:var(--border-accent);color:var(--text-primary);}
         .action-btn--accuse{border-color:var(--accent-red);color:var(--accent-red-bright);}
-        
         .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:200;align-items:center;justify-content:center}
         .modal-overlay.visible{display:flex}
         .modal-content{background:var(--bg-secondary);border:1px solid var(--border-color);padding:2rem;max-width:500px;width:90%;text-align:center;}
         .modal-title{font-family:var(--font-display);font-size:1.5rem;margin-bottom:1rem;color:var(--accent-gold);}
         .modal-btn{background:var(--accent-gold-dim);border:none;padding:1rem 2rem;margin-top:1rem;cursor:pointer;font-family:var(--font-mono);font-size:0.7rem;}
-
         @media(max-width:600px){
             html{font-size:20px} 
             .game-container {padding: 0.5rem;}
@@ -163,30 +115,17 @@
         <div class="start-content">
             <h1 class="start-title" data-i18n="title">The Interrogator</h1>
             <p class="start-tagline">AI-Generated Detective Stories</p>
-            
             <div class="category-grid">
-                <div class="cat-card" data-category="war">
-                    <div class="cat-icon">⚔️</div>
-                    <div class="cat-title" data-i18n="catWar">War Zone</div>
-                    <div class="cat-desc" data-i18n="catWarDesc">Україна, наші дні. Шпигуни та диверсанти.</div>
-                </div>
-                <div class="cat-card" data-category="history">
-                    <div class="cat-icon">📜</div>
-                    <div class="cat-title" data-i18n="catHistory">History</div>
-                    <div class="cat-desc" data-i18n="catHistoryDesc">Історія України. Козаки, УПА, підпілля.</div>
-                </div>
-                <div class="cat-card" data-category="hollywood">
-                    <div class="cat-icon">🎬</div>
-                    <div class="cat-title" data-i18n="catHollywood">Hollywood</div>
-                    <div class="cat-desc" data-i18n="catHollywoodDesc">90-ті. Вбивства, скандали, зірки.</div>
-                </div>
+                <div class="cat-card" data-category="war"><div class="cat-icon">⚔️</div><div class="cat-title" data-i18n="catWar">War Zone</div><div class="cat-desc" data-i18n="catWarDesc">Україна, наші дні.</div></div>
+                <div class="cat-card" data-category="history"><div class="cat-icon">📜</div><div class="cat-title" data-i18n="catHistory">History</div><div class="cat-desc" data-i18n="catHistoryDesc">Історія України.</div></div>
+                <div class="cat-card" data-category="hollywood"><div class="cat-icon">🎬</div><div class="cat-title" data-i18n="catHollywood">Hollywood</div><div class="cat-desc" data-i18n="catHollywoodDesc">90-ті. Вбивства.</div></div>
             </div>
         </div>
     </div>
 
     <div class="loading-screen" id="loading-screen">
         <div class="loader"></div>
-        <div class="loading-text" data-i18n="generating">Генерую справу...<br><span>(Це може зайняти 15 секунд)</span></div>
+        <div class="loading-text" data-i18n="generating">Генерую справу...</div>
     </div>
 
     <div class="game-screen" id="game-screen">
@@ -260,34 +199,18 @@ let currentLang = 'ua';
 
 const i18n = {
     ua: {
-        title: "Слідчий",
-        catWar: "Війна", catWarDesc: "Україна. Шпигуни, диверсанти.",
-        catHistory: "Історія", catHistoryDesc: "Козаки, УПА, підпілля.",
-        catHollywood: "Голлівуд", catHollywoodDesc: "90-ті. Вбивства, інтриги.",
-        generating: "Генерую справу...<br>(Це може зайняти 15 секунд)",
-        energy: "Енергія", pressure: "Тиск", files: "📁 Матеріали",
-        context: "Обставини", facts: "Факти", suspect: "Підозрюваний",
-        send: "Надіслати", hint: "💡 Підказка", coffee: "☕ Кава",
-        verdict: "⚖️ Вердикт", restart: "↺ Спочатку", reveal: "🔓 Розкрити",
-        truth: "Правда", back: "В меню", feedback: "💬 Відгук",
-        prompt: "Задайте питання...",
-        winTitle: "Справу розкрито", loseTitle: "Провал",
-        startMsg: "Допит розпочато.", hintMsg: "💡 Зверни увагу на дрібні деталі."
+        title: "Слідчий", catWar: "Війна", catWarDesc: "Україна. Шпигуни.", catHistory: "Історія", catHistoryDesc: "Козаки, підпілля.", catHollywood: "Голлівуд", catHollywoodDesc: "90-ті. Вбивства.",
+        generating: "Генерую справу...<br>(Це може зайняти 15 секунд)", energy: "Енергія", pressure: "Тиск", files: "📁 Матеріали",
+        context: "Обставини", facts: "Факти", suspect: "Підозрюваний", send: "Надіслати", hint: "💡 Підказка", coffee: "☕ Кава",
+        verdict: "⚖️ Вердикт", restart: "↺ Спочатку", reveal: "🔓 Розкрити", truth: "Правда", back: "В меню", feedback: "💬 Відгук",
+        prompt: "Задайте питання...", winTitle: "Справу розкрито", loseTitle: "Провал", startMsg: "Допит розпочато.", hintMsg: "💡 Зверни увагу на дрібні деталі."
     },
     en: {
-        title: "The Interrogator",
-        catWar: "War Zone", catWarDesc: "Ukraine. Spies, saboteurs.",
-        catHistory: "History", catHistoryDesc: "Cossacks, rebels, secrets.",
-        catHollywood: "Hollywood", catHollywoodDesc: "90s. Murders, scandals.",
-        generating: "Generating case...<br>(This may take 15 seconds)",
-        energy: "Energy", pressure: "Pressure", files: "📁 Case Files",
-        context: "Context", facts: "Facts", suspect: "Suspect",
-        send: "Send", hint: "💡 Hint", coffee: "☕ Coffee",
-        verdict: "⚖️ Verdict", restart: "↺ Restart", reveal: "🔓 Reveal",
-        truth: "The Truth", back: "Menu", feedback: "💬 Feedback",
-        prompt: "Ask a question...",
-        winTitle: "Case Closed", loseTitle: "Failed",
-        startMsg: "Interrogation started.", hintMsg: "💡 Look for small inconsistencies."
+        title: "The Interrogator", catWar: "War Zone", catWarDesc: "Ukraine. Spies.", catHistory: "History", catHistoryDesc: "Cossacks, rebels.", catHollywood: "Hollywood", catHollywoodDesc: "90s. Murders.",
+        generating: "Generating case...<br>(This may take 15 seconds)", energy: "Energy", pressure: "Pressure", files: "📁 Case Files",
+        context: "Context", facts: "Facts", suspect: "Suspect", send: "Send", hint: "💡 Hint", coffee: "☕ Coffee",
+        verdict: "⚖️ Verdict", restart: "↺ Restart", reveal: "🔓 Reveal", truth: "The Truth", back: "Menu", feedback: "💬 Feedback",
+        prompt: "Ask a question...", winTitle: "Case Closed", loseTitle: "Failed", startMsg: "Interrogation started.", hintMsg: "💡 Look for small inconsistencies."
     }
 };
 
@@ -334,39 +257,17 @@ const DOM={
 };
 
 function t(key) { return i18n[currentLang][key] || key; }
-
-function updateTexts() {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        el.innerHTML = t(el.dataset.i18n); 
-    });
-    DOM.chatInput.placeholder = t('prompt');
-}
+function updateTexts() { document.querySelectorAll('[data-i18n]').forEach(el => { el.innerHTML = t(el.dataset.i18n); }); DOM.chatInput.placeholder = t('prompt'); }
 
 async function generateCase(category) {
-    // AUDIO UNLOCK
-    if (!isMuted) {
-        DOM.audioBg.play().catch(() => {});
-        DOM.audioBg.pause();
-    }
-
+    if (!isMuted) { DOM.audioBg.play().catch(() => {}); DOM.audioBg.pause(); }
     DOM.startScreen.classList.add('hidden');
     DOM.loadingScreen.classList.add('visible');
-    
     try {
-        const r = await fetch(API_ENDPOINT + '/generate', {
-            method: 'POST',
-            body: JSON.stringify({ category: category, lang: currentLang }) 
-        });
-        
-        if (!r.ok) {
-            const errData = await r.json();
-            throw new Error(errData.error || "API Error");
-        }
-        
-        const data = await r.json();
-        currentCaseData = data;
+        const r = await fetch(API_ENDPOINT + '/generate', { method: 'POST', body: JSON.stringify({ category: category, lang: currentLang }) });
+        if (!r.ok) { const errData = await r.json(); throw new Error(errData.error || "API Error"); }
+        currentCaseData = await r.json();
         startGame();
-        
     } catch (e) {
         console.error(e);
         alert(`Error: ${e.message}`);
@@ -378,48 +279,35 @@ async function generateCase(category) {
 function startGame() {
     DOM.loadingScreen.classList.remove('visible');
     DOM.gameScreen.classList.add('active');
-    
     GameState.reset();
     updateUI();
-    
     DOM.gameTitle.textContent = currentCaseData.title;
     DOM.gameSuspectName.textContent = currentCaseData.suspectName;
     DOM.caseDescription.textContent = currentCaseData.crimeDescription;
     DOM.suspectInfo.textContent = currentCaseData.suspectProfile;
-    
     DOM.caseEvidence.innerHTML = currentCaseData.knownFacts.map(f => `<li>${f}</li>`).join('');
-    
     DOM.chatLog.innerHTML = '';
     
-    // Hide old image, show loader
+    // RESET IMAGE
     DOM.suspectImg.style.display = 'none';
     DOM.suspectImg.src = "";
     DOM.suspectLoaderMini.classList.add('visible');
     
-    if(!isMuted) {
-        DOM.audioBg.currentTime = 0;
-        DOM.audioBg.play().catch(e=>{});
-    }
-    
+    if(!isMuted) { DOM.audioBg.currentTime = 0; DOM.audioBg.play().catch(e=>{}); }
     addMsg(t('startMsg'), 'system');
-    
     generateSuspectImage();
-    
     setTimeout(() => {
         GameState.conversationHistory.push({role:'assistant', content: currentCaseData.npcGreeting});
         addMsg(currentCaseData.npcGreeting, 'npc');
     }, 500);
-    
     DOM.briefingToggle.classList.add('active');
     DOM.briefingContent.classList.add('visible');
 }
 
 async function generateSuspectImage() {
     let newState = 'calm';
-    if (GameState.suspicion > 80) newState = 'broken';
-    else if (GameState.suspicion > 50) newState = 'nervous';
-    
-    if (newState === lastVisualState && DOM.suspectImg.src.includes('replicate')) return;
+    if (GameState.suspicion > 80) newState = 'broken'; else if (GameState.suspicion > 50) newState = 'nervous';
+    if (newState === lastVisualState && DOM.suspectImg.src.includes('http')) return;
     lastVisualState = newState;
     
     let prompt = currentCaseData.visualPrompt;
@@ -427,53 +315,42 @@ async function generateSuspectImage() {
     if(newState === 'broken') prompt += ", crying, looking down, defeated, despair";
     
     try {
-        const r = await fetch(API_ENDPOINT + '/image', {
-            method: 'POST',
-            body: JSON.stringify({ prompt: prompt })
-        });
+        const r = await fetch(API_ENDPOINT + '/image', { method: 'POST', body: JSON.stringify({ prompt: prompt }) });
         const data = await r.json();
+        if(data.error) throw new Error(data.error);
         
         if(data.imageUrl) {
-            DOM.suspectImg.src = data.imageUrl;
-            DOM.suspectImg.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+                DOM.suspectImg.src = data.imageUrl;
                 DOM.suspectLoaderMini.classList.remove('visible');
                 DOM.suspectImg.style.display = 'block';
             };
+            img.src = data.imageUrl;
         }
     } catch(e) {
-        console.log("Image gen skip/fail");
+        console.error("Image Gen Error:", e);
+        // Show specific error to user if image fails
+        alert("Image Error: " + e.message);
+        DOM.suspectLoaderMini.classList.remove('visible');
     }
 }
 
 async function sendMessage() {
     if(GameState.gameOver || GameState.energy <= 0) return;
-    
     const txt = DOM.chatInput.value.trim();
     if(!txt) return;
-    
     DOM.chatInput.value = '';
     GameState.energy--;
     updateUI();
-    
     addMsg(txt, 'player');
     GameState.conversationHistory.push({role:'user', content: txt});
-    
     showTyping();
-    
     const sysPrompt = `${currentCaseData.systemPrompt}\n\nCURRENT STATE:\nSuspicion Level: ${GameState.suspicion}%\nEnergy Left: ${GameState.energy}\n\nINSTRUCTIONS: Respond to the detective. If they catch you in a lie or press hard, increase your nervousness. ALWAYS append hidden tag <<<NERVOUSNESS: [0-100]>>> at the end.`;
-    
     try {
-        const r = await fetch(API_ENDPOINT + '/chat', {
-            method: 'POST',
-            body: JSON.stringify({
-                system: sysPrompt,
-                messages: GameState.conversationHistory
-            })
-        });
-        
+        const r = await fetch(API_ENDPOINT + '/chat', { method: 'POST', body: JSON.stringify({ system: sysPrompt, messages: GameState.conversationHistory }) });
         const data = await r.json();
         let reply = data.content[0].text;
-        
         const match = reply.match(/<<<NERVOUSNESS:\s*(\d+)>>>/);
         if(match) {
             GameState.suspicion = parseInt(match[1]);
@@ -481,140 +358,41 @@ async function sendMessage() {
             updateUI();
             generateSuspectImage();
         }
-        
         GameState.conversationHistory.push({role:'assistant', content: reply});
         hideTyping();
         addMsg(reply, 'npc');
-        
-    } catch(e) {
-        hideTyping();
-        addMsg("*...", 'npc');
-    }
-    
+    } catch(e) { hideTyping(); addMsg("*...", 'npc'); }
     if(GameState.energy <= 0) setTimeout(()=>showModal('lose', t('loseTitle')), 1000);
 }
 
 async function handleAccuse() {
     if(GameState.gameOver) return;
-    
     const choice = confirm(currentLang==='ua'?"Ви впевнені у звинуваченні?":"Are you sure about the verdict?");
     if(!choice) return;
-    
     addMsg("⏳ ...", 'system');
-    
     const log = GameState.conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n');
-    const judgePrompt = `
-    Case: ${currentCaseData.title}
-    Truth: ${currentCaseData.truthReveal}
-    
-    Analyze the interrogation log below. Did the user uncover the truth or break the suspect?
-    Reply JSON ONLY: { "verdict": "WIN" or "LOSE", "reason": "Reason in ${currentLang === 'ua' ? 'Ukrainian' : 'English'}" }
-    
-    LOG:
-    ${log}
-    `;
-    
+    const judgePrompt = `Case: ${currentCaseData.title}\nTruth: ${currentCaseData.truthReveal}\n\nAnalyze the interrogation log below. Did the user uncover the truth or break the suspect?\nReply JSON ONLY: { "verdict": "WIN" or "LOSE", "reason": "Reason in ${currentLang === 'ua' ? 'Ukrainian' : 'English'}" }\n\nLOG:\n${log}`;
     try {
-        const r = await fetch(API_ENDPOINT + '/chat', {
-            method: 'POST',
-            body: JSON.stringify({
-                system: "You are a Senior Detective Judge.",
-                messages: [{role:'user', content: judgePrompt}]
-            })
-        });
+        const r = await fetch(API_ENDPOINT + '/chat', { method: 'POST', body: JSON.stringify({ system: "You are a Senior Detective Judge.", messages: [{role:'user', content: judgePrompt}] }) });
         const data = await r.json();
         const cleanJson = data.content[0].text.replace(/```json/g,'').replace(/```/g,'').trim();
         const res = JSON.parse(cleanJson);
-        
         showModal(res.verdict.toLowerCase(), res.reason);
-        
-    } catch(e) {
-        GameState.suspicion > 60 ? showModal('win', "Success") : showModal('lose', "Fail");
-    }
+    } catch(e) { GameState.suspicion > 60 ? showModal('win', "Success") : showModal('lose', "Fail"); }
 }
 
-function updateUI() {
-    DOM.energyCurrent.textContent = GameState.energy;
-    DOM.suspicionBar.style.width = GameState.suspicion + '%';
-    DOM.suspicionText.textContent = GameState.suspicion + '%';
-    DOM.coffeeBtn.disabled = GameState.energy >= 15;
-}
-
-// TYPEWRITER
-function typeWriter(element, text, speed = 20) {
-    let i = 0;
-    
-    if(!isMuted) {
-        DOM.audioType.currentTime = 0;
-        DOM.audioType.play().catch(()=>{});
-    }
-
-    const interval = setInterval(() => {
-        if (i < text.length) {
-            element.textContent += text.charAt(i);
-            i++;
-            DOM.chatLog.scrollTop = DOM.chatLog.scrollHeight;
-        } else {
-            clearInterval(interval);
-            if(!isMuted) DOM.audioType.pause();
-        }
-    }, speed);
-}
-
-function addMsg(text, type) {
-    const d = document.createElement('div');
-    d.className = `message message-${type}`;
-    
-    const sender = document.createElement('div');
-    sender.className = 'message-sender';
-    sender.textContent = type==='player' ? 'Detective' : 'Suspect';
-    
-    const txtDiv = document.createElement('div');
-    txtDiv.className = 'message-text';
-    
-    d.appendChild(sender);
-    d.appendChild(txtDiv);
-    DOM.chatLog.appendChild(d);
-    
-    if(type === 'npc') {
-        typeWriter(txtDiv, text);
-    } else {
-        txtDiv.textContent = text;
-    }
-    
-    DOM.chatLog.scrollTop = DOM.chatLog.scrollHeight;
-}
-
-function showTyping(){
-    const d=document.createElement('div'); d.id='typing'; d.className='typing-indicator';
-    d.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
-    DOM.chatLog.appendChild(d); DOM.chatLog.scrollTop=DOM.chatLog.scrollHeight;
-}
+function updateUI() { DOM.energyCurrent.textContent = GameState.energy; DOM.suspicionBar.style.width = GameState.suspicion + '%'; DOM.suspicionText.textContent = GameState.suspicion + '%'; DOM.coffeeBtn.disabled = GameState.energy >= 15; }
+function typeWriter(element, text, speed=20) { let i=0; if(!isMuted){DOM.audioType.currentTime=0;DOM.audioType.play().catch(()=>{});} const interval=setInterval(()=>{if(i<text.length){element.textContent+=text.charAt(i);i++;DOM.chatLog.scrollTop=DOM.chatLog.scrollHeight;}else{clearInterval(interval);if(!isMuted)DOM.audioType.pause();}},speed); }
+function addMsg(text, type) { const d=document.createElement('div'); d.className=`message message-${type}`; d.innerHTML=`<div class="message-sender">${type==='player'?'Detective':'Suspect'}</div><div class="message-text">${type==='npc'?'':text}</div>`; DOM.chatLog.appendChild(d); DOM.chatLog.scrollTop=DOM.chatLog.scrollHeight; if(type==='npc'){typeWriter(d.querySelector('.message-text'), text);} }
+function showTyping(){ const d=document.createElement('div'); d.id='typing'; d.className='typing-indicator'; d.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>'; DOM.chatLog.appendChild(d); DOM.chatLog.scrollTop=DOM.chatLog.scrollHeight; }
 function hideTyping(){ document.getElementById('typing')?.remove(); }
+function showModal(type, text) { GameState.gameOver=true; DOM.modalOverlay.classList.add('visible'); DOM.modalIcon.textContent=type==='win'?'✅':'❌'; DOM.modalTitle.textContent=type==='win'?t('winTitle'):t('loseTitle'); DOM.modalText.textContent=text; DOM.modalRevealText.textContent=currentCaseData.truthReveal; }
 
-function showModal(type, text) {
-    GameState.gameOver = true;
-    DOM.modalOverlay.classList.add('visible');
-    DOM.modalIcon.textContent = type==='win' ? '✅' : '❌';
-    DOM.modalTitle.textContent = type==='win' ? t('winTitle') : t('loseTitle');
-    DOM.modalText.textContent = text;
-    DOM.modalRevealText.textContent = currentCaseData.truthReveal;
-}
-
-// EVENTS
-DOM.langBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        currentLang = btn.dataset.lang;
-        DOM.langBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        updateTexts();
-    });
-});
-
-DOM.catCards.forEach(c => c.addEventListener('click', () => generateCase(c.dataset.category)));
-DOM.sendBtn.addEventListener('click', sendMessage);
-DOM.chatInput.addEventListener('keypress', e => { if(e.key==='Enter') sendMessage() });
-DOM.briefingToggle.addEventListener('click', () => DOM.briefingContent.classList.toggle('visible'));
+DOM.langBtns.forEach(btn=>{btn.addEventListener('click',()=>{currentLang=btn.dataset.lang;DOM.langBtns.forEach(b=>b.classList.remove('active'));btn.classList.add('active');updateTexts();});});
+DOM.catCards.forEach(c=>c.addEventListener('click',()=>generateCase(c.dataset.category)));
+DOM.sendBtn.addEventListener('click',sendMessage);
+DOM.chatInput.addEventListener('keypress',e=>{if(e.key==='Enter')sendMessage()});
+DOM.briefingToggle.addEventListener('click',()=>DOM.briefingContent.classList.toggle('visible'));
 DOM.hintBtn.addEventListener('click', () => { if(GameState.hintsRemaining>0) { GameState.hintsRemaining--; addMsg(t('hintMsg'), 'system'); }});
 DOM.coffeeBtn.addEventListener('click', () => { if(GameState.energy<15){GameState.energy=Math.min(15, GameState.energy+5); updateUI(); addMsg("*sip*", 'system')} });
 DOM.accuseBtn.addEventListener('click', handleAccuse);
@@ -626,7 +404,6 @@ DOM.muteBtn.addEventListener('click', () => { isMuted=!isMuted; DOM.muteBtn.text
 DOM.exportBtn.addEventListener('click', () => alert("Export not implemented in generator mode yet."));
 
 updateTexts();
-
 })();
 </script>
 </body>
