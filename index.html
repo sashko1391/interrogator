@@ -1,289 +1,305 @@
 <!DOCTYPE html>
-
 <html lang="ua">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Interrogator: AI Generator</title>
+    <title>The Interrogator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Code+Pro:wght@400;500&family=Crimson+Pro:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root{--bg-primary:#0a0a0c;--bg-secondary:#12121a;--bg-tertiary:#1a1a24;--bg-card:#15151f;--text-primary:#e8e6e3;--text-secondary:#9a9a9a;--text-muted:#5a5a6a;--accent-gold:#d4af37;--accent-gold-dim:#8b7323;--accent-red:#8b2942;--accent-red-bright:#c73e5c;--accent-green:#2d5a3d;--accent-green-bright:#4a9b6a;--border-color:#2a2a3a;--border-accent:#3a3a4a;--font-display:'Playfair Display',Georgia,serif;--font-body:'Crimson Pro',Georgia,serif;--font-mono:'Source Code Pro',monospace}
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-        html{font-size:22px;scroll-behavior:smooth}
+        html{font-size:20px;scroll-behavior:smooth}
         body{font-family:var(--font-body);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-y:auto;position:relative;}
-
-```
-    /* Noise overlay */
-    body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.05;pointer-events:none;z-index:1000}
-    
-    /* Background - градієнт fallback */
-    .bg-fallback{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 20%,rgba(139,41,66,0.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(212,175,55,0.1) 0%,transparent 50%),linear-gradient(180deg,#0a0a0c 0%,#12121a 100%);z-index:-2}
-    
-    /* Background image - landscape */
-    .bg-image{position:fixed;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;z-index:-1;opacity:0.5;}
-    .bg-image.bg-landscape{background-image:url('bg-landscape.jpg');}
-    .bg-image.bg-portrait{background-image:url('bg-portrait.jpg');display:none;}
-    
-    /* Portrait mode */
-    @media (orientation: portrait) {
-        .bg-image.bg-landscape{display:none;}
-        .bg-image.bg-portrait{display:block;}
-    }
-    
-    /* Controls */
-    .top-controls-left{position:fixed;top:1rem;left:1rem;display:flex;gap:0.5rem;z-index:2000;}
-    .lang-switcher{position:fixed;top:1rem;right:1rem;display:flex;z-index:2000;}
-    .icon-btn{background:rgba(18,18,26,0.9);border:1px solid var(--border-color);color:var(--text-muted);padding:0.6rem;font-family:var(--font-mono);font-size:0.8rem;cursor:pointer;border-radius:4px;min-width:40px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
-    .icon-btn:hover{border-color:var(--accent-gold);color:var(--accent-gold);}
-    .lang-btn{background:rgba(18,18,26,0.9);border:1px solid var(--border-color);color:var(--text-muted);padding:0.6rem;font-family:var(--font-mono);font-size:0.8rem;cursor:pointer;min-width:40px;transition:all 0.2s;}
-    .lang-btn:first-child{border-radius:4px 0 0 4px;border-right:none;}
-    .lang-btn:last-child{border-radius:0 4px 4px 0;border-left:1px solid var(--border-color);}
-    .lang-btn.active{background:var(--accent-gold-dim);color:var(--bg-primary);border-color:var(--accent-gold-dim);font-weight:bold;}
-    
-    /* Start Screen */
-    .start-screen{min-height:100vh;width:100%;display:flex;flex-direction:column;position:absolute;top:0;left:0;z-index:100;background:transparent;}
-    .start-screen.hidden{display:none}
-    .start-content{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center;}
-    .start-title{font-family:var(--font-display);font-size:2.5rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);margin-bottom:0.5rem;text-shadow:0 0 60px rgba(212,175,55,0.3)}
-    .start-tagline{font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted);letter-spacing:0.3em;text-transform:uppercase;margin-bottom:2rem}
-    
-    /* Category Grid */
-    .category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;width:100%;max-width:900px;padding:0 1rem;}
-    .cat-card{background:rgba(21,21,31,0.9);border:1px solid var(--border-color);border-radius:4px;padding:2rem;cursor:pointer;transition:all 0.3s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1rem;}
-    .cat-card:hover{border-color:var(--accent-gold);transform:translateY(-5px);background:rgba(26,26,36,0.95);box-shadow:0 10px 40px rgba(212,175,55,0.1);}
-    .cat-icon{font-size:3rem;margin-bottom:0.5rem;}
-    .cat-title{font-family:var(--font-display);font-size:1.2rem;color:var(--accent-gold);}
-    .cat-desc{font-size:0.75rem;color:var(--text-secondary);line-height:1.6;}
-    
-    /* Donate Notice */
-    .donate-notice{margin-top:2rem;padding:1.5rem;background:rgba(21,21,31,0.6);border:1px solid var(--border-color);border-radius:4px;text-align:center;max-width:500px;}
-    .donate-notice p{font-size:0.7rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.6;}
-    .donate-btn{display:inline-block;padding:0.7rem 1.5rem;background:transparent;border:1px solid var(--accent-gold-dim);border-radius:4px;color:var(--accent-gold);font-family:var(--font-mono);font-size:0.65rem;text-decoration:none;transition:all 0.2s;}
-    .donate-btn:hover{background:var(--accent-gold-dim);color:var(--bg-primary);}
-    
-    /* Loading Screen */
-    .loading-screen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,10,12,0.95);z-index:200;align-items:center;justify-content:center;flex-direction:column;}
-    .loading-screen.visible{display:flex;}
-    .loader{width:50px;height:50px;border:3px solid var(--bg-tertiary);border-top:3px solid var(--accent-gold);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:1rem;}
-    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-    .loading-text{font-family:var(--font-mono);font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;animation:pulse 2s infinite;text-align:center;max-width:300px;line-height:1.6;}
-    @keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}
-    
-    /* Game Screen */
-    .game-screen{display:none;min-height:100vh;width:100%;}
-    .game-screen.active{display:block;}
-    .game-container{max-width:900px;margin:0 auto;padding:1.5rem;padding-top:4rem;min-height:100vh;display:flex;flex-direction:column;}
-    
-    /* Game Header */
-    .game-header{display:flex;align-items:center;gap:1.5rem;padding:1rem 0;border-bottom:1px solid var(--border-color);margin-bottom:1rem;}
-    .suspect-image-container{width:100px;height:100px;border-radius:4px;overflow:hidden;border:1px solid var(--border-color);background:#000;position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
-    .suspect-image{width:100%;height:100%;object-fit:cover;display:none;animation:fadeIn 1s ease;}
-    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    .loader-mini{width:20px;height:20px;border:2px solid var(--bg-tertiary);border-top:2px solid var(--accent-gold);border-radius:50%;animation:spin 1s linear infinite;display:none;}
-    .loader-mini.visible{display:block;}
-    .game-header-text{flex:1;}
-    .game-title{font-family:var(--font-display);font-size:1.2rem;text-transform:uppercase;color:var(--text-primary);}
-    .game-subtitle{font-family:var(--font-mono);font-size:0.55rem;color:var(--text-muted);text-transform:uppercase;}
-    
-    /* Status Bar */
-    .status-bar{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;padding:0.8rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;margin-bottom:1rem;}
-    .status-item{display:flex;flex-direction:column;gap:0.25rem}
-    .status-label{font-family:var(--font-mono);font-size:0.5rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-muted)}
-    .status-value{display:flex;align-items:center;gap:0.5rem}
-    .energy-display{font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--accent-gold)}
-    .suspicion-container{flex:1}
-    .suspicion-bar-bg{height:8px;background:var(--bg-tertiary);border-radius:4px;overflow:hidden}
-    .suspicion-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#2d5a3d,#d4af37,#c73e5c);transition:width 300ms;border-radius:4px}
-    .suspicion-value{font-family:var(--font-mono);font-size:0.6rem;color:var(--text-secondary);margin-top:0.25rem;}
-    
-    /* Briefing */
-    .briefing-container{margin-bottom:1rem;}
-    .briefing-toggle{width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;padding:0.8rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.65rem;text-transform:uppercase;cursor:pointer;display:flex;justify-content:space-between;transition:all 0.2s;}
-    .briefing-toggle:hover{border-color:var(--border-accent);}
-    .briefing-toggle-icon{transition:transform 0.2s;}
-    .briefing-toggle.active .briefing-toggle-icon{transform:rotate(180deg);}
-    .briefing-content{display:none;background:var(--bg-card);border:1px solid var(--border-color);border-top:none;border-radius:0 0 4px 4px;padding:1.5rem;}
-    .briefing-content.visible{display:block;animation:slideDown 0.3s ease;}
-    @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-    .briefing-section{margin-bottom:1rem;}
-    .briefing-section:last-child{margin-bottom:0;}
-    .briefing-section-title{color:var(--accent-gold);font-family:var(--font-display);font-size:0.9rem;margin-bottom:0.5rem;}
-    .briefing-text{font-size:0.75rem;color:var(--text-secondary);line-height:1.6;}
-    .evidence-list{list-style:none;padding-left:1rem}
-    .evidence-list li{position:relative;padding-left:1rem;margin-bottom:0.5rem;color:var(--text-secondary);font-size:0.7rem}
-    .evidence-list li::before{content:'▪';position:absolute;left:0;color:var(--accent-gold-dim)}
-    
-    /* Chat */
-    .chat-container{flex:1;display:flex;flex-direction:column;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;overflow:hidden;height:50vh;min-height:350px;}
-    .chat-log{flex-grow:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;}
-    .chat-log::-webkit-scrollbar{width:6px}
-    .chat-log::-webkit-scrollbar-track{background:var(--bg-tertiary)}
-    .chat-log::-webkit-scrollbar-thumb{background:var(--border-accent);border-radius:3px}
-    
-    /* Messages */
-    .message{max-width:85%;padding:1rem;border-radius:4px;animation:messageIn 0.3s ease;}
-    @keyframes messageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-    .message-player{align-self:flex-end;background:var(--bg-tertiary);border:1px solid var(--border-accent);border-right:3px solid var(--accent-gold);}
-    .message-npc{align-self:flex-start;background:var(--bg-card);border:1px solid var(--border-color);border-left:3px solid var(--accent-red);}
-    .message-system{align-self:center;background:transparent;border:1px dashed var(--border-color);text-align:center;max-width:90%;color:var(--text-muted);font-family:var(--font-mono);font-size:0.65rem;}
-    .message-sender{font-family:var(--font-mono);font-size:0.5rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.25rem;}
-    .message-text{font-size:0.75rem;line-height:1.5;}
-    .message-player .message-text{color:var(--text-primary);}
-    .message-npc .message-text{color:var(--text-secondary);font-style:italic;}
-    
-    /* Typing Indicator */
-    .typing-indicator{display:flex;gap:4px;padding:1rem;align-self:flex-start;background:var(--bg-card);border-radius:4px;border-left:3px solid var(--accent-red);}
-    .typing-dot{width:8px;height:8px;background:var(--text-muted);border-radius:50%;animation:typingBounce 1.4s infinite ease-in-out;}
-    .typing-dot:nth-child(1){animation-delay:0ms;}
-    .typing-dot:nth-child(2){animation-delay:200ms;}
-    .typing-dot:nth-child(3){animation-delay:400ms;}
-    @keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-6px);opacity:1}}
-    
-    /* Input */
-    .input-container{display:flex;gap:0.5rem;padding:1rem;background:var(--bg-tertiary);border-top:1px solid var(--border-color);}
-    .chat-input{flex:1;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:4px;padding:1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.75rem;outline:none;transition:border-color 0.2s;}
-    .chat-input:focus{border-color:var(--accent-gold-dim);}
-    .chat-input::placeholder{color:var(--text-muted);font-style:italic;}
-    .chat-input:disabled{opacity:0.5;cursor:not-allowed;}
-    .send-btn{background:var(--accent-gold-dim);border:none;border-radius:4px;padding:0 1.5rem;color:var(--bg-primary);font-family:var(--font-mono);font-size:0.6rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
-    .send-btn:hover:not(:disabled){background:var(--accent-gold);}
-    .send-btn:disabled{opacity:0.5;cursor:not-allowed;}
-    
-    /* Action Buttons */
-    .action-bar{display:flex;gap:0.5rem;margin-top:0.5rem;flex-wrap:wrap;padding-bottom:1rem;}
-    .action-btn{flex:1;background:transparent;border:1px solid var(--border-color);border-radius:4px;padding:0.8rem;color:var(--text-secondary);font-family:var(--font-mono);font-size:0.55rem;text-transform:uppercase;cursor:pointer;min-width:70px;text-align:center;transition:all 0.2s;}
-    .action-btn:hover:not(:disabled){border-color:var(--border-accent);color:var(--text-primary);}
-    .action-btn:disabled{opacity:0.4;cursor:not-allowed;}
-    .action-btn--hint{border-color:var(--accent-green);color:var(--accent-green-bright);}
-    .action-btn--hint:hover:not(:disabled){background:var(--accent-green);color:var(--text-primary);}
-    .action-btn--coffee{border-color:var(--accent-gold-dim);color:var(--accent-gold);}
-    .action-btn--coffee:hover:not(:disabled){background:var(--accent-gold-dim);color:var(--bg-primary);}
-    .action-btn--accuse{border-color:var(--accent-red);color:var(--accent-red-bright);}
-    .action-btn--accuse:hover:not(:disabled){background:var(--accent-red);color:var(--text-primary);}
-    .action-btn--reveal{border-color:var(--text-muted);color:var(--text-muted);font-size:0.5rem;}
-    .action-btn--reveal:hover:not(:disabled){border-color:var(--accent-red);color:var(--accent-red-bright);}
-    
-    /* Modal */
-    .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:200;align-items:center;justify-content:center}
-    .modal-overlay.visible{display:flex}
-    .modal-content{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;padding:2rem;max-width:500px;width:90%;text-align:center;animation:modalIn 0.4s ease;}
-    @keyframes modalIn{from{opacity:0;transform:scale(0.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
-    .modal-icon{font-size:3rem;margin-bottom:1rem;}
-    .modal-title{font-family:var(--font-display);font-size:1.3rem;margin-bottom:1rem;text-transform:uppercase;letter-spacing:0.1em;}
-    .modal-title--win{color:var(--accent-green-bright);}
-    .modal-title--lose{color:var(--accent-red-bright);}
-    .modal-text{font-size:0.8rem;color:var(--text-secondary);line-height:1.6;margin-bottom:1rem;}
-    .modal-reveal{background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:4px;padding:1rem;margin-bottom:1rem;text-align:left;}
-    .modal-reveal-title{font-family:var(--font-mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-gold);margin-bottom:0.5rem;}
-    .modal-reveal-text{font-size:0.7rem;color:var(--text-secondary);line-height:1.6;}
-    .modal-btn{background:var(--accent-gold-dim);border:none;border-radius:4px;padding:1rem 2rem;cursor:pointer;font-family:var(--font-mono);font-size:0.7rem;font-weight:500;text-transform:uppercase;transition:all 0.2s;}
-    .modal-btn:hover{background:var(--accent-gold);}
-    .modal-actions{display:flex;gap:0.5rem;justify-content:center;margin-top:1rem;flex-wrap:wrap;}
-    .modal-btn-secondary{padding:0.6rem 1rem;background:transparent;border:1px solid var(--border-color);border-radius:4px;color:var(--text-muted);font-family:var(--font-mono);font-size:0.6rem;text-decoration:none;cursor:pointer;transition:all 0.2s;}
-    .modal-btn-secondary:hover{border-color:var(--accent-gold);color:var(--accent-gold);}
-    
-    /* Responsive */
-    @media(max-width:600px){
-        html{font-size:18px}
-        .game-container{padding:0.5rem;padding-top:3.5rem;}
-        .game-header{flex-direction:column;align-items:center;text-align:center;}
-        .category-grid{grid-template-columns:1fr;}
-        .action-bar{gap:0.3rem;}
-        .action-btn{padding:0.6rem;font-size:0.5rem;min-width:60px;}
-        .status-bar{grid-template-columns:1fr;gap:1rem;}
-    }
-</style>
-```
-
+        body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.05;pointer-events:none;z-index:1000}
+        .bg-fallback{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 20%,rgba(139,41,66,0.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(212,175,55,0.1) 0%,transparent 50%),linear-gradient(180deg,#0a0a0c 0%,#12121a 100%);z-index:-2}
+        .bg-image{position:fixed;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;z-index:-1;opacity:0.5;}
+        .bg-image.bg-landscape{background-image:url('bg-landscape.jpg');}
+        .bg-image.bg-portrait{background-image:url('bg-portrait.jpg');display:none;}
+        @media (orientation: portrait){.bg-image.bg-landscape{display:none;}.bg-image.bg-portrait{display:block;}}
+        
+        /* Controls */
+        .top-controls-left{position:fixed;top:1rem;left:1rem;display:flex;gap:0.5rem;z-index:2000;}
+        .lang-switcher{position:fixed;top:1rem;right:1rem;display:flex;z-index:2000;}
+        .icon-btn{background:rgba(18,18,26,0.9);border:1px solid var(--border-color);color:var(--text-muted);padding:0.5rem;font-family:var(--font-mono);font-size:0.75rem;cursor:pointer;border-radius:4px;min-width:36px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+        .icon-btn:hover{border-color:var(--accent-gold);color:var(--accent-gold);}
+        .lang-btn{background:rgba(18,18,26,0.9);border:1px solid var(--border-color);color:var(--text-muted);padding:0.5rem;font-family:var(--font-mono);font-size:0.7rem;cursor:pointer;min-width:36px;transition:all 0.2s;}
+        .lang-btn:first-child{border-radius:4px 0 0 4px;border-right:none;}
+        .lang-btn:last-child{border-radius:0 4px 4px 0;}
+        .lang-btn.active{background:var(--accent-gold-dim);color:var(--bg-primary);border-color:var(--accent-gold-dim);}
+        
+        /* Start Screen */
+        .start-screen{min-height:100vh;width:100%;display:flex;flex-direction:column;position:absolute;top:0;left:0;z-index:100;background:transparent;}
+        .start-screen.hidden{display:none}
+        .start-content{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1.5rem;padding-top:4rem;text-align:center;}
+        .start-title{font-family:var(--font-display);font-size:2.2rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-primary);margin-bottom:0.3rem;text-shadow:0 0 60px rgba(212,175,55,0.3)}
+        .start-tagline{font-family:var(--font-mono);font-size:0.55rem;color:var(--text-muted);letter-spacing:0.25em;text-transform:uppercase;margin-bottom:1.5rem}
+        
+        /* Rules Box */
+        .rules-box{background:rgba(21,21,31,0.8);border:1px solid var(--border-color);border-radius:4px;padding:1.2rem;margin-bottom:1.5rem;max-width:600px;text-align:left;}
+        .rules-title{font-family:var(--font-mono);font-size:0.6rem;color:var(--accent-gold);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:0.8rem;display:flex;align-items:center;gap:0.5rem;}
+        .rules-list{list-style:none;}
+        .rules-list li{font-size:0.7rem;color:var(--text-secondary);margin-bottom:0.5rem;padding-left:1.2rem;position:relative;line-height:1.5;}
+        .rules-list li::before{content:'→';position:absolute;left:0;color:var(--accent-gold-dim);}
+        .rules-list li strong{color:var(--text-primary);}
+        
+        /* Category Grid */
+        .category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;width:100%;max-width:750px;padding:0 1rem;margin-bottom:1.5rem;}
+        .cat-card{background:rgba(21,21,31,0.9);border:1px solid var(--border-color);border-radius:4px;padding:1.5rem;cursor:pointer;transition:all 0.3s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0.8rem;}
+        .cat-card:hover{border-color:var(--accent-gold);transform:translateY(-3px);background:rgba(26,26,36,0.95);box-shadow:0 10px 40px rgba(212,175,55,0.1);}
+        .cat-icon{font-size:2.5rem;}
+        .cat-title{font-family:var(--font-display);font-size:1rem;color:var(--accent-gold);}
+        .cat-desc{font-size:0.65rem;color:var(--text-secondary);line-height:1.5;}
+        
+        /* Donate Notice */
+        .donate-notice{padding:1rem;background:rgba(21,21,31,0.5);border:1px dashed var(--border-color);border-radius:4px;text-align:center;max-width:450px;}
+        .donate-notice p{font-size:0.6rem;color:var(--text-muted);margin-bottom:0.8rem;line-height:1.5;}
+        .donate-btn{display:inline-block;padding:0.5rem 1.2rem;background:transparent;border:1px solid var(--accent-gold-dim);border-radius:4px;color:var(--accent-gold);font-family:var(--font-mono);font-size:0.6rem;text-decoration:none;transition:all 0.2s;}
+        .donate-btn:hover{background:var(--accent-gold-dim);color:var(--bg-primary);}
+        
+        /* Loading Screen */
+        .loading-screen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,10,12,0.95);z-index:200;align-items:center;justify-content:center;flex-direction:column;}
+        .loading-screen.visible{display:flex;}
+        .loader{width:50px;height:50px;border:3px solid var(--bg-tertiary);border-top:3px solid var(--accent-gold);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:1rem;}
+        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        .loading-text{font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;animation:pulse 2s infinite;text-align:center;max-width:300px;line-height:1.6;}
+        @keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}
+        
+        /* Game Screen */
+        .game-screen{display:none;min-height:100vh;width:100%;}
+        .game-screen.active{display:block;}
+        .game-container{max-width:900px;margin:0 auto;padding:1rem;padding-top:3.5rem;min-height:100vh;display:flex;flex-direction:column;}
+        
+        /* Game Header */
+        .game-header{padding:0.8rem 0;border-bottom:1px solid var(--border-color);margin-bottom:0.8rem;text-align:center;}
+        .game-title{font-family:var(--font-display);font-size:1.1rem;text-transform:uppercase;color:var(--text-primary);margin-bottom:0.3rem;}
+        .game-meta{font-family:var(--font-mono);font-size:0.5rem;color:var(--text-muted);display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;}
+        .game-meta span{display:flex;align-items:center;gap:0.3rem;}
+        
+        /* Status Bar */
+        .status-bar{display:flex;gap:1rem;padding:0.6rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;margin-bottom:0.8rem;align-items:center;}
+        .status-item{display:flex;align-items:center;gap:0.4rem;}
+        .status-label{font-family:var(--font-mono);font-size:0.45rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted)}
+        .energy-display{font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--accent-gold)}
+        .suspicion-container{flex:1;display:flex;align-items:center;gap:0.5rem;}
+        .suspicion-bar-bg{flex:1;height:6px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden}
+        .suspicion-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#2d5a3d,#d4af37,#c73e5c);transition:width 300ms;border-radius:3px}
+        .suspicion-value{font-family:var(--font-mono);font-size:0.55rem;color:var(--text-secondary);min-width:35px;}
+        
+        /* Suspect Tabs */
+        .suspect-tabs{display:flex;gap:0.3rem;margin-bottom:0.8rem;overflow-x:auto;padding-bottom:0.3rem;}
+        .suspect-tab{flex:1;min-width:100px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px 4px 0 0;padding:0.6rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:0.5rem;}
+        .suspect-tab:hover{border-color:var(--border-accent);}
+        .suspect-tab.active{background:var(--bg-card);border-color:var(--accent-gold-dim);border-bottom-color:var(--bg-card);}
+        .suspect-tab-img{width:35px;height:35px;border-radius:50%;overflow:hidden;border:2px solid var(--border-color);background:#000;flex-shrink:0;}
+        .suspect-tab-img img{width:100%;height:100%;object-fit:cover;display:none;}
+        .suspect-tab-img .loader-mini{width:12px;height:12px;border-width:2px;margin:auto;}
+        .suspect-tab.active .suspect-tab-img{border-color:var(--accent-gold-dim);}
+        .suspect-tab-info{flex:1;text-align:left;overflow:hidden;}
+        .suspect-tab-name{font-family:var(--font-mono);font-size:0.55rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .suspect-tab-role{font-size:0.5rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .suspect-tab-status{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+        .suspect-tab-status.neutral{background:var(--text-muted);}
+        .suspect-tab-status.nervous{background:var(--accent-gold);}
+        .suspect-tab-status.breaking{background:var(--accent-red-bright);}
+        
+        /* Suspect Panel */
+        .suspect-panel{display:none;background:var(--bg-card);border:1px solid var(--border-color);border-top:none;border-radius:0 0 4px 4px;margin-top:-1px;}
+        .suspect-panel.active{display:block;}
+        .suspect-header{display:flex;gap:1rem;padding:1rem;border-bottom:1px solid var(--border-color);}
+        .suspect-image-container{width:80px;height:80px;border-radius:4px;overflow:hidden;border:1px solid var(--border-color);background:#000;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+        .suspect-image{width:100%;height:100%;object-fit:cover;display:none;}
+        .loader-mini{width:16px;height:16px;border:2px solid var(--bg-tertiary);border-top:2px solid var(--accent-gold);border-radius:50%;animation:spin 1s linear infinite;}
+        .suspect-info{flex:1;}
+        .suspect-name{font-family:var(--font-display);font-size:0.95rem;color:var(--text-primary);margin-bottom:0.2rem;}
+        .suspect-role{font-family:var(--font-mono);font-size:0.55rem;color:var(--accent-gold);text-transform:uppercase;margin-bottom:0.4rem;}
+        .suspect-profile{font-size:0.65rem;color:var(--text-secondary);line-height:1.5;}
+        
+        /* Chat */
+        .chat-container{flex:1;display:flex;flex-direction:column;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;overflow:hidden;min-height:280px;max-height:350px;}
+        .chat-log{flex-grow:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.8rem;}
+        .chat-log::-webkit-scrollbar{width:5px}
+        .chat-log::-webkit-scrollbar-track{background:var(--bg-tertiary)}
+        .chat-log::-webkit-scrollbar-thumb{background:var(--border-accent);border-radius:3px}
+        .message{max-width:85%;padding:0.8rem;border-radius:4px;animation:messageIn 0.3s ease;}
+        @keyframes messageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .message-player{align-self:flex-end;background:var(--bg-tertiary);border:1px solid var(--border-accent);border-right:3px solid var(--accent-gold);}
+        .message-npc{align-self:flex-start;background:var(--bg-card);border:1px solid var(--border-color);border-left:3px solid var(--accent-red);}
+        .message-system{align-self:center;background:transparent;border:1px dashed var(--border-color);text-align:center;max-width:90%;color:var(--text-muted);font-family:var(--font-mono);font-size:0.55rem;}
+        .message-sender{font-family:var(--font-mono);font-size:0.45rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.2rem;}
+        .message-text{font-size:0.7rem;line-height:1.5;}
+        .message-player .message-text{color:var(--text-primary);}
+        .message-npc .message-text{color:var(--text-secondary);font-style:italic;}
+        .typing-indicator{display:flex;gap:4px;padding:0.8rem;align-self:flex-start;background:var(--bg-card);border-radius:4px;border-left:3px solid var(--accent-red);}
+        .typing-dot{width:6px;height:6px;background:var(--text-muted);border-radius:50%;animation:typingBounce 1.4s infinite ease-in-out;}
+        .typing-dot:nth-child(1){animation-delay:0ms;}
+        .typing-dot:nth-child(2){animation-delay:200ms;}
+        .typing-dot:nth-child(3){animation-delay:400ms;}
+        @keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-5px);opacity:1}}
+        
+        /* Input */
+        .input-container{display:flex;gap:0.4rem;padding:0.8rem;background:var(--bg-tertiary);border-top:1px solid var(--border-color);}
+        .chat-input{flex:1;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:4px;padding:0.8rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.7rem;outline:none;transition:border-color 0.2s;}
+        .chat-input:focus{border-color:var(--accent-gold-dim);}
+        .chat-input::placeholder{color:var(--text-muted);font-style:italic;}
+        .chat-input:disabled{opacity:0.5;cursor:not-allowed;}
+        .send-btn{background:var(--accent-gold-dim);border:none;border-radius:4px;padding:0 1.2rem;color:var(--bg-primary);font-family:var(--font-mono);font-size:0.55rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+        .send-btn:hover:not(:disabled){background:var(--accent-gold);}
+        .send-btn:disabled{opacity:0.5;cursor:not-allowed;}
+        
+        /* Briefing Toggle */
+        .briefing-toggle{width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;padding:0.6rem 1rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.55rem;text-transform:uppercase;cursor:pointer;display:flex;justify-content:space-between;margin-bottom:0.8rem;transition:all 0.2s;}
+        .briefing-toggle:hover{border-color:var(--border-accent);}
+        .briefing-content{display:none;background:var(--bg-card);border:1px solid var(--border-color);border-radius:4px;padding:1rem;margin-bottom:0.8rem;margin-top:-0.5rem;}
+        .briefing-content.visible{display:block;}
+        .briefing-section{margin-bottom:0.8rem;}
+        .briefing-section:last-child{margin-bottom:0;}
+        .briefing-section-title{color:var(--accent-gold);font-family:var(--font-mono);font-size:0.6rem;margin-bottom:0.4rem;text-transform:uppercase;}
+        .briefing-text{font-size:0.65rem;color:var(--text-secondary);line-height:1.6;}
+        .evidence-list{list-style:none;padding-left:0.8rem}
+        .evidence-list li{position:relative;padding-left:0.8rem;margin-bottom:0.3rem;color:var(--text-secondary);font-size:0.6rem}
+        .evidence-list li::before{content:'▪';position:absolute;left:0;color:var(--accent-gold-dim)}
+        
+        /* Action Buttons */
+        .action-bar{display:flex;gap:0.4rem;margin-top:0.8rem;flex-wrap:wrap;}
+        .action-btn{flex:1;background:transparent;border:1px solid var(--border-color);border-radius:4px;padding:0.6rem;color:var(--text-secondary);font-family:var(--font-mono);font-size:0.5rem;text-transform:uppercase;cursor:pointer;min-width:60px;text-align:center;transition:all 0.2s;}
+        .action-btn:hover:not(:disabled){border-color:var(--border-accent);color:var(--text-primary);}
+        .action-btn:disabled{opacity:0.4;cursor:not-allowed;}
+        .action-btn--accuse{border-color:var(--accent-red);color:var(--accent-red-bright);}
+        .action-btn--accuse:hover:not(:disabled){background:var(--accent-red);color:var(--text-primary);}
+        .action-btn--share{border-color:var(--accent-green);color:var(--accent-green-bright);}
+        .action-btn--share:hover:not(:disabled){background:var(--accent-green);color:var(--text-primary);}
+        
+        /* Modal */
+        .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:200;align-items:center;justify-content:center;padding:1rem;}
+        .modal-overlay.visible{display:flex}
+        .modal-content{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;padding:1.5rem;max-width:500px;width:100%;text-align:center;animation:modalIn 0.4s ease;max-height:90vh;overflow-y:auto;}
+        @keyframes modalIn{from{opacity:0;transform:scale(0.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+        .modal-icon{font-size:2.5rem;margin-bottom:0.8rem;}
+        .modal-title{font-family:var(--font-display);font-size:1.1rem;margin-bottom:0.8rem;text-transform:uppercase;letter-spacing:0.1em;}
+        .modal-title--win{color:var(--accent-green-bright);}
+        .modal-title--lose{color:var(--accent-red-bright);}
+        .modal-text{font-size:0.7rem;color:var(--text-secondary);line-height:1.6;margin-bottom:1rem;}
+        .modal-reveal{background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:4px;padding:0.8rem;margin-bottom:1rem;text-align:left;}
+        .modal-reveal-title{font-family:var(--font-mono);font-size:0.5rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-gold);margin-bottom:0.4rem;}
+        .modal-reveal-text{font-size:0.6rem;color:var(--text-secondary);line-height:1.5;}
+        .modal-btn{background:var(--accent-gold-dim);border:none;border-radius:4px;padding:0.8rem 1.5rem;cursor:pointer;font-family:var(--font-mono);font-size:0.6rem;font-weight:500;text-transform:uppercase;transition:all 0.2s;color:var(--bg-primary);}
+        .modal-btn:hover{background:var(--accent-gold);}
+        .modal-actions{display:flex;gap:0.5rem;justify-content:center;margin-top:0.8rem;flex-wrap:wrap;}
+        .modal-btn-secondary{padding:0.5rem 0.8rem;background:transparent;border:1px solid var(--border-color);border-radius:4px;color:var(--text-muted);font-family:var(--font-mono);font-size:0.5rem;text-decoration:none;cursor:pointer;transition:all 0.2s;}
+        .modal-btn-secondary:hover{border-color:var(--accent-gold);color:var(--accent-gold);}
+        
+        /* Share Modal */
+        .share-input{width:100%;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:4px;padding:0.8rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.6rem;text-align:center;margin-bottom:0.8rem;}
+        
+        /* Responsive */
+        @media(max-width:600px){
+            html{font-size:16px}
+            .game-container{padding:0.5rem;padding-top:3rem;}
+            .suspect-tabs{flex-wrap:nowrap;}
+            .suspect-tab{min-width:90px;padding:0.4rem;}
+            .suspect-header{flex-direction:column;align-items:center;text-align:center;}
+            .status-bar{flex-wrap:wrap;}
+            .action-bar{gap:0.3rem;}
+            .action-btn{padding:0.5rem;font-size:0.45rem;}
+            .rules-box{padding:0.8rem;}
+            .category-grid{grid-template-columns:1fr;}
+        }
+    </style>
 </head>
 <body>
     <div class="bg-fallback"></div>
     <div class="bg-image bg-landscape"></div>
     <div class="bg-image bg-portrait"></div>
 
-```
-<div class="lang-switcher">
-    <button class="lang-btn active" data-lang="ua">UA</button>
-    <button class="lang-btn" data-lang="en">EN</button>
-</div>
-
-<div class="top-controls-left">
-    <button class="icon-btn" id="mute-btn" title="Sound">🔊</button>
-    <button class="icon-btn" id="export-btn" title="Export" style="display:none;">💾</button>
-    <button class="icon-btn" id="back-btn" title="Back" style="display:none;">←</button>
-</div>
-
-<div class="start-screen" id="start-screen">
-    <div class="start-content">
-        <h1 class="start-title" data-i18n="title">Слідчий</h1>
-        <p class="start-tagline" data-i18n="tagline">AI-Generated Detective Stories</p>
-        <div class="category-grid">
-            <div class="cat-card" data-category="war">
-                <div class="cat-icon">⚔️</div>
-                <div class="cat-title" data-i18n="catWar">Війна</div>
-                <div class="cat-desc" data-i18n="catWarDesc">Україна. Шпигуни та зрадники.</div>
-            </div>
-            <div class="cat-card" data-category="history">
-                <div class="cat-icon">📜</div>
-                <div class="cat-title" data-i18n="catHistory">Історія</div>
-                <div class="cat-desc" data-i18n="catHistoryDesc">Козаки, підпілля, революція.</div>
-            </div>
-            <div class="cat-card" data-category="hollywood">
-                <div class="cat-icon">🎬</div>
-                <div class="cat-title" data-i18n="catHollywood">Голлівуд</div>
-                <div class="cat-desc" data-i18n="catHollywoodDesc">90-ті. Зірки та вбивства.</div>
-            </div>
-        </div>
-        <div class="donate-notice">
-            <p data-i18n="donateText">Гра використовує платні API. Якщо вам сподобалось — підтримайте проєкт 💛</p>
-            <a href="https://www.paypal.com/donate/?hosted_button_id=TXNCFR9CLWNDU" target="_blank" class="donate-btn" data-i18n="donateBtn">☕ Підтримати</a>
-        </div>
+    <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="ua">UA</button>
+        <button class="lang-btn" data-lang="en">EN</button>
     </div>
-</div>
 
-<div class="loading-screen" id="loading-screen">
-    <div class="loader"></div>
-    <div class="loading-text" data-i18n="generating">Генерую справу...<br>(15-20 секунд)</div>
-</div>
+    <div class="top-controls-left">
+        <button class="icon-btn" id="mute-btn" title="Sound">🔊</button>
+        <button class="icon-btn" id="export-btn" title="Export" style="display:none;">💾</button>
+        <button class="icon-btn" id="back-btn" title="Back" style="display:none;">←</button>
+    </div>
 
-<div class="game-screen" id="game-screen">
-    <div class="game-container">
-        <header class="game-header">
-            <div class="suspect-image-container">
-                <img id="suspect-img" class="suspect-image" src="" alt="Suspect">
-                <div class="loader-mini" id="suspect-loader-mini"></div>
+    <!-- START SCREEN -->
+    <div class="start-screen" id="start-screen">
+        <div class="start-content">
+            <h1 class="start-title" data-i18n="title">Слідчий</h1>
+            <p class="start-tagline" data-i18n="tagline">AI-Generated Detective Stories</p>
+            
+            <div class="rules-box">
+                <div class="rules-title">📋 <span data-i18n="rulesTitle">Правила гри</span></div>
+                <ul class="rules-list">
+                    <li data-i18n="rule1"><strong>3 підозрюваних</strong> — допитуй кожного, шукай суперечності</li>
+                    <li data-i18n="rule2"><strong>15 питань</strong> — розподіляй між підозрюваними як хочеш</li>
+                    <li data-i18n="rule3"><strong>Хто винен?</strong> — може бути один, двоє, всі або ніхто</li>
+                    <li data-i18n="rule4"><strong>Слідкуй за тиском</strong> — нервові підозрювані видають себе</li>
+                    <li data-i18n="rule5"><strong>Винось вердикт</strong> — обирай винних та дізнавайся правду</li>
+                </ul>
             </div>
-            <div class="game-header-text">
-                <h1 class="game-title" id="game-title">Case #???</h1>
-                <p class="game-subtitle" id="game-suspect-name">...</p>
-            </div>
-        </header>
-        
-        <div class="status-bar">
-            <div class="status-item">
-                <span class="status-label" data-i18n="energy">Енергія</span>
-                <div class="status-value">
-                    <span class="energy-display" id="energy-current">15</span>
-                    <span style="font-size:0.6rem;color:var(--text-muted);">/ 15</span>
+            
+            <div class="category-grid">
+                <div class="cat-card" data-category="war">
+                    <div class="cat-icon">⚔️</div>
+                    <div class="cat-title" data-i18n="catWar">Війна</div>
+                    <div class="cat-desc" data-i18n="catWarDesc">Україна 2022-2024. Шпигуни, зрадники.</div>
+                </div>
+                <div class="cat-card" data-category="history">
+                    <div class="cat-icon">📜</div>
+                    <div class="cat-title" data-i18n="catHistory">Історія</div>
+                    <div class="cat-desc" data-i18n="catHistoryDesc">Козаки, УПА, революція.</div>
+                </div>
+                <div class="cat-card" data-category="hollywood">
+                    <div class="cat-icon">🎬</div>
+                    <div class="cat-title" data-i18n="catHollywood">Голлівуд</div>
+                    <div class="cat-desc" data-i18n="catHollywoodDesc">90-ті. Зірки, скандали, вбивства.</div>
                 </div>
             </div>
-            <div class="status-item">
-                <span class="status-label" data-i18n="pressure">Тиск</span>
+            
+            <div class="donate-notice">
+                <p data-i18n="donateText">Гра використовує платні AI API. Якщо сподобалось — підтримай 💛</p>
+                <a href="https://www.paypal.com/donate/?hosted_button_id=TXNCFR9CLWNDU" target="_blank" class="donate-btn" data-i18n="donateBtn">☕ Підтримати</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loader"></div>
+        <div class="loading-text" data-i18n="generating">Генерую справу з 3 підозрюваними...<br>(20-30 секунд)</div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div class="game-screen" id="game-screen">
+        <div class="game-container">
+            <header class="game-header">
+                <h1 class="game-title" id="game-title">Case #???</h1>
+                <div class="game-meta">
+                    <span>🔗 <span id="case-id">???</span></span>
+                    <span id="guilty-hint"></span>
+                </div>
+            </header>
+            
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-label" data-i18n="questions">Питань</span>
+                    <span class="energy-display" id="energy-current">15</span>
+                </div>
                 <div class="suspicion-container">
+                    <span class="status-label" data-i18n="pressure">Тиск</span>
                     <div class="suspicion-bar-bg">
                         <div class="suspicion-bar-fill" id="suspicion-bar"></div>
                     </div>
                     <span class="suspicion-value" id="suspicion-text">0%</span>
                 </div>
             </div>
-        </div>
-        
-        <div class="briefing-container">
+            
             <button class="briefing-toggle" id="briefing-toggle">
                 <span data-i18n="files">📁 Матеріали справи</span>
-                <span class="briefing-toggle-icon">▼</span>
+                <span>▼</span>
             </button>
             <div class="briefing-content" id="briefing-content">
                 <div class="briefing-section">
@@ -294,49 +310,80 @@
                     <h3 class="briefing-section-title" data-i18n="facts">Відомі факти</h3>
                     <ul class="evidence-list" id="case-evidence"></ul>
                 </div>
-                <div class="briefing-section">
-                    <h3 class="briefing-section-title" data-i18n="suspect">Підозрюваний</h3>
-                    <p class="briefing-text" id="suspect-info"></p>
+            </div>
+            
+            <!-- Suspect Tabs -->
+            <div class="suspect-tabs" id="suspect-tabs"></div>
+            
+            <!-- Suspect Panels -->
+            <div id="suspect-panels"></div>
+            
+            <!-- Chat (shared, but context per suspect) -->
+            <div class="chat-container">
+                <div class="chat-log" id="chat-log"></div>
+                <div class="input-container">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="..." maxlength="500">
+                    <button class="send-btn" id="send-btn" data-i18n="send">Надіслати</button>
                 </div>
             </div>
-        </div>
-        
-        <div class="chat-container">
-            <div class="chat-log" id="chat-log"></div>
-            <div class="input-container">
-                <input type="text" class="chat-input" id="chat-input" placeholder="Задайте питання..." maxlength="500">
-                <button class="send-btn" id="send-btn" data-i18n="send">Надіслати</button>
+            
+            <div class="action-bar">
+                <button class="action-btn action-btn--accuse" id="accuse-btn" data-i18n="verdict">⚖️ Вердикт</button>
+                <button class="action-btn action-btn--share" id="share-btn" data-i18n="share">📤 Поділитись</button>
+                <button class="action-btn" id="restart-btn" data-i18n="restart">↺ Спочатку</button>
+                <button class="action-btn" id="reveal-btn" data-i18n="reveal">🔓 Розкрити</button>
             </div>
         </div>
-        
-        <div class="action-bar">
-            <button class="action-btn action-btn--accuse" id="accuse-btn" data-i18n="verdict">⚖️ Вердикт</button>
-            <button class="action-btn" id="restart-btn" data-i18n="restart">↺ Спочатку</button>
-            <button class="action-btn action-btn--reveal" id="reveal-btn" data-i18n="reveal">🔓 Розкрити</button>
+    </div>
+    
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content" id="modal-content">
+            <div class="modal-icon" id="modal-icon">🔍</div>
+            <h2 class="modal-title" id="modal-title">Case Closed</h2>
+            <p class="modal-text" id="modal-text"></p>
+            <div class="modal-reveal">
+                <h4 class="modal-reveal-title" data-i18n="truth">Правда</h4>
+                <p class="modal-reveal-text" id="modal-reveal-text"></p>
+            </div>
+            <button class="modal-btn" id="modal-btn" data-i18n="back">В меню</button>
+            <div class="modal-actions">
+                <button class="modal-btn-secondary" id="modal-save-btn">💾 <span data-i18n="saveCase">Зберегти</span></button>
+                <a href="https://forms.gle/xtrEqNsFb8wx7uyq5" target="_blank" class="modal-btn-secondary" data-i18n="feedback">💬 Відгук</a>
+            </div>
         </div>
     </div>
-</div>
-
-<div class="modal-overlay" id="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-icon" id="modal-icon">🔍</div>
-        <h2 class="modal-title" id="modal-title">Case Closed</h2>
-        <p class="modal-text" id="modal-text"></p>
-        <div class="modal-reveal">
-            <h4 class="modal-reveal-title" data-i18n="truth">Правда</h4>
-            <p class="modal-reveal-text" id="modal-reveal-text"></p>
-        </div>
-        <button class="modal-btn" id="modal-btn" data-i18n="back">В меню</button>
-        <div class="modal-actions">
-            <button class="modal-btn-secondary" id="modal-save-btn">💾 <span data-i18n="saveCase">Зберегти допит</span></button>
-            <a href="https://forms.gle/xtrEqNsFb8wx7uyq5" target="_blank" class="modal-btn-secondary" data-i18n="feedback">💬 Відгук</a>
+    
+    <!-- SHARE MODAL -->
+    <div class="modal-overlay" id="share-modal">
+        <div class="modal-content">
+            <div class="modal-icon">📤</div>
+            <h2 class="modal-title" data-i18n="shareTitle">Поділитись справою</h2>
+            <p class="modal-text" data-i18n="shareText">Надішли це посилання другу — він отримає ту саму справу!</p>
+            <input type="text" class="share-input" id="share-url" readonly>
+            <button class="modal-btn" id="copy-share-btn" data-i18n="copyLink">📋 Копіювати</button>
+            <div class="modal-actions">
+                <button class="modal-btn-secondary" id="close-share-btn" data-i18n="close">Закрити</button>
+            </div>
         </div>
     </div>
-</div>
-
-<audio id="audio-typewriter" src="p_machine.mp3" preload="auto"></audio>
-<audio id="audio-background" src="background.mp3" preload="auto" loop></audio>
-```
+    
+    <!-- VERDICT MODAL -->
+    <div class="modal-overlay" id="verdict-modal">
+        <div class="modal-content">
+            <div class="modal-icon">⚖️</div>
+            <h2 class="modal-title" data-i18n="verdictTitle">Винесіть вердикт</h2>
+            <p class="modal-text" data-i18n="verdictText">Хто винен? Оберіть підозрюваних:</p>
+            <div id="verdict-checkboxes" style="text-align:left;margin-bottom:1rem;"></div>
+            <button class="modal-btn" id="submit-verdict-btn" data-i18n="submitVerdict">Підтвердити вердикт</button>
+            <div class="modal-actions">
+                <button class="modal-btn-secondary" id="cancel-verdict-btn" data-i18n="cancel">Скасувати</button>
+            </div>
+        </div>
+    </div>
+    
+    <audio id="audio-typewriter" src="p_machine.mp3" preload="auto"></audio>
+    <audio id="audio-background" src="background.mp3" preload="auto" loop></audio>
 
 <script>
 (function(){
@@ -344,131 +391,140 @@
 
 const API_ENDPOINT = 'https://interrogator-api.sashko1391.workers.dev';
 let currentCaseData = null;
+let currentSuspectIndex = 0;
 let isMuted = localStorage.getItem('interrogator-muted') === 'true';
 let audioStarted = false;
-let lastVisualState = 'neutral';
 let currentLang = localStorage.getItem('interrogator-lang') || 'ua';
 
-// ═══════════════════════════════════════════════════════════════════════
-// LOCALIZATION
-// ═══════════════════════════════════════════════════════════════════════
+// Per-suspect state
+let suspectStates = [];
+
 const i18n = {
     ua: {
         title: "Слідчий",
         tagline: "AI-Generated Detective Stories",
+        rulesTitle: "Правила гри",
+        rule1: "<strong>3 підозрюваних</strong> — допитуй кожного, шукай суперечності",
+        rule2: "<strong>15 питань</strong> — розподіляй між підозрюваними як хочеш",
+        rule3: "<strong>Хто винен?</strong> — може бути один, двоє, всі або ніхто",
+        rule4: "<strong>Слідкуй за тиском</strong> — нервові підозрювані видають себе",
+        rule5: "<strong>Винось вердикт</strong> — обирай винних та дізнавайся правду",
         catWar: "Війна",
-        catWarDesc: "Україна. Шпигуни та зрадники.",
-        catHistory: "Історія", 
-        catHistoryDesc: "Козаки, підпілля, революція.",
+        catWarDesc: "Україна 2022-2024. Шпигуни, зрадники.",
+        catHistory: "Історія",
+        catHistoryDesc: "Козаки, УПА, революція.",
         catHollywood: "Голлівуд",
-        catHollywoodDesc: "90-ті. Зірки та вбивства.",
-        generating: "Генерую справу...<br>(15-20 секунд)",
-        energy: "Енергія",
+        catHollywoodDesc: "90-ті. Зірки, скандали, вбивства.",
+        donateText: "Гра використовує платні AI API. Якщо сподобалось — підтримай 💛",
+        donateBtn: "☕ Підтримати",
+        generating: "Генерую справу з 3 підозрюваними...<br>(20-30 секунд)",
+        questions: "Питань",
         pressure: "Тиск",
         files: "📁 Матеріали справи",
         context: "Обставини",
         facts: "Відомі факти",
-        suspect: "Підозрюваний",
         send: "Надіслати",
-        hint: "Підказка",
-        coffee: "Кава",
         verdict: "⚖️ Вердикт",
+        share: "📤 Поділитись",
         restart: "↺ Спочатку",
-        reveal: "🔓 Розкрити відповідь",
+        reveal: "🔓 Розкрити",
         truth: "Правда",
         back: "В меню",
-        feedback: "💬 Залишити відгук",
+        saveCase: "Зберегти",
+        feedback: "💬 Відгук",
         prompt: "Задайте питання...",
         winTitle: "Справу розкрито!",
         loseTitle: "Провал...",
-        startMsg: "🎬 Допит розпочато.",
+        startMsg: "🎬 Оберіть підозрюваного для допиту.",
         detective: "Детектив",
-        suspectLabel: "Підозрюваний",
-        hint1: "💡 Зверни увагу на невідповідності в часі та місці.",
-        hint2: "💡 Запитай про стосунки та мотиви.",
-        hint3: "💡 Вкажи на суперечності, які знайшов.",
-        coffeeMsg: "☕ +5 енергії. Кава допомагає думати.",
-        revealConfirm: "⚠️ УВАГА!\n\nРозкриття відповіді закінчить гру.\nВи зможете почати нову справу.\n\nВведіть ТАК для підтвердження:",
+        shareTitle: "Поділитись справою",
+        shareText: "Надішли це посилання другу — він отримає ту саму справу!",
+        copyLink: "📋 Копіювати",
+        close: "Закрити",
+        verdictTitle: "Винесіть вердикт",
+        verdictText: "Хто винен? Оберіть підозрюваних:",
+        submitVerdict: "Підтвердити вердикт",
+        cancel: "Скасувати",
+        copied: "Скопійовано!",
+        revealConfirm: "⚠️ Розкрити відповідь?\n\nЦе закінчить гру.\nВведіть ТАК:",
         revealWord: "ТАК",
-        verdictConfirm: "Ви впевнені у своєму вердикті?",
-        noHints: "Підказки закінчились!",
-        noCoffee: "Кава закінчилась!",
-        energyFull: "Енергія вже повна!",
-        donateText: "Гра використовує платні API. Якщо вам сподобалось — підтримайте проєкт 💛",
-        donateBtn: "☕ Підтримати",
-        saveCase: "Зберегти допит",
+        guiltyOne: "👤 Винен один",
+        guiltyTwo: "👥 Винні двоє",
+        guiltyAll: "👥👤 Винні всі",
+        guiltyNone: "❌ Ніхто не винен",
+        correct: "Правильно!",
+        incorrect: "Неправильно.",
         exportTitle: "ПРОТОКОЛ ДОПИТУ"
     },
     en: {
         title: "The Interrogator",
         tagline: "AI-Generated Detective Stories",
+        rulesTitle: "Game Rules",
+        rule1: "<strong>3 suspects</strong> — interrogate each, find contradictions",
+        rule2: "<strong>15 questions</strong> — distribute between suspects as you wish",
+        rule3: "<strong>Who's guilty?</strong> — can be one, two, all or nobody",
+        rule4: "<strong>Watch the pressure</strong> — nervous suspects give themselves away",
+        rule5: "<strong>Make your verdict</strong> — choose the guilty and discover the truth",
         catWar: "War Zone",
-        catWarDesc: "Ukraine. Spies and traitors.",
+        catWarDesc: "Ukraine 2022-2024. Spies, traitors.",
         catHistory: "History",
-        catHistoryDesc: "Cossacks, rebels, revolution.",
+        catHistoryDesc: "Cossacks, UPA, revolution.",
         catHollywood: "Hollywood",
-        catHollywoodDesc: "90s. Stars and murders.",
-        generating: "Generating case...<br>(15-20 seconds)",
-        energy: "Energy",
+        catHollywoodDesc: "90s. Stars, scandals, murders.",
+        donateText: "This game uses paid AI APIs. If you enjoyed it — support us 💛",
+        donateBtn: "☕ Support",
+        generating: "Generating case with 3 suspects...<br>(20-30 seconds)",
+        questions: "Questions",
         pressure: "Pressure",
         files: "📁 Case Files",
         context: "Context",
         facts: "Known Facts",
-        suspect: "Suspect",
         send: "Send",
-        hint: "Hint",
-        coffee: "Coffee",
         verdict: "⚖️ Verdict",
+        share: "📤 Share",
         restart: "↺ Restart",
-        reveal: "🔓 Reveal Answer",
+        reveal: "🔓 Reveal",
         truth: "The Truth",
         back: "Menu",
-        feedback: "💬 Leave Feedback",
+        saveCase: "Save",
+        feedback: "💬 Feedback",
         prompt: "Ask a question...",
-        winTitle: "Case Closed!",
+        winTitle: "Case Solved!",
         loseTitle: "Failed...",
-        startMsg: "🎬 Interrogation started.",
+        startMsg: "🎬 Select a suspect to interrogate.",
         detective: "Detective",
-        suspectLabel: "Suspect",
-        hint1: "💡 Look for inconsistencies in time and place.",
-        hint2: "💡 Ask about relationships and motives.",
-        hint3: "💡 Point out contradictions you found.",
-        coffeeMsg: "☕ +5 energy. Coffee helps you think.",
-        revealConfirm: "⚠️ WARNING!\n\nRevealing the answer will end the game.\nYou can start a new case.\n\nType YES to confirm:",
+        shareTitle: "Share Case",
+        shareText: "Send this link to a friend — they'll get the same case!",
+        copyLink: "📋 Copy",
+        close: "Close",
+        verdictTitle: "Make Your Verdict",
+        verdictText: "Who's guilty? Select the suspects:",
+        submitVerdict: "Submit Verdict",
+        cancel: "Cancel",
+        copied: "Copied!",
+        revealConfirm: "⚠️ Reveal the answer?\n\nThis will end the game.\nType YES:",
         revealWord: "YES",
-        verdictConfirm: "Are you sure about your verdict?",
-        noHints: "No hints left!",
-        noCoffee: "No coffee left!",
-        energyFull: "Energy is already full!",
-        donateText: "This game uses paid APIs. If you enjoyed it — please support the project 💛",
-        donateBtn: "☕ Support",
-        saveCase: "Save transcript",
+        guiltyOne: "👤 One guilty",
+        guiltyTwo: "👥 Two guilty",
+        guiltyAll: "👥👤 All guilty",
+        guiltyNone: "❌ Nobody guilty",
+        correct: "Correct!",
+        incorrect: "Incorrect.",
         exportTitle: "INTERROGATION TRANSCRIPT"
     }
 };
 
-// ═══════════════════════════════════════════════════════════════════════
-// GAME STATE
-// ═══════════════════════════════════════════════════════════════════════
 const GameState = {
     energy: 15,
     maxEnergy: 15,
-    suspicion: 0,
-    conversationHistory: [],
     gameOver: false,
     
     reset() {
         this.energy = 15;
-        this.suspicion = 0;
-        this.conversationHistory = [];
         this.gameOver = false;
-        lastVisualState = 'neutral';
     }
 };
 
-// ═══════════════════════════════════════════════════════════════════════
-// DOM ELEMENTS
-// ═══════════════════════════════════════════════════════════════════════
 const DOM = {
     startScreen: document.getElementById('start-screen'),
     loadingScreen: document.getElementById('loading-screen'),
@@ -483,43 +539,46 @@ const DOM = {
     briefingContent: document.getElementById('briefing-content'),
     caseDescription: document.getElementById('case-description'),
     caseEvidence: document.getElementById('case-evidence'),
-    suspectInfo: document.getElementById('suspect-info'),
     gameTitle: document.getElementById('game-title'),
-    gameSuspectName: document.getElementById('game-suspect-name'),
-    suspectImg: document.getElementById('suspect-img'),
-    suspectLoaderMini: document.getElementById('suspect-loader-mini'),
+    caseId: document.getElementById('case-id'),
+    guiltyHint: document.getElementById('guilty-hint'),
+    suspectTabs: document.getElementById('suspect-tabs'),
+    suspectPanels: document.getElementById('suspect-panels'),
     modalOverlay: document.getElementById('modal-overlay'),
+    modalContent: document.getElementById('modal-content'),
     modalTitle: document.getElementById('modal-title'),
     modalText: document.getElementById('modal-text'),
     modalRevealText: document.getElementById('modal-reveal-text'),
     modalIcon: document.getElementById('modal-icon'),
+    shareModal: document.getElementById('share-modal'),
+    shareUrl: document.getElementById('share-url'),
+    verdictModal: document.getElementById('verdict-modal'),
+    verdictCheckboxes: document.getElementById('verdict-checkboxes'),
     catCards: document.querySelectorAll('.cat-card'),
     backBtn: document.getElementById('back-btn'),
+    exportBtn: document.getElementById('export-btn'),
     modalBtn: document.getElementById('modal-btn'),
     modalSaveBtn: document.getElementById('modal-save-btn'),
     revealBtn: document.getElementById('reveal-btn'),
     accuseBtn: document.getElementById('accuse-btn'),
     restartBtn: document.getElementById('restart-btn'),
-    exportBtn: document.getElementById('export-btn'),
+    shareBtn: document.getElementById('share-btn'),
+    copyShareBtn: document.getElementById('copy-share-btn'),
+    closeShareBtn: document.getElementById('close-share-btn'),
+    submitVerdictBtn: document.getElementById('submit-verdict-btn'),
+    cancelVerdictBtn: document.getElementById('cancel-verdict-btn'),
     muteBtn: document.getElementById('mute-btn'),
     audioBg: document.getElementById('audio-background'),
     audioType: document.getElementById('audio-typewriter'),
     langBtns: document.querySelectorAll('.lang-btn')
 };
 
-// ═══════════════════════════════════════════════════════════════════════
-// UTILITY FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════════
-function t(key) {
-    return i18n[currentLang][key] || i18n['en'][key] || key;
-}
+function t(key) { return i18n[currentLang][key] || i18n['en'][key] || key; }
 
 function updateTexts() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (i18n[currentLang][key]) {
-            el.innerHTML = i18n[currentLang][key];
-        }
+        if (i18n[currentLang][key]) el.innerHTML = i18n[currentLang][key];
     });
     DOM.chatInput.placeholder = t('prompt');
 }
@@ -527,10 +586,13 @@ function updateTexts() {
 function setLanguage(lang) {
     currentLang = lang;
     localStorage.setItem('interrogator-lang', lang);
-    DOM.langBtns.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === lang);
-    });
+    DOM.langBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
     updateTexts();
+}
+
+function updateMuteButton() {
+    DOM.muteBtn.textContent = isMuted ? '🔇' : '🔊';
+    localStorage.setItem('interrogator-muted', isMuted);
 }
 
 function startAudio() {
@@ -541,44 +603,112 @@ function startAudio() {
     }
 }
 
-function updateMuteButton() {
-    DOM.muteBtn.textContent = isMuted ? '🔇' : '🔊';
-    localStorage.setItem('interrogator-muted', isMuted);
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// UI UPDATE FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════════
 function updateUI() {
     DOM.energyCurrent.textContent = GameState.energy;
     DOM.energyCurrent.style.color = GameState.energy <= 3 ? 'var(--accent-red-bright)' : 'var(--accent-gold)';
-    DOM.suspicionBar.style.width = GameState.suspicion + '%';
-    DOM.suspicionText.textContent = GameState.suspicion + '%';
     
-    // Disable buttons when game over
-    DOM.sendBtn.disabled = GameState.gameOver;
-    DOM.chatInput.disabled = GameState.gameOver;
+    // Calculate average suspicion
+    const avgSuspicion = suspectStates.length > 0 
+        ? Math.round(suspectStates.reduce((sum, s) => sum + s.suspicion, 0) / suspectStates.length)
+        : 0;
+    DOM.suspicionBar.style.width = avgSuspicion + '%';
+    DOM.suspicionText.textContent = avgSuspicion + '%';
+    
+    DOM.sendBtn.disabled = GameState.gameOver || GameState.energy <= 0;
+    DOM.chatInput.disabled = GameState.gameOver || GameState.energy <= 0;
     DOM.accuseBtn.disabled = GameState.gameOver;
 }
 
-function disableAllInputs(disabled) {
-    DOM.sendBtn.disabled = disabled;
-    DOM.chatInput.disabled = disabled;
-    DOM.accuseBtn.disabled = disabled;
-    DOM.revealBtn.disabled = disabled;
+function getEmotionalState(suspicion) {
+    if (suspicion >= 70) return 'breaking';
+    if (suspicion >= 40) return 'nervous';
+    return 'neutral';
+}
+
+function updateSuspectTabs() {
+    suspectStates.forEach((state, i) => {
+        const tab = document.querySelector(`.suspect-tab[data-index="${i}"]`);
+        if (tab) {
+            const statusDot = tab.querySelector('.suspect-tab-status');
+            statusDot.className = 'suspect-tab-status ' + getEmotionalState(state.suspicion);
+        }
+    });
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// MESSAGE FUNCTIONS
+// SUSPECT IMAGE GENERATION
 // ═══════════════════════════════════════════════════════════════════════
-function addMsg(text, type) {
+async function generateSuspectImage(suspectIndex) {
+    const suspect = currentCaseData.suspects[suspectIndex];
+    const state = suspectStates[suspectIndex];
+    if (!suspect?.visualPrompt) return;
+    
+    const emotionalState = getEmotionalState(state.suspicion);
+    if (emotionalState === state.lastImageState && state.imageUrl) return;
+    
+    state.lastImageState = emotionalState;
+    
+    // Show loader
+    const panel = document.querySelector(`.suspect-panel[data-index="${suspectIndex}"]`);
+    const tabImg = document.querySelector(`.suspect-tab[data-index="${suspectIndex}"] .suspect-tab-img`);
+    if (panel) {
+        panel.querySelector('.loader-mini').style.display = 'block';
+        panel.querySelector('.suspect-image').style.display = 'none';
+    }
+    
+    let prompt = suspect.visualPrompt;
+    if (emotionalState === 'nervous') prompt += ", nervous, sweating, anxious eyes, tense";
+    if (emotionalState === 'breaking') prompt += ", crying, looking down, defeated, despair, broken";
+    
+    try {
+        const response = await fetch(API_ENDPOINT + '/image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+        
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        
+        if (data.imageUrl) {
+            state.imageUrl = data.imageUrl;
+            
+            const img = new Image();
+            img.onload = () => {
+                if (panel) {
+                    panel.querySelector('.suspect-image').src = data.imageUrl;
+                    panel.querySelector('.suspect-image').style.display = 'block';
+                    panel.querySelector('.loader-mini').style.display = 'none';
+                }
+                if (tabImg) {
+                    const tabImgEl = tabImg.querySelector('img');
+                    if (tabImgEl) {
+                        tabImgEl.src = data.imageUrl;
+                        tabImgEl.style.display = 'block';
+                    }
+                    const tabLoader = tabImg.querySelector('.loader-mini');
+                    if (tabLoader) tabLoader.style.display = 'none';
+                }
+            };
+            img.src = data.imageUrl;
+        }
+    } catch (e) {
+        console.error('Image Error:', e);
+        if (panel) panel.querySelector('.loader-mini').style.display = 'none';
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// MESSAGES
+// ═══════════════════════════════════════════════════════════════════════
+function addMsg(text, type, suspectName = null) {
     const div = document.createElement('div');
     div.className = `message message-${type}`;
     
     if (type === 'player') {
         div.innerHTML = `<div class="message-sender">${t('detective')}</div><div class="message-text">${text}</div>`;
     } else if (type === 'npc') {
-        div.innerHTML = `<div class="message-sender">${currentCaseData?.suspectName || t('suspectLabel')}</div><div class="message-text"></div>`;
+        div.innerHTML = `<div class="message-sender">${suspectName || 'Suspect'}</div><div class="message-text"></div>`;
         DOM.chatLog.appendChild(div);
         DOM.chatLog.scrollTop = DOM.chatLog.scrollHeight;
         typeWriter(div.querySelector('.message-text'), text);
@@ -591,7 +721,7 @@ function addMsg(text, type) {
     DOM.chatLog.scrollTop = DOM.chatLog.scrollHeight;
 }
 
-function typeWriter(element, text, speed = 25) {
+function typeWriter(element, text, speed = 20) {
     let i = 0;
     if (!isMuted) {
         DOM.audioType.volume = 0.2;
@@ -625,40 +755,136 @@ function hideTyping() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// MODAL FUNCTIONS
+// SELECT SUSPECT
 // ═══════════════════════════════════════════════════════════════════════
-function showModal(type, reason = '') {
-    GameState.gameOver = true;
-    disableAllInputs(true);
+function selectSuspect(index) {
+    currentSuspectIndex = index;
     
-    DOM.modalIcon.textContent = type === 'win' ? '✅' : '❌';
-    DOM.modalTitle.textContent = type === 'win' ? t('winTitle') : t('loseTitle');
-    DOM.modalTitle.className = `modal-title modal-title--${type}`;
-    DOM.modalText.textContent = reason;
-    DOM.modalRevealText.textContent = currentCaseData?.truthReveal || '';
-    DOM.modalOverlay.classList.add('visible');
+    // Update tabs
+    document.querySelectorAll('.suspect-tab').forEach((tab, i) => {
+        tab.classList.toggle('active', i === index);
+    });
     
-    if (!isMuted) DOM.audioBg.pause();
+    // Update panels
+    document.querySelectorAll('.suspect-panel').forEach((panel, i) => {
+        panel.classList.toggle('active', i === index);
+    });
+    
+    // Load chat history for this suspect
+    DOM.chatLog.innerHTML = '';
+    const state = suspectStates[index];
+    state.chatHistory.forEach(msg => {
+        if (msg.role === 'user') {
+            addMsg(msg.content, 'player');
+        } else if (msg.role === 'assistant') {
+            // Don't use typewriter for history
+            const div = document.createElement('div');
+            div.className = 'message message-npc';
+            div.innerHTML = `<div class="message-sender">${currentCaseData.suspects[index].name}</div><div class="message-text">${msg.content}</div>`;
+            DOM.chatLog.appendChild(div);
+        }
+    });
+    DOM.chatLog.scrollTop = DOM.chatLog.scrollHeight;
+    
+    // Generate image if needed
+    generateSuspectImage(index);
 }
 
-function hideModal() {
-    DOM.modalOverlay.classList.remove('visible');
+// ═══════════════════════════════════════════════════════════════════════
+// SEND MESSAGE
+// ═══════════════════════════════════════════════════════════════════════
+async function sendMessage() {
+    if (GameState.gameOver || GameState.energy <= 0) return;
+    
+    const text = DOM.chatInput.value.trim();
+    if (!text) return;
+    
+    DOM.chatInput.value = '';
+    GameState.energy--;
+    updateUI();
+    
+    const suspect = currentCaseData.suspects[currentSuspectIndex];
+    const state = suspectStates[currentSuspectIndex];
+    
+    addMsg(text, 'player');
+    state.chatHistory.push({ role: 'user', content: text });
+    
+    DOM.sendBtn.disabled = true;
+    DOM.chatInput.disabled = true;
+    showTyping();
+    
+    const systemPrompt = `${suspect.systemPrompt || ''}
+
+CURRENT STATE:
+- Suspicion/Nervousness Level: ${state.suspicion}%
+- Questions remaining: ${GameState.energy}
+
+CRITICAL: At the end of EVERY response, append this hidden tag with current nervousness (0-100):
+<<<NERVOUSNESS: [number]>>>
+
+The number should increase if the detective asks probing questions about your lies or weak points.`;
+    
+    try {
+        const response = await fetch(API_ENDPOINT + '/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                system: systemPrompt,
+                messages: state.chatHistory
+            })
+        });
+        
+        const data = await response.json();
+        let reply = data.content?.[0]?.text || '*мовчить*';
+        
+        // Extract nervousness
+        const match = reply.match(/<<<NERVOUSNESS:\s*(\d+)>>>/);
+        if (match) {
+            const oldState = getEmotionalState(state.suspicion);
+            state.suspicion = Math.min(100, Math.max(state.suspicion, parseInt(match[1])));
+            reply = reply.replace(match[0], '').trim();
+            
+            const newState = getEmotionalState(state.suspicion);
+            if (newState !== oldState) {
+                generateSuspectImage(currentSuspectIndex);
+            }
+            
+            updateUI();
+            updateSuspectTabs();
+        }
+        
+        state.chatHistory.push({ role: 'assistant', content: reply });
+        hideTyping();
+        addMsg(reply, 'npc', suspect.name);
+        
+    } catch (e) {
+        console.error('Chat Error:', e);
+        hideTyping();
+        addMsg('*мовчить*', 'npc', suspect.name);
+    }
+    
+    DOM.sendBtn.disabled = false;
+    DOM.chatInput.disabled = false;
+    DOM.chatInput.focus();
+    
+    if (GameState.energy <= 0) {
+        setTimeout(() => showResultModal('lose', currentLang === 'ua' ? 'Питання закінчились.' : 'Out of questions.'), 1000);
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// API FUNCTIONS
+// GENERATE CASE
 // ═══════════════════════════════════════════════════════════════════════
 async function generateCase(category) {
     startAudio();
     DOM.startScreen.classList.add('hidden');
-    DOM.backBtn.style.display = 'none';
     DOM.loadingScreen.classList.add('visible');
     
     try {
         const response = await fetch(API_ENDPOINT + '/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ category: category, lang: currentLang })
+            body: JSON.stringify({ category, lang: currentLang })
         });
         
         if (!response.ok) {
@@ -676,52 +902,30 @@ async function generateCase(category) {
     }
 }
 
-async function generateSuspectImage() {
-    if (!currentCaseData?.visualPrompt) return;
-    
-    let newState = 'calm';
-    if (GameState.suspicion > 80) newState = 'broken';
-    else if (GameState.suspicion > 50) newState = 'nervous';
-    
-    if (newState === lastVisualState && DOM.suspectImg.src.includes('http')) return;
-    lastVisualState = newState;
-    
-    DOM.suspectLoaderMini.classList.add('visible');
-    
-    let prompt = currentCaseData.visualPrompt;
-    if (newState === 'nervous') prompt += ", nervous, sweating, anxious eyes";
-    if (newState === 'broken') prompt += ", crying, looking down, defeated, despair";
+async function loadSharedCase(caseId) {
+    startAudio();
+    DOM.startScreen.classList.add('hidden');
+    DOM.loadingScreen.classList.add('visible');
     
     try {
-        const response = await fetch(API_ENDPOINT + '/image', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: prompt })
-        });
+        const response = await fetch(API_ENDPOINT + '/case/' + caseId);
         
-        const data = await response.json();
-        if (data.error) throw new Error(data.error);
-        
-        if (data.imageUrl) {
-            const img = new Image();
-            img.onload = () => {
-                DOM.suspectImg.src = data.imageUrl;
-                DOM.suspectLoaderMini.classList.remove('visible');
-                DOM.suspectImg.style.display = 'block';
-            };
-            img.onerror = () => {
-                DOM.suspectLoaderMini.classList.remove('visible');
-            };
-            img.src = data.imageUrl;
+        if (!response.ok) {
+            throw new Error('Case not found');
         }
+        
+        currentCaseData = await response.json();
+        startGame();
     } catch (e) {
-        console.error('Image Error:', e);
-        DOM.suspectLoaderMini.classList.remove('visible');
+        console.error('Load Error:', e);
+        alert(`Error: ${e.message}`);
+        DOM.loadingScreen.classList.remove('visible');
+        DOM.startScreen.classList.remove('hidden');
     }
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// GAME FUNCTIONS
+// START GAME
 // ═══════════════════════════════════════════════════════════════════════
 function startGame() {
     DOM.loadingScreen.classList.remove('visible');
@@ -730,163 +934,158 @@ function startGame() {
     DOM.exportBtn.style.display = 'flex';
     
     GameState.reset();
-    updateUI();
     
-    // Fill case data
+    // Initialize suspect states
+    suspectStates = currentCaseData.suspects.map(s => ({
+        suspicion: 0,
+        chatHistory: [{ role: 'assistant', content: s.npcGreeting }],
+        lastImageState: null,
+        imageUrl: null
+    }));
+    
+    // Fill case info
     DOM.gameTitle.textContent = currentCaseData.title || 'Case #???';
-    DOM.gameSuspectName.textContent = currentCaseData.suspectName || '???';
+    DOM.caseId.textContent = currentCaseData.caseId || '???';
     DOM.caseDescription.textContent = currentCaseData.crimeDescription || '';
-    DOM.suspectInfo.textContent = currentCaseData.suspectProfile || '';
     DOM.caseEvidence.innerHTML = (currentCaseData.knownFacts || []).map(f => `<li>${f}</li>`).join('');
     
-    // Reset chat
-    DOM.chatLog.innerHTML = '';
+    // Guilty hint
+    const guiltyMap = { one: 'guiltyOne', two: 'guiltyTwo', all: 'guiltyAll', none: 'guiltyNone' };
+    DOM.guiltyHint.textContent = t(guiltyMap[currentCaseData.guiltyPattern] || 'guiltyOne');
     
-    // Reset image
-    DOM.suspectImg.style.display = 'none';
-    DOM.suspectImg.src = '';
-    DOM.suspectLoaderMini.classList.add('visible');
+    // Build suspect tabs and panels
+    DOM.suspectTabs.innerHTML = '';
+    DOM.suspectPanels.innerHTML = '';
     
-    // Start background music
+    currentCaseData.suspects.forEach((suspect, i) => {
+        // Tab
+        const tab = document.createElement('div');
+        tab.className = 'suspect-tab' + (i === 0 ? ' active' : '');
+        tab.dataset.index = i;
+        tab.innerHTML = `
+            <div class="suspect-tab-img">
+                <img src="" alt="${suspect.name}">
+                <div class="loader-mini" style="display:block;"></div>
+            </div>
+            <div class="suspect-tab-info">
+                <div class="suspect-tab-name">${suspect.name}</div>
+                <div class="suspect-tab-role">${suspect.role || ''}</div>
+            </div>
+            <div class="suspect-tab-status neutral"></div>
+        `;
+        tab.addEventListener('click', () => selectSuspect(i));
+        DOM.suspectTabs.appendChild(tab);
+        
+        // Panel
+        const panel = document.createElement('div');
+        panel.className = 'suspect-panel' + (i === 0 ? ' active' : '');
+        panel.dataset.index = i;
+        panel.innerHTML = `
+            <div class="suspect-header">
+                <div class="suspect-image-container">
+                    <img class="suspect-image" src="" alt="${suspect.name}">
+                    <div class="loader-mini" style="display:block;"></div>
+                </div>
+                <div class="suspect-info">
+                    <div class="suspect-name">${suspect.name}</div>
+                    <div class="suspect-role">${suspect.role || ''}</div>
+                    <div class="suspect-profile">${suspect.profile || ''}</div>
+                </div>
+            </div>
+        `;
+        DOM.suspectPanels.appendChild(panel);
+    });
+    
+    updateUI();
+    
+    // Start music
     if (!isMuted) {
         DOM.audioBg.currentTime = 0;
         DOM.audioBg.play().catch(() => {});
     }
     
     // Initial messages
+    DOM.chatLog.innerHTML = '';
     addMsg(t('startMsg'), 'system');
-    generateSuspectImage();
     
-    setTimeout(() => {
-        if (currentCaseData.npcGreeting) {
-            GameState.conversationHistory.push({ role: 'assistant', content: currentCaseData.npcGreeting });
-            addMsg(currentCaseData.npcGreeting, 'npc');
-        }
-    }, 500);
-    
-    // Open briefing by default
-    DOM.briefingToggle.classList.add('active');
-    DOM.briefingContent.classList.add('visible');
+    // Select first suspect
+    selectSuspect(0);
     
     DOM.chatInput.focus();
 }
 
-async function sendMessage() {
-    if (GameState.gameOver || GameState.energy <= 0) return;
+// ═══════════════════════════════════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════════════════════════════════
+function showResultModal(type, reason = '') {
+    GameState.gameOver = true;
     
-    const text = DOM.chatInput.value.trim();
-    if (!text) return;
+    DOM.modalIcon.textContent = type === 'win' ? '✅' : '❌';
+    DOM.modalTitle.textContent = type === 'win' ? t('winTitle') : t('loseTitle');
+    DOM.modalTitle.className = 'modal-title modal-title--' + type;
+    DOM.modalText.textContent = reason;
+    DOM.modalRevealText.textContent = currentCaseData?.truthReveal || '';
+    DOM.modalOverlay.classList.add('visible');
     
-    DOM.chatInput.value = '';
-    GameState.energy--;
-    updateUI();
-    
-    addMsg(text, 'player');
-    GameState.conversationHistory.push({ role: 'user', content: text });
-    
-    disableAllInputs(true);
-    showTyping();
-    
-    const systemPrompt = `${currentCaseData.systemPrompt || ''}
-
-CURRENT STATE:
-- Suspicion Level: ${GameState.suspicion}%
-- Energy Left: ${GameState.energy}
-
-INSTRUCTIONS: 
-- Respond in character as the suspect
-- If caught in a lie or pressed hard, show more nervousness
-- ALWAYS append hidden tag at the end: <<<NERVOUSNESS: [0-100]>>>
-- Keep responses under 150 words`;
-    
-    try {
-        const response = await fetch(API_ENDPOINT + '/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                system: systemPrompt,
-                messages: GameState.conversationHistory
-            })
-        });
-        
-        const data = await response.json();
-        let reply = data.content?.[0]?.text || '*мовчить*';
-        
-        // Extract nervousness
-        const match = reply.match(/<<<NERVOUSNESS:\s*(\d+)>>>/);
-        if (match) {
-            GameState.suspicion = Math.min(100, Math.max(GameState.suspicion, parseInt(match[1])));
-            reply = reply.replace(match[0], '').trim();
-            updateUI();
-            generateSuspectImage();
-        }
-        
-        GameState.conversationHistory.push({ role: 'assistant', content: reply });
-        hideTyping();
-        addMsg(reply, 'npc');
-        
-    } catch (e) {
-        console.error('Chat Error:', e);
-        hideTyping();
-        addMsg('*мовчить*', 'npc');
-    }
-    
-    disableAllInputs(false);
-    updateUI();
-    DOM.chatInput.focus();
-    
-    // Check energy
-    if (GameState.energy <= 0) {
-        setTimeout(() => showModal('lose', currentLang === 'ua' ? 'Енергія вичерпана.' : 'Energy exhausted.'), 1000);
-    }
+    if (!isMuted) DOM.audioBg.pause();
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// ACTION HANDLERS
-// ═══════════════════════════════════════════════════════════════════════
-async function handleAccuse() {
+function hideModal() {
+    DOM.modalOverlay.classList.remove('visible');
+}
+
+function showShareModal() {
+    const url = window.location.origin + window.location.pathname + '?case=' + (currentCaseData?.caseId || '');
+    DOM.shareUrl.value = url;
+    DOM.shareModal.classList.add('visible');
+}
+
+function hideShareModal() {
+    DOM.shareModal.classList.remove('visible');
+}
+
+function showVerdictModal() {
     if (GameState.gameOver) return;
     
-    const confirmed = confirm(t('verdictConfirm'));
-    if (!confirmed) return;
+    DOM.verdictCheckboxes.innerHTML = '';
+    currentCaseData.suspects.forEach((suspect, i) => {
+        const div = document.createElement('div');
+        div.style.cssText = 'margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem;';
+        div.innerHTML = `
+            <input type="checkbox" id="verdict-${i}" value="${i}" style="width:18px;height:18px;">
+            <label for="verdict-${i}" style="font-size:0.7rem;color:var(--text-secondary);cursor:pointer;">
+                ${suspect.name} <span style="color:var(--text-muted);">(${suspect.role})</span>
+            </label>
+        `;
+        DOM.verdictCheckboxes.appendChild(div);
+    });
     
-    addMsg('⏳ Аналізую...', 'system');
-    disableAllInputs(true);
-    
-    const log = GameState.conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n');
-    const judgePrompt = `Case: ${currentCaseData.title}
-Truth: ${currentCaseData.truthReveal}
+    DOM.verdictModal.classList.add('visible');
+}
 
-Analyze the interrogation log below. Did the user uncover the truth or break the suspect?
-Reply JSON ONLY: { "verdict": "WIN" or "LOSE", "reason": "Short reason in ${currentLang === 'ua' ? 'Ukrainian' : 'English'}" }
+function hideVerdictModal() {
+    DOM.verdictModal.classList.remove('visible');
+}
 
-LOG:
-${log}`;
+function submitVerdict() {
+    const checked = Array.from(DOM.verdictCheckboxes.querySelectorAll('input:checked')).map(cb => parseInt(cb.value));
     
-    try {
-        const response = await fetch(API_ENDPOINT + '/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                system: "You are a Senior Detective Judge. Analyze interrogations.",
-                messages: [{ role: 'user', content: judgePrompt }]
-            })
-        });
-        
-        const data = await response.json();
-        const text = data.content?.[0]?.text || '{}';
-        const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        const result = JSON.parse(cleanJson);
-        
-        showModal(result.verdict?.toLowerCase() || 'lose', result.reason || '');
-    } catch (e) {
-        console.error('Judge Error:', e);
-        // Fallback based on suspicion
-        if (GameState.suspicion >= 60) {
-            showModal('win', currentLang === 'ua' ? 'Підозрюваний зламався під тиском.' : 'Suspect broke under pressure.');
-        } else {
-            showModal('lose', currentLang === 'ua' ? 'Недостатньо доказів.' : 'Insufficient evidence.');
-        }
+    // Get actual guilty suspects
+    const actualGuilty = currentCaseData.suspects
+        .map((s, i) => s.isGuilty ? i : -1)
+        .filter(i => i >= 0);
+    
+    // Compare
+    const isCorrect = checked.length === actualGuilty.length && 
+        checked.every(i => actualGuilty.includes(i));
+    
+    hideVerdictModal();
+    
+    if (isCorrect) {
+        showResultModal('win', t('correct'));
+    } else {
+        const guiltyNames = actualGuilty.map(i => currentCaseData.suspects[i].name).join(', ');
+        showResultModal('lose', t('incorrect') + ' ' + (currentLang === 'ua' ? 'Винні: ' : 'Guilty: ') + (guiltyNames || (currentLang === 'ua' ? 'Ніхто' : 'Nobody')));
     }
 }
 
@@ -896,103 +1095,16 @@ function revealAnswer() {
     const input = prompt(t('revealConfirm'));
     if (input && input.toUpperCase() === t('revealWord')) {
         GameState.gameOver = true;
-        disableAllInputs(true);
-        addMsg('🔓 ' + t('truth') + ': ' + (currentCaseData?.truthReveal || '???'), 'system');
+        const guiltyNames = currentCaseData.suspects
+            .filter(s => s.isGuilty)
+            .map(s => s.name)
+            .join(', ') || (currentLang === 'ua' ? 'Ніхто' : 'Nobody');
+        
+        addMsg('🔓 ' + (currentLang === 'ua' ? 'Винні: ' : 'Guilty: ') + guiltyNames, 'system');
+        addMsg('📜 ' + currentCaseData.truthReveal, 'system');
+        
         if (!isMuted) DOM.audioBg.pause();
     }
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// EXPORT FUNCTION
-// ═══════════════════════════════════════════════════════════════════════
-function exportTranscript() {
-    if (!currentCaseData) return;
-    
-    const now = new Date();
-    const dateStr = now.toLocaleDateString(currentLang === 'ua' ? 'uk-UA' : 'en-US');
-    const timeStr = now.toLocaleTimeString(currentLang === 'ua' ? 'uk-UA' : 'en-US', { hour: '2-digit', minute: '2-digit' });
-    
-    let content = `
-╔══════════════════════════════════════════════════════════════╗
-║  ${t('exportTitle')}
-║  ${dateStr} ${timeStr}
-╚══════════════════════════════════════════════════════════════╝
-
-═══════════════════════════════════════════════════════════════
-${currentLang === 'ua' ? 'СПРАВА' : 'CASE'}: ${currentCaseData.title || '???'}
-${currentLang === 'ua' ? 'ПІДОЗРЮВАНИЙ' : 'SUSPECT'}: ${currentCaseData.suspectName || '???'}
-═══════════════════════════════════════════════════════════════
-
-${currentLang === 'ua' ? '【 ОБСТАВИНИ 】' : '【 CONTEXT 】'}
-${currentCaseData.crimeDescription || ''}
-
-${currentLang === 'ua' ? '【 ВІДОМІ ФАКТИ 】' : '【 KNOWN FACTS 】'}
-${(currentCaseData.knownFacts || []).map((f, i) => `  ${i + 1}. ${f}`).join('\n')}
-
-${currentLang === 'ua' ? '【 ПРОФІЛЬ ПІДОЗРЮВАНОГО 】' : '【 SUSPECT PROFILE 】'}
-${currentCaseData.suspectProfile || ''}
-
-═══════════════════════════════════════════════════════════════
-${currentLang === 'ua' ? '【 ПРОТОКОЛ ДОПИТУ 】' : '【 INTERROGATION LOG 】'}
-═══════════════════════════════════════════════════════════════
-
-`;
-    
-    // Add conversation
-    GameState.conversationHistory.forEach(msg => {
-        const role = msg.role === 'user' 
-            ? (currentLang === 'ua' ? 'ДЕТЕКТИВ' : 'DETECTIVE')
-            : (currentCaseData.suspectName || (currentLang === 'ua' ? 'ПІДОЗРЮВАНИЙ' : 'SUSPECT'));
-        content += `[${role}]\n${msg.content}\n\n`;
-    });
-    
-    // Add stats
-    content += `
-═══════════════════════════════════════════════════════════════
-${currentLang === 'ua' ? '【 СТАТИСТИКА 】' : '【 STATS 】'}
-═══════════════════════════════════════════════════════════════
-${currentLang === 'ua' ? 'Тиск на підозрюваного' : 'Suspect pressure'}: ${GameState.suspicion}%
-${currentLang === 'ua' ? 'Залишок енергії' : 'Energy remaining'}: ${GameState.energy}/${GameState.maxEnergy}
-${currentLang === 'ua' ? 'Питань задано' : 'Questions asked'}: ${GameState.conversationHistory.filter(m => m.role === 'user').length}
-`;
-
-    // Add truth if game is over
-    if (GameState.gameOver && currentCaseData.truthReveal) {
-        content += `
-═══════════════════════════════════════════════════════════════
-${currentLang === 'ua' ? '【 ПРАВДА 】' : '【 THE TRUTH 】'}
-═══════════════════════════════════════════════════════════════
-${currentCaseData.truthReveal}
-`;
-    }
-    
-    // Add image URL if available
-    if (DOM.suspectImg.src && DOM.suspectImg.src.includes('http')) {
-        content += `
-═══════════════════════════════════════════════════════════════
-${currentLang === 'ua' ? '【 ФОТО ПІДОЗРЮВАНОГО 】' : '【 SUSPECT PHOTO 】'}
-═══════════════════════════════════════════════════════════════
-${DOM.suspectImg.src}
-`;
-    }
-    
-    content += `
-═══════════════════════════════════════════════════════════════
-The Interrogator • AI-Generated Detective Game
-https://sashko1391.github.io/interrogator
-═══════════════════════════════════════════════════════════════
-`;
-    
-    // Create and download file
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `interrogation_${currentCaseData.title?.replace(/[^a-zA-Zа-яА-ЯіІїЇєЄ0-9]/g, '_') || 'case'}_${now.getTime()}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
 }
 
 function goBack() {
@@ -1002,63 +1114,109 @@ function goBack() {
     DOM.exportBtn.style.display = 'none';
     if (!isMuted) DOM.audioBg.pause();
     hideModal();
+    
+    // Clear URL params
+    window.history.replaceState({}, '', window.location.pathname);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════════════════
+function exportTranscript() {
+    if (!currentCaseData) return;
+    
+    const now = new Date();
+    const dateStr = now.toLocaleDateString(currentLang === 'ua' ? 'uk-UA' : 'en-US');
+    
+    let content = `${t('exportTitle')}\n${'═'.repeat(50)}\n`;
+    content += `${currentLang === 'ua' ? 'Справа' : 'Case'}: ${currentCaseData.title}\n`;
+    content += `${currentLang === 'ua' ? 'Код' : 'Code'}: ${currentCaseData.caseId}\n`;
+    content += `${currentLang === 'ua' ? 'Дата' : 'Date'}: ${dateStr}\n\n`;
+    
+    content += `${currentLang === 'ua' ? 'ОБСТАВИНИ' : 'CONTEXT'}\n${'-'.repeat(30)}\n${currentCaseData.crimeDescription}\n\n`;
+    
+    content += `${currentLang === 'ua' ? 'ПІДОЗРЮВАНІ' : 'SUSPECTS'}\n${'-'.repeat(30)}\n`;
+    currentCaseData.suspects.forEach((s, i) => {
+        content += `${i + 1}. ${s.name} (${s.role})\n`;
+    });
+    content += '\n';
+    
+    content += `${currentLang === 'ua' ? 'ДОПИТИ' : 'INTERROGATIONS'}\n${'═'.repeat(50)}\n\n`;
+    
+    currentCaseData.suspects.forEach((suspect, i) => {
+        const state = suspectStates[i];
+        if (state.chatHistory.length > 1) {
+            content += `【 ${suspect.name} 】 (${currentLang === 'ua' ? 'Тиск' : 'Pressure'}: ${state.suspicion}%)\n${'-'.repeat(30)}\n`;
+            state.chatHistory.forEach(msg => {
+                const role = msg.role === 'user' ? (currentLang === 'ua' ? 'Детектив' : 'Detective') : suspect.name;
+                content += `[${role}]: ${msg.content}\n\n`;
+            });
+        }
+    });
+    
+    if (GameState.gameOver) {
+        content += `\n${currentLang === 'ua' ? 'ПРАВДА' : 'TRUTH'}\n${'-'.repeat(30)}\n${currentCaseData.truthReveal}\n`;
+    }
+    
+    content += `\n${'═'.repeat(50)}\nThe Interrogator • https://sashko1391.github.io/interrogator\n`;
+    
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `interrogation_${currentCaseData.caseId}_${Date.now()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 // ═══════════════════════════════════════════════════════════════════════
 // EVENT LISTENERS
 // ═══════════════════════════════════════════════════════════════════════
-DOM.langBtns.forEach(btn => {
-    btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
-});
-
-DOM.catCards.forEach(card => {
-    card.addEventListener('click', () => generateCase(card.dataset.category));
-});
-
+DOM.langBtns.forEach(btn => btn.addEventListener('click', () => setLanguage(btn.dataset.lang)));
+DOM.catCards.forEach(card => card.addEventListener('click', () => generateCase(card.dataset.category)));
 DOM.sendBtn.addEventListener('click', sendMessage);
-DOM.chatInput.addEventListener('keypress', e => {
-    if (e.key === 'Enter') sendMessage();
-});
-
-DOM.briefingToggle.addEventListener('click', () => {
-    DOM.briefingToggle.classList.toggle('active');
-    DOM.briefingContent.classList.toggle('visible');
-});
-
-DOM.accuseBtn.addEventListener('click', handleAccuse);
+DOM.chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+DOM.briefingToggle.addEventListener('click', () => DOM.briefingContent.classList.toggle('visible'));
+DOM.accuseBtn.addEventListener('click', showVerdictModal);
+DOM.shareBtn.addEventListener('click', showShareModal);
 DOM.revealBtn.addEventListener('click', revealAnswer);
-DOM.restartBtn.addEventListener('click', () => {
-    if (currentCaseData) startGame();
-});
-
+DOM.restartBtn.addEventListener('click', () => { if (currentCaseData) startGame(); });
 DOM.exportBtn.addEventListener('click', exportTranscript);
 DOM.modalSaveBtn.addEventListener('click', exportTranscript);
-
 DOM.backBtn.addEventListener('click', goBack);
-DOM.modalBtn.addEventListener('click', () => {
-    hideModal();
-    goBack();
+DOM.modalBtn.addEventListener('click', () => { hideModal(); goBack(); });
+DOM.copyShareBtn.addEventListener('click', () => {
+    DOM.shareUrl.select();
+    document.execCommand('copy');
+    DOM.copyShareBtn.textContent = t('copied');
+    setTimeout(() => DOM.copyShareBtn.innerHTML = '📋 ' + t('copyLink'), 2000);
 });
-
+DOM.closeShareBtn.addEventListener('click', hideShareModal);
+DOM.submitVerdictBtn.addEventListener('click', submitVerdict);
+DOM.cancelVerdictBtn.addEventListener('click', hideVerdictModal);
 DOM.muteBtn.addEventListener('click', () => {
     isMuted = !isMuted;
     updateMuteButton();
-    if (isMuted) {
-        DOM.audioBg.pause();
-        DOM.audioType.pause();
-    } else if (DOM.gameScreen.classList.contains('active')) {
-        DOM.audioBg.play().catch(() => {});
-    }
+    if (isMuted) { DOM.audioBg.pause(); DOM.audioType.pause(); }
+    else if (DOM.gameScreen.classList.contains('active')) DOM.audioBg.play().catch(() => {});
 });
 
 // ═══════════════════════════════════════════════════════════════════════
-// INITIALIZATION
+// INIT
 // ═══════════════════════════════════════════════════════════════════════
 updateMuteButton();
 setLanguage(currentLang);
 
+// Check for shared case in URL
+const urlParams = new URLSearchParams(window.location.search);
+const sharedCaseId = urlParams.get('case');
+if (sharedCaseId) {
+    loadSharedCase(sharedCaseId);
+}
+
 })();
 </script>
-
 </body>
 </html>
