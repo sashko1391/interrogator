@@ -12,7 +12,12 @@
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         html{font-size:20px;scroll-behavior:smooth}
         body{font-family:var(--font-body);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-y:auto;position:relative;}
-        body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.05;pointer-events:none;z-index:1000}
+        body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.03;pointer-events:none;z-index:1000}
+        
+        /* Disable noise on low-power devices */
+        @media (prefers-reduced-motion: reduce) {
+            body::before { display: none; }
+        }
         .bg-fallback{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 20%,rgba(139,41,66,0.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(212,175,55,0.1) 0%,transparent 50%),linear-gradient(180deg,#0a0a0c 0%,#12121a 100%);z-index:-2}
         .bg-image{position:fixed;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;z-index:-1;opacity:0.5;}
         .bg-image.bg-landscape{background-image:url('bg-landscape.jpg');}
@@ -48,6 +53,8 @@
         .category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;width:100%;max-width:750px;padding:0 1rem;margin-bottom:1.5rem;}
         .cat-card{background:rgba(21,21,31,0.9);border:1px solid var(--border-color);border-radius:4px;padding:1.5rem;cursor:pointer;transition:all 0.3s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0.8rem;}
         .cat-card:hover{border-color:var(--accent-gold);transform:translateY(-3px);background:rgba(26,26,36,0.95);box-shadow:0 10px 40px rgba(212,175,55,0.1);}
+        .cat-card--daily{border-color:var(--accent-gold-dim);background:linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(21,21,31,0.9) 100%);}
+        .cat-card--daily:hover{border-color:var(--accent-gold);box-shadow:0 10px 40px rgba(212,175,55,0.2);}
         .cat-icon{font-size:2.5rem;}
         .cat-title{font-family:var(--font-display);font-size:1rem;color:var(--accent-gold);}
         .cat-desc{font-size:0.65rem;color:var(--text-secondary);line-height:1.5;}
@@ -57,6 +64,56 @@
         .donate-notice p{font-size:0.6rem;color:var(--text-muted);margin-bottom:0.8rem;line-height:1.5;}
         .donate-btn{display:inline-block;padding:0.5rem 1.2rem;background:transparent;border:1px solid var(--accent-gold-dim);border-radius:4px;color:var(--accent-gold);font-family:var(--font-mono);font-size:0.6rem;text-decoration:none;transition:all 0.2s;}
         .donate-btn:hover{background:var(--accent-gold-dim);color:var(--bg-primary);}
+        
+        /* Streamer Toggle */
+        .streamer-toggle{display:flex;align-items:center;gap:0.8rem;margin-top:1.5rem;padding:0.8rem 1.2rem;background:rgba(21,21,31,0.6);border:1px dashed var(--border-color);border-radius:4px;}
+        .toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
+        .toggle-switch input{opacity:0;width:0;height:0;}
+        .toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:12px;transition:0.3s;}
+        .toggle-slider::before{position:absolute;content:"";height:18px;width:18px;left:2px;bottom:2px;background:var(--text-muted);border-radius:50%;transition:0.3s;}
+        .toggle-switch input:checked + .toggle-slider{background:var(--accent-red);border-color:var(--accent-red);}
+        .toggle-switch input:checked + .toggle-slider::before{transform:translateX(20px);background:var(--text-primary);}
+        .streamer-label{font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted);}
+        .streamer-active .streamer-label{color:var(--accent-red-bright);}
+        
+        /* Daily badge */
+        .daily-badge{display:inline-block;padding:0.2rem 0.5rem;background:var(--accent-gold);color:var(--bg-primary);font-family:var(--font-mono);font-size:0.45rem;text-transform:uppercase;border-radius:2px;margin-left:0.5rem;animation:pulse 2s infinite;}
+        
+        /* Limits Display */
+        .limits-display{display:flex;gap:1.5rem;justify-content:center;margin-top:1rem;padding:0.8rem 1.2rem;background:rgba(21,21,31,0.6);border:1px solid var(--border-color);border-radius:4px;}
+        .limits-row{display:flex;flex-direction:column;align-items:center;gap:0.2rem;}
+        .limits-label{font-family:var(--font-mono);font-size:0.5rem;color:var(--text-muted);text-transform:uppercase;}
+        .limits-value{font-family:var(--font-display);font-size:1rem;color:var(--accent-gold);}
+        .limits-value.warning{color:var(--accent-red-bright);}
+        .limits-value.premium{color:var(--accent-green-bright);}
+        .limits-premium{font-family:var(--font-mono);font-size:0.55rem;color:var(--accent-green-bright);}
+        
+        /* Premium Section */
+        .premium-section{margin-top:1rem;}
+        .premium-btn{background:linear-gradient(135deg, var(--accent-gold-dim) 0%, var(--accent-gold) 100%);border:none;border-radius:4px;padding:0.8rem 1.5rem;color:var(--bg-primary);font-family:var(--font-mono);font-size:0.65rem;font-weight:600;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 15px rgba(212,175,55,0.3);}
+        .premium-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(212,175,55,0.4);}
+        .premium-btn.active{background:var(--accent-green);box-shadow:0 4px 15px rgba(74,155,106,0.3);}
+        
+        /* Premium Modal */
+        .premium-benefits{text-align:left;margin:1rem 0;padding:1rem;background:var(--bg-tertiary);border-radius:4px;}
+        .benefit-item{font-size:0.7rem;color:var(--text-secondary);margin-bottom:0.5rem;}
+        .benefit-item:last-child{margin-bottom:0;}
+        .donate-btn-large{display:block;padding:1rem 2rem;background:linear-gradient(135deg, var(--accent-gold-dim) 0%, var(--accent-gold) 100%);border:none;border-radius:4px;color:var(--bg-primary);font-family:var(--font-mono);font-size:0.75rem;font-weight:600;text-decoration:none;text-align:center;margin:1rem 0;transition:all 0.3s;}
+        .donate-btn-large:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(212,175,55,0.4);}
+        .premium-note{font-size:0.55rem;color:var(--text-muted);margin-bottom:1rem;}
+        .token-section{border-top:1px solid var(--border-color);padding-top:1rem;margin-top:1rem;}
+        .token-label{font-size:0.6rem;color:var(--text-muted);margin-bottom:0.5rem;}
+        .token-input{width:100%;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:4px;padding:0.8rem;color:var(--text-primary);font-family:var(--font-mono);font-size:0.7rem;text-align:center;text-transform:uppercase;margin-bottom:0.5rem;}
+        .token-btn{width:100%;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:4px;padding:0.6rem;color:var(--text-secondary);font-family:var(--font-mono);font-size:0.6rem;cursor:pointer;transition:all 0.2s;}
+        .token-btn:hover{border-color:var(--accent-gold);color:var(--accent-gold);}
+        .token-error{font-size:0.55rem;color:var(--accent-red-bright);margin-top:0.5rem;min-height:1rem;}
+        .token-success{color:var(--accent-green-bright);}
+        
+        /* Limit Modal */
+        .limit-options{margin:1rem 0;}
+        .or-text{font-size:0.6rem;color:var(--text-muted);margin:0.8rem 0;}
+        .daily-btn{width:100%;background:transparent;border:1px solid var(--accent-gold-dim);border-radius:4px;padding:0.8rem;color:var(--accent-gold);font-family:var(--font-mono);font-size:0.65rem;cursor:pointer;transition:all 0.2s;}
+        .daily-btn:hover{background:var(--accent-gold-dim);color:var(--bg-primary);}
         
         /* Loading Screen */
         .loading-screen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,10,12,0.95);z-index:200;align-items:center;justify-content:center;flex-direction:column;}
@@ -242,6 +299,11 @@
             </div>
             
             <div class="category-grid">
+                <div class="cat-card cat-card--daily" data-category="daily">
+                    <div class="cat-icon">🎯</div>
+                    <div class="cat-title" data-i18n="dailyCase">🎯 Справа дня</div>
+                    <div class="cat-desc" data-i18n="dailyCaseDesc">Та сама справа для всіх. Порівняй результати!</div>
+                </div>
                 <div class="cat-card" data-category="war">
                     <div class="cat-icon">⚔️</div>
                     <div class="cat-title" data-i18n="catWar">Війна</div>
@@ -257,6 +319,30 @@
                     <div class="cat-title" data-i18n="catHollywood">Голлівуд</div>
                     <div class="cat-desc" data-i18n="catHollywoodDesc">90-ті. Зірки, скандали, вбивства.</div>
                 </div>
+            </div>
+            
+            <div class="streamer-toggle">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="streamer-toggle-input">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="streamer-label" data-i18n="streamerMode">🎥 Режим стрімера</span>
+            </div>
+            
+            <div class="limits-display" id="limits-display">
+                <div class="limits-row">
+                    <span class="limits-label" data-i18n="casesLeft">Справ сьогодні</span>
+                    <span class="limits-value" id="cases-left">3/3</span>
+                </div>
+                <div class="limits-row">
+                    <span class="limits-label" data-i18n="questionsLeft">Питань</span>
+                    <span class="limits-value" id="questions-left">50/50</span>
+                </div>
+                <div class="limits-premium" id="premium-status"></div>
+            </div>
+            
+            <div class="premium-section">
+                <button class="premium-btn" id="premium-btn" data-i18n="getPremium">✨ Отримати Premium</button>
             </div>
             
             <div class="donate-notice">
@@ -382,6 +468,63 @@
         </div>
     </div>
     
+    <!-- PREMIUM MODAL -->
+    <div class="modal-overlay" id="premium-modal">
+        <div class="modal-content">
+            <div class="modal-icon">✨</div>
+            <h2 class="modal-title" data-i18n="getPremium">Отримати Premium</h2>
+            
+            <div class="premium-benefits">
+                <div class="benefit-item">✓ <span data-i18n="premiumBenefits">Без лімітів + нові справи</span></div>
+                <div class="benefit-item">✓ Streamer mode</div>
+                <div class="benefit-item">✓ Підтримка розробника 💛</div>
+            </div>
+            
+            <a href="https://www.paypal.com/donate/?hosted_button_id=TXNCFR9CLWNDU" target="_blank" class="donate-btn-large">
+                ☕ <span data-i18n="supportProject">Підтримати проєкт</span>
+            </a>
+            
+            <p class="premium-note">$5 = 7 днів | $10+ = 30 днів</p>
+            
+            <div class="token-section">
+                <p class="token-label" data-i18n="enterToken">Введіть код Premium</p>
+                <input type="text" class="token-input" id="premium-token-input" placeholder="PRO-XXXXXXXXXXXX" maxlength="16">
+                <button class="token-btn" id="activate-token-btn" data-i18n="activate">Активувати</button>
+                <p class="token-error" id="token-error"></p>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="modal-btn-secondary" id="close-premium-btn" data-i18n="close">Закрити</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- LIMIT REACHED MODAL -->
+    <div class="modal-overlay" id="limit-modal">
+        <div class="modal-content">
+            <div class="modal-icon">⏳</div>
+            <h2 class="modal-title" data-i18n="limitReached">Ліміт вичерпано</h2>
+            
+            <p class="modal-text" data-i18n="freeLimit">Безкоштовно: 3 справи / 50 питань на день</p>
+            
+            <div class="limit-options">
+                <a href="https://www.paypal.com/donate/?hosted_button_id=TXNCFR9CLWNDU" target="_blank" class="donate-btn-large">
+                    ✨ <span data-i18n="getPremium">Отримати Premium</span>
+                </a>
+                
+                <p class="or-text" data-i18n="or">або</p>
+                
+                <button class="daily-btn" id="play-daily-btn">
+                    🎯 <span data-i18n="dailyCase">Справа дня</span> (безкоштовно)
+                </button>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="modal-btn-secondary" id="close-limit-btn" data-i18n="close">Закрити</button>
+            </div>
+        </div>
+    </div>
+    
     <audio id="audio-typewriter" src="p_machine.mp3" preload="auto"></audio>
     <audio id="audio-background" src="background.mp3" preload="auto" loop></audio>
 
@@ -395,9 +538,15 @@ let currentSuspectIndex = 0;
 let isMuted = localStorage.getItem('interrogator-muted') === 'true';
 let audioStarted = false;
 let currentLang = localStorage.getItem('interrogator-lang') || 'ua';
+let streamerMode = localStorage.getItem('interrogator-streamer') === 'true';
+let premiumToken = localStorage.getItem('interrogator-premium') || null;
+let userLimits = { maxCases: 3, maxQuestions: 50, casesGenerated: 0, questionsUsed: 0 };
 
 // Per-suspect state
 let suspectStates = [];
+let imageGenerationCooldowns = {}; // Track cooldowns per suspect
+
+const IMAGE_COOLDOWN_MS = 45000; // 45 seconds between image generations per suspect
 
 const i18n = {
     ua: {
@@ -415,9 +564,16 @@ const i18n = {
         catHistoryDesc: "Козаки, УПА, революція.",
         catHollywood: "Голлівуд",
         catHollywoodDesc: "90-ті. Зірки, скандали, вбивства.",
+        dailyCase: "🎯 Справа дня",
+        dailyCaseDesc: "Та сама справа для всіх. Порівняй результати!",
+        streamerMode: "🎥 Режим стрімера",
+        streamerModeOn: "Стрім: ON",
+        streamerModeOff: "Стрім: OFF",
+        unlimitedEnergy: "∞ питань",
         donateText: "Гра використовує платні AI API. Якщо сподобалось — підтримай 💛",
         donateBtn: "☕ Підтримати",
         generating: "Генерую справу з 3 підозрюваними...<br>(20-30 секунд)",
+        loadingDaily: "Завантажую справу дня...",
         questions: "Питань",
         pressure: "Тиск",
         files: "📁 Матеріали справи",
@@ -454,7 +610,28 @@ const i18n = {
         guiltyNone: "❌ Ніхто не винен",
         correct: "Правильно!",
         incorrect: "Неправильно.",
-        exportTitle: "ПРОТОКОЛ ДОПИТУ"
+        exportTitle: "ПРОТОКОЛ ДОПИТУ",
+        statsPlayed: "Зіграли",
+        statsCorrect: "Вгадали",
+        yourResult: "Ти в топ",
+        dailyLabel: "СПРАВА ДНЯ",
+        // Monetization
+        limitReached: "Ліміт вичерпано",
+        casesLeft: "Справ сьогодні",
+        questionsLeft: "Питань",
+        unlimited: "∞",
+        getPremium: "Отримати Premium",
+        premiumActive: "Premium активний",
+        enterToken: "Введіть код Premium",
+        tokenPlaceholder: "PRO-XXXXXXXXXXXX",
+        activate: "Активувати",
+        invalidToken: "Невірний код",
+        tokenActivated: "Premium активовано!",
+        supportProject: "Підтримати проєкт",
+        freeLimit: "Безкоштовно: 3 справи / 50 питань на день",
+        premiumBenefits: "Premium: без лімітів + нові справи",
+        watchAd: "Переглянути рекламу (+1 справа)",
+        or: "або"
     },
     en: {
         title: "The Interrogator",
@@ -471,9 +648,16 @@ const i18n = {
         catHistoryDesc: "Cossacks, UPA, revolution.",
         catHollywood: "Hollywood",
         catHollywoodDesc: "90s. Stars, scandals, murders.",
+        dailyCase: "🎯 Daily Case",
+        dailyCaseDesc: "Same case for everyone. Compare your results!",
+        streamerMode: "🎥 Streamer Mode",
+        streamerModeOn: "Stream: ON",
+        streamerModeOff: "Stream: OFF",
+        unlimitedEnergy: "∞ questions",
         donateText: "This game uses paid AI APIs. If you enjoyed it — support us 💛",
         donateBtn: "☕ Support",
         generating: "Generating case with 3 suspects...<br>(20-30 seconds)",
+        loadingDaily: "Loading daily case...",
         questions: "Questions",
         pressure: "Pressure",
         files: "📁 Case Files",
@@ -510,7 +694,28 @@ const i18n = {
         guiltyNone: "❌ Nobody guilty",
         correct: "Correct!",
         incorrect: "Incorrect.",
-        exportTitle: "INTERROGATION TRANSCRIPT"
+        exportTitle: "INTERROGATION TRANSCRIPT",
+        statsPlayed: "Played",
+        statsCorrect: "Correct",
+        yourResult: "You're in top",
+        dailyLabel: "DAILY CASE",
+        // Monetization
+        limitReached: "Limit reached",
+        casesLeft: "Cases today",
+        questionsLeft: "Questions",
+        unlimited: "∞",
+        getPremium: "Get Premium",
+        premiumActive: "Premium active",
+        enterToken: "Enter Premium code",
+        tokenPlaceholder: "PRO-XXXXXXXXXXXX",
+        activate: "Activate",
+        invalidToken: "Invalid code",
+        tokenActivated: "Premium activated!",
+        supportProject: "Support project",
+        freeLimit: "Free: 3 cases / 50 questions per day",
+        premiumBenefits: "Premium: no limits + fresh cases",
+        watchAd: "Watch ad (+1 case)",
+        or: "or"
     }
 };
 
@@ -518,9 +723,11 @@ const GameState = {
     energy: 15,
     maxEnergy: 15,
     gameOver: false,
+    isDaily: false,
     
     reset() {
-        this.energy = 15;
+        this.energy = streamerMode ? 999 : 15;
+        this.maxEnergy = streamerMode ? 999 : 15;
         this.gameOver = false;
     }
 };
@@ -570,7 +777,23 @@ const DOM = {
     muteBtn: document.getElementById('mute-btn'),
     audioBg: document.getElementById('audio-background'),
     audioType: document.getElementById('audio-typewriter'),
-    langBtns: document.querySelectorAll('.lang-btn')
+    langBtns: document.querySelectorAll('.lang-btn'),
+    streamerToggle: document.getElementById('streamer-toggle-input'),
+    loadingText: document.querySelector('.loading-text'),
+    // Monetization
+    limitsDisplay: document.getElementById('limits-display'),
+    casesLeft: document.getElementById('cases-left'),
+    questionsLeft: document.getElementById('questions-left'),
+    premiumStatus: document.getElementById('premium-status'),
+    premiumBtn: document.getElementById('premium-btn'),
+    premiumModal: document.getElementById('premium-modal'),
+    premiumTokenInput: document.getElementById('premium-token-input'),
+    activateTokenBtn: document.getElementById('activate-token-btn'),
+    tokenError: document.getElementById('token-error'),
+    closePremiumBtn: document.getElementById('close-premium-btn'),
+    limitModal: document.getElementById('limit-modal'),
+    closeLimitBtn: document.getElementById('close-limit-btn'),
+    playDailyBtn: document.getElementById('play-daily-btn')
 };
 
 function t(key) { return i18n[currentLang][key] || i18n['en'][key] || key; }
@@ -604,8 +827,9 @@ function startAudio() {
 }
 
 function updateUI() {
-    DOM.energyCurrent.textContent = GameState.energy;
-    DOM.energyCurrent.style.color = GameState.energy <= 3 ? 'var(--accent-red-bright)' : 'var(--accent-gold)';
+    // Show infinity or number
+    DOM.energyCurrent.textContent = streamerMode ? '∞' : GameState.energy;
+    DOM.energyCurrent.style.color = (!streamerMode && GameState.energy <= 3) ? 'var(--accent-red-bright)' : 'var(--accent-gold)';
     
     // Calculate average suspicion
     const avgSuspicion = suspectStates.length > 0 
@@ -614,9 +838,16 @@ function updateUI() {
     DOM.suspicionBar.style.width = avgSuspicion + '%';
     DOM.suspicionText.textContent = avgSuspicion + '%';
     
-    DOM.sendBtn.disabled = GameState.gameOver || GameState.energy <= 0;
-    DOM.chatInput.disabled = GameState.gameOver || GameState.energy <= 0;
+    DOM.sendBtn.disabled = GameState.gameOver || (!streamerMode && GameState.energy <= 0);
+    DOM.chatInput.disabled = GameState.gameOver || (!streamerMode && GameState.energy <= 0);
     DOM.accuseBtn.disabled = GameState.gameOver;
+    
+    // Hide guilty hint in streamer mode
+    if (streamerMode && DOM.guiltyHint) {
+        DOM.guiltyHint.style.display = 'none';
+    } else if (DOM.guiltyHint) {
+        DOM.guiltyHint.style.display = '';
+    }
 }
 
 function getEmotionalState(suspicion) {
@@ -644,9 +875,29 @@ async function generateSuspectImage(suspectIndex) {
     if (!suspect?.visualPrompt) return;
     
     const emotionalState = getEmotionalState(state.suspicion);
+    
+    // Skip if same state and already have image
     if (emotionalState === state.lastImageState && state.imageUrl) return;
     
+    // Check cooldown
+    const now = Date.now();
+    const cooldownKey = `${suspectIndex}-${emotionalState}`;
+    if (imageGenerationCooldowns[cooldownKey] && now - imageGenerationCooldowns[cooldownKey] < IMAGE_COOLDOWN_MS) {
+        return; // Still on cooldown
+    }
+    
+    // Also check if we already have this state cached
+    const cacheKey = `img-${suspectIndex}-${emotionalState}`;
+    if (state[cacheKey]) {
+        // Use cached image
+        state.imageUrl = state[cacheKey];
+        state.lastImageState = emotionalState;
+        updateSuspectImageUI(suspectIndex, state.imageUrl);
+        return;
+    }
+    
     state.lastImageState = emotionalState;
+    imageGenerationCooldowns[cooldownKey] = now;
     
     // Show loader
     const panel = document.querySelector(`.suspect-panel[data-index="${suspectIndex}"]`);
@@ -672,29 +923,40 @@ async function generateSuspectImage(suspectIndex) {
         
         if (data.imageUrl) {
             state.imageUrl = data.imageUrl;
+            // Cache by emotional state
+            const cacheKey = `img-${suspectIndex}-${emotionalState}`;
+            state[cacheKey] = data.imageUrl;
             
             const img = new Image();
             img.onload = () => {
-                if (panel) {
-                    panel.querySelector('.suspect-image').src = data.imageUrl;
-                    panel.querySelector('.suspect-image').style.display = 'block';
-                    panel.querySelector('.loader-mini').style.display = 'none';
-                }
-                if (tabImg) {
-                    const tabImgEl = tabImg.querySelector('img');
-                    if (tabImgEl) {
-                        tabImgEl.src = data.imageUrl;
-                        tabImgEl.style.display = 'block';
-                    }
-                    const tabLoader = tabImg.querySelector('.loader-mini');
-                    if (tabLoader) tabLoader.style.display = 'none';
-                }
+                updateSuspectImageUI(suspectIndex, data.imageUrl);
             };
             img.src = data.imageUrl;
         }
     } catch (e) {
         console.error('Image Error:', e);
         if (panel) panel.querySelector('.loader-mini').style.display = 'none';
+    }
+}
+
+// Helper to update image UI
+function updateSuspectImageUI(suspectIndex, imageUrl) {
+    const panel = document.querySelector(`.suspect-panel[data-index="${suspectIndex}"]`);
+    const tabImg = document.querySelector(`.suspect-tab[data-index="${suspectIndex}"] .suspect-tab-img`);
+    
+    if (panel) {
+        panel.querySelector('.suspect-image').src = imageUrl;
+        panel.querySelector('.suspect-image').style.display = 'block';
+        panel.querySelector('.loader-mini').style.display = 'none';
+    }
+    if (tabImg) {
+        const tabImgEl = tabImg.querySelector('img');
+        if (tabImgEl) {
+            tabImgEl.src = imageUrl;
+            tabImgEl.style.display = 'block';
+        }
+        const tabLoader = tabImg.querySelector('.loader-mini');
+        if (tabLoader) tabLoader.style.display = 'none';
     }
 }
 
@@ -794,13 +1056,14 @@ function selectSuspect(index) {
 // SEND MESSAGE
 // ═══════════════════════════════════════════════════════════════════════
 async function sendMessage() {
-    if (GameState.gameOver || GameState.energy <= 0) return;
+    if (GameState.gameOver) return;
+    if (!streamerMode && GameState.energy <= 0) return;
     
     const text = DOM.chatInput.value.trim();
     if (!text) return;
     
     DOM.chatInput.value = '';
-    GameState.energy--;
+    if (!streamerMode) GameState.energy--;
     updateUI();
     
     const suspect = currentCaseData.suspects[currentSuspectIndex];
@@ -819,6 +1082,8 @@ CURRENT STATE:
 - Suspicion/Nervousness Level: ${state.suspicion}%
 - Questions remaining: ${GameState.energy}
 
+LANGUAGE: Respond ONLY in ${currentLang === 'ua' ? 'UKRAINIAN' : 'ENGLISH'}. All text, actions, emotions must be in ${currentLang === 'ua' ? 'Ukrainian' : 'English'}. ${currentLang === 'ua' ? 'Використовуй *зірочки* для дій українською.' : 'Use *asterisks* for actions in English.'}
+
 CRITICAL: At the end of EVERY response, append this hidden tag with current nervousness (0-100):
 <<<NERVOUSNESS: [number]>>>
 
@@ -830,9 +1095,23 @@ The number should increase if the detective asks probing questions about your li
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 system: systemPrompt,
-                messages: state.chatHistory
+                messages: state.chatHistory,
+                premiumToken: premiumToken,
+                isDaily: GameState.isDaily
             })
         });
+        
+        // Handle limit errors
+        if (response.status === 429) {
+            const errData = await response.json().catch(() => ({}));
+            if (errData.error === 'question_limit') {
+                hideTyping();
+                addMsg('⏳ ' + t('limitReached'), 'system');
+                DOM.sendBtn.disabled = true;
+                DOM.chatInput.disabled = true;
+                return;
+            }
+        }
         
         const data = await response.json();
         let reply = data.content?.[0]?.text || '*мовчить*';
@@ -841,7 +1120,10 @@ The number should increase if the detective asks probing questions about your li
         const match = reply.match(/<<<NERVOUSNESS:\s*(\d+)>>>/);
         if (match) {
             const oldState = getEmotionalState(state.suspicion);
-            state.suspicion = Math.min(100, Math.max(state.suspicion, parseInt(match[1])));
+            // Validate and clamp nervousness value
+            const parsed = Math.min(100, Math.max(0, parseInt(match[1]) || 0));
+            // Only increase, never decrease
+            state.suspicion = Math.max(state.suspicion, parsed);
             reply = reply.replace(match[0], '').trim();
             
             const newState = getEmotionalState(state.suspicion);
@@ -867,7 +1149,7 @@ The number should increase if the detective asks probing questions about your li
     DOM.chatInput.disabled = false;
     DOM.chatInput.focus();
     
-    if (GameState.energy <= 0) {
+    if (!streamerMode && GameState.energy <= 0) {
         setTimeout(() => showResultModal('lose', currentLang === 'ua' ? 'Питання закінчились.' : 'Out of questions.'), 1000);
     }
 }
@@ -876,23 +1158,65 @@ The number should increase if the detective asks probing questions about your li
 // GENERATE CASE
 // ═══════════════════════════════════════════════════════════════════════
 async function generateCase(category) {
+    // Check limits for non-daily, non-premium
+    if (category !== 'daily' && !premiumToken) {
+        const casesRemaining = userLimits.maxCases - userLimits.casesGenerated;
+        if (casesRemaining <= 0) {
+            showLimitModal();
+            return;
+        }
+    }
+    
     startAudio();
     DOM.startScreen.classList.add('hidden');
     DOM.loadingScreen.classList.add('visible');
     
+    // Update loading text based on category
+    if (DOM.loadingText) {
+        DOM.loadingText.innerHTML = category === 'daily' ? t('loadingDaily') : t('generating');
+    }
+    
     try {
-        const response = await fetch(API_ENDPOINT + '/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ category, lang: currentLang })
-        });
+        let response;
+        
+        if (category === 'daily') {
+            // Fetch daily case
+            response = await fetch(API_ENDPOINT + '/daily?lang=' + currentLang);
+        } else {
+            response = await fetch(API_ENDPOINT + '/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    category, 
+                    lang: currentLang,
+                    premiumToken: premiumToken
+                })
+            });
+        }
         
         if (!response.ok) {
             const errData = await response.json().catch(() => ({}));
+            
+            // Handle limit errors
+            if (errData.error === 'daily_limit') {
+                DOM.loadingScreen.classList.remove('visible');
+                DOM.startScreen.classList.remove('hidden');
+                showLimitModal();
+                return;
+            }
+            
             throw new Error(errData.error || `HTTP ${response.status}`);
         }
         
         currentCaseData = await response.json();
+        GameState.isDaily = currentCaseData.isDaily || category === 'daily';
+        
+        // Update local limits
+        if (!premiumToken && category !== 'daily') {
+            userLimits.casesGenerated++;
+            updateLimitsDisplay();
+        }
+        
         startGame();
     } catch (e) {
         console.error('Generate Error:', e);
@@ -934,6 +1258,7 @@ function startGame() {
     DOM.exportBtn.style.display = 'flex';
     
     GameState.reset();
+    imageGenerationCooldowns = {}; // Reset cooldowns
     
     // Initialize suspect states
     suspectStates = currentCaseData.suspects.map(s => ({
@@ -944,7 +1269,8 @@ function startGame() {
     }));
     
     // Fill case info
-    DOM.gameTitle.textContent = currentCaseData.title || 'Case #???';
+    const dailyBadge = GameState.isDaily ? `<span class="daily-badge">${t('dailyLabel')}</span>` : '';
+    DOM.gameTitle.innerHTML = (currentCaseData.title || 'Case #???') + dailyBadge;
     DOM.caseId.textContent = currentCaseData.caseId || '???';
     DOM.caseDescription.textContent = currentCaseData.crimeDescription || '';
     DOM.caseEvidence.innerHTML = (currentCaseData.knownFacts || []).map(f => `<li>${f}</li>`).join('');
@@ -1067,7 +1393,7 @@ function hideVerdictModal() {
     DOM.verdictModal.classList.remove('visible');
 }
 
-function submitVerdict() {
+async function submitVerdict() {
     const checked = Array.from(DOM.verdictCheckboxes.querySelectorAll('input:checked')).map(cb => parseInt(cb.value));
     
     // Get actual guilty suspects
@@ -1081,11 +1407,40 @@ function submitVerdict() {
     
     hideVerdictModal();
     
+    // Submit stats to backend
+    let statsText = '';
+    try {
+        const statsResponse = await fetch(API_ENDPOINT + '/verdict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                caseId: currentCaseData.caseId,
+                isCorrect: isCorrect
+            })
+        });
+        
+        if (statsResponse.ok) {
+            const stats = await statsResponse.json();
+            if (stats.played > 1) {
+                const yourPercentile = isCorrect 
+                    ? Math.round((1 - (stats.correct / stats.played)) * 100)
+                    : Math.round((stats.correct / stats.played) * 100);
+                
+                statsText = `\n\n📊 ${t('statsPlayed')}: ${stats.played} | ${t('statsCorrect')}: ${stats.percentCorrect}%`;
+                if (isCorrect) {
+                    statsText += `\n🏆 ${t('yourResult')} ${Math.max(1, yourPercentile)}%!`;
+                }
+            }
+        }
+    } catch (e) {
+        console.error('Stats error:', e);
+    }
+    
     if (isCorrect) {
-        showResultModal('win', t('correct'));
+        showResultModal('win', t('correct') + statsText);
     } else {
         const guiltyNames = actualGuilty.map(i => currentCaseData.suspects[i].name).join(', ');
-        showResultModal('lose', t('incorrect') + ' ' + (currentLang === 'ua' ? 'Винні: ' : 'Guilty: ') + (guiltyNames || (currentLang === 'ua' ? 'Ніхто' : 'Nobody')));
+        showResultModal('lose', t('incorrect') + ' ' + (currentLang === 'ua' ? 'Винні: ' : 'Guilty: ') + (guiltyNames || (currentLang === 'ua' ? 'Ніхто' : 'Nobody')) + statsText);
     }
 }
 
@@ -1172,12 +1527,116 @@ function exportTranscript() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// MONETIZATION FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════
+
+async function fetchUserLimits() {
+    try {
+        const response = await fetch(API_ENDPOINT + '/limits');
+        if (response.ok) {
+            userLimits = await response.json();
+            updateLimitsDisplay();
+        }
+    } catch (e) {
+        console.error('Failed to fetch limits:', e);
+    }
+}
+
+function updateLimitsDisplay() {
+    if (!DOM.casesLeft || !DOM.questionsLeft) return;
+    
+    const isPremium = !!premiumToken;
+    
+    if (isPremium) {
+        DOM.casesLeft.textContent = t('unlimited');
+        DOM.casesLeft.classList.add('premium');
+        DOM.casesLeft.classList.remove('warning');
+        DOM.questionsLeft.textContent = t('unlimited');
+        DOM.questionsLeft.classList.add('premium');
+        DOM.premiumStatus.textContent = '✨ ' + t('premiumActive');
+        DOM.premiumBtn.textContent = '✨ ' + t('premiumActive');
+        DOM.premiumBtn.classList.add('active');
+    } else {
+        const casesRemaining = Math.max(0, userLimits.maxCases - userLimits.casesGenerated);
+        const questionsRemaining = Math.max(0, userLimits.maxQuestions - userLimits.questionsUsed);
+        
+        DOM.casesLeft.textContent = `${casesRemaining}/${userLimits.maxCases}`;
+        DOM.casesLeft.classList.toggle('warning', casesRemaining === 0);
+        DOM.casesLeft.classList.remove('premium');
+        
+        DOM.questionsLeft.textContent = `${questionsRemaining}/${userLimits.maxQuestions}`;
+        DOM.questionsLeft.classList.toggle('warning', questionsRemaining <= 10);
+        DOM.questionsLeft.classList.remove('premium');
+        
+        DOM.premiumStatus.textContent = '';
+        DOM.premiumBtn.textContent = '✨ ' + t('getPremium');
+        DOM.premiumBtn.classList.remove('active');
+    }
+}
+
+function showPremiumModal() {
+    DOM.premiumModal.classList.add('visible');
+    DOM.tokenError.textContent = '';
+    DOM.premiumTokenInput.value = '';
+}
+
+function hidePremiumModal() {
+    DOM.premiumModal.classList.remove('visible');
+}
+
+function showLimitModal() {
+    DOM.limitModal.classList.add('visible');
+}
+
+function hideLimitModal() {
+    DOM.limitModal.classList.remove('visible');
+}
+
+async function activatePremiumToken() {
+    const token = DOM.premiumTokenInput.value.trim().toUpperCase();
+    
+    if (!token || !token.startsWith('PRO-') || token.length < 12) {
+        DOM.tokenError.textContent = t('invalidToken');
+        DOM.tokenError.classList.remove('token-success');
+        return;
+    }
+    
+    try {
+        const response = await fetch(API_ENDPOINT + '/validate-premium', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token })
+        });
+        
+        const data = await response.json();
+        
+        if (data.valid) {
+            premiumToken = token;
+            localStorage.setItem('interrogator-premium', token);
+            DOM.tokenError.textContent = t('tokenActivated');
+            DOM.tokenError.classList.add('token-success');
+            updateLimitsDisplay();
+            
+            setTimeout(() => {
+                hidePremiumModal();
+            }, 1500);
+        } else {
+            DOM.tokenError.textContent = t('invalidToken');
+            DOM.tokenError.classList.remove('token-success');
+        }
+    } catch (e) {
+        DOM.tokenError.textContent = t('invalidToken');
+        DOM.tokenError.classList.remove('token-success');
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // EVENT LISTENERS
 // ═══════════════════════════════════════════════════════════════════════
 DOM.langBtns.forEach(btn => btn.addEventListener('click', () => setLanguage(btn.dataset.lang)));
 DOM.catCards.forEach(card => card.addEventListener('click', () => generateCase(card.dataset.category)));
 DOM.sendBtn.addEventListener('click', sendMessage);
-DOM.chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+DOM.chatInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
 DOM.briefingToggle.addEventListener('click', () => DOM.briefingContent.classList.toggle('visible'));
 DOM.accuseBtn.addEventListener('click', showVerdictModal);
 DOM.shareBtn.addEventListener('click', showShareModal);
@@ -1187,10 +1646,16 @@ DOM.exportBtn.addEventListener('click', exportTranscript);
 DOM.modalSaveBtn.addEventListener('click', exportTranscript);
 DOM.backBtn.addEventListener('click', goBack);
 DOM.modalBtn.addEventListener('click', () => { hideModal(); goBack(); });
-DOM.copyShareBtn.addEventListener('click', () => {
-    DOM.shareUrl.select();
-    document.execCommand('copy');
-    DOM.copyShareBtn.textContent = t('copied');
+DOM.copyShareBtn.addEventListener('click', async () => {
+    try {
+        await navigator.clipboard.writeText(DOM.shareUrl.value);
+        DOM.copyShareBtn.textContent = t('copied');
+    } catch (e) {
+        // Fallback for older browsers
+        DOM.shareUrl.select();
+        document.execCommand('copy');
+        DOM.copyShareBtn.textContent = t('copied');
+    }
     setTimeout(() => DOM.copyShareBtn.innerHTML = '📋 ' + t('copyLink'), 2000);
 });
 DOM.closeShareBtn.addEventListener('click', hideShareModal);
@@ -1203,11 +1668,50 @@ DOM.muteBtn.addEventListener('click', () => {
     else if (DOM.gameScreen.classList.contains('active')) DOM.audioBg.play().catch(() => {});
 });
 
+// Streamer mode toggle
+if (DOM.streamerToggle) {
+    DOM.streamerToggle.checked = streamerMode;
+    DOM.streamerToggle.parentElement.parentElement.classList.toggle('streamer-active', streamerMode);
+    
+    DOM.streamerToggle.addEventListener('change', () => {
+        streamerMode = DOM.streamerToggle.checked;
+        localStorage.setItem('interrogator-streamer', streamerMode);
+        DOM.streamerToggle.parentElement.parentElement.classList.toggle('streamer-active', streamerMode);
+    });
+}
+
+// Premium/Monetization
+if (DOM.premiumBtn) {
+    DOM.premiumBtn.addEventListener('click', showPremiumModal);
+}
+if (DOM.closePremiumBtn) {
+    DOM.closePremiumBtn.addEventListener('click', hidePremiumModal);
+}
+if (DOM.activateTokenBtn) {
+    DOM.activateTokenBtn.addEventListener('click', activatePremiumToken);
+}
+if (DOM.premiumTokenInput) {
+    DOM.premiumTokenInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') activatePremiumToken();
+    });
+}
+if (DOM.closeLimitBtn) {
+    DOM.closeLimitBtn.addEventListener('click', hideLimitModal);
+}
+if (DOM.playDailyBtn) {
+    DOM.playDailyBtn.addEventListener('click', () => {
+        hideLimitModal();
+        generateCase('daily');
+    });
+}
+
 // ═══════════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════════
 updateMuteButton();
 setLanguage(currentLang);
+fetchUserLimits();
+updateLimitsDisplay();
 
 // Check for shared case in URL
 const urlParams = new URLSearchParams(window.location.search);
