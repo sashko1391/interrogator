@@ -34,10 +34,10 @@
         .icon-btn{background:rgba(18,18,26,0.9);border:1px solid var(--border-color);color:var(--text-muted);padding:0.6rem;font-family:var(--font-mono);font-size:0.8rem;cursor:pointer;border-radius:4px;min-width:40px;display:flex;align-items:center;justify-content:center;}
         .icon-btn:hover{border-color:var(--accent-gold);}
         
-        .lang-btn{border-radius:0;border-right:none;}
-        .lang-btn:first-child{border-radius:4px 0 0 4px;}
-        .lang-btn:last-child{border-radius:0 4px 4px 0;border-right:1px solid var(--border-color);}
-        .lang-btn.active{background:var(--accent-gold-dim);color:var(--bg-primary);border-color:var(--accent-gold-dim);}
+        .lang-btn{background:rgba(18,18,26,0.9);border:1px solid var(--border-color);color:var(--text-muted);padding:0.6rem;font-family:var(--font-mono);font-size:0.8rem;cursor:pointer;min-width:40px;}
+        .lang-btn:first-child{border-radius:4px 0 0 4px; border-right: none;}
+        .lang-btn:last-child{border-radius:0 4px 4px 0; border-left: 1px solid var(--border-color);}
+        .lang-btn.active{background:var(--accent-gold-dim);color:var(--bg-primary);border-color:var(--accent-gold-dim);font-weight:bold;}
         
         .start-screen{min-height:100vh;width:100%;display:flex;flex-direction:column;position:absolute;top:0;left:0;z-index:100;background:transparent;}
         .start-screen.hidden{display:none}
@@ -125,8 +125,8 @@
     <div class="bg-image bg-landscape"></div>
 
     <div class="lang-switcher">
-        <button class="icon-btn lang-btn active" data-lang="ua">UA</button>
-        <button class="icon-btn lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn active" data-lang="ua">UA</button>
+        <button class="lang-btn" data-lang="en">EN</button>
     </div>
 
     <div class="top-controls-left">
@@ -149,7 +149,7 @@
                 <div class="cat-card" data-category="history">
                     <div class="cat-icon">📜</div>
                     <div class="cat-title" data-i18n="catHistory">History</div>
-                    <div class="cat-desc" data-i18n="catHistoryDesc">Історія України. Козаки, підпілля.</div>
+                    <div class="cat-desc" data-i18n="catHistoryDesc">Історія України. Козаки, УПА, підпілля.</div>
                 </div>
                 <div class="cat-card" data-category="hollywood">
                     <div class="cat-icon">🎬</div>
@@ -314,7 +314,7 @@ function t(key) { return i18n[currentLang][key] || key; }
 
 function updateTexts() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
-        el.innerHTML = t(el.dataset.i18n); // innerHTML to support <br>
+        el.innerHTML = t(el.dataset.i18n); 
     });
     DOM.chatInput.placeholder = t('prompt');
 }
@@ -327,7 +327,7 @@ async function generateCase(category) {
     try {
         const r = await fetch(API_ENDPOINT + '/generate', {
             method: 'POST',
-            body: JSON.stringify({ category: category, lang: currentLang }) // Передаємо мову
+            body: JSON.stringify({ category: category, lang: currentLang }) 
         });
         
         if (!r.ok) {
@@ -456,8 +456,7 @@ async function sendMessage() {
 async function handleAccuse() {
     if(GameState.gameOver) return;
     
-    // Simple prompt for now, logic inside AI
-    const choice = confirm("Ви впевнені у звинуваченні? (OK - так, Cancel - ні)");
+    const choice = confirm(currentLang==='ua'?"Ви впевнені у звинуваченні?":"Are you sure about the verdict?");
     if(!choice) return;
     
     addMsg("⏳ ...", 'system');
